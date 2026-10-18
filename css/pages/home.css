@@ -1,0 +1,224 @@
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--espaco-6);
+  align-items: center;
+  padding: var(--espaco-7);
+  background: var(--cor-roxo);
+  color: var(--cor-branco);
+  border: 0;
+  box-shadow: var(--sombra-md);
+}
+
+/* Duas formas decorativas discretas */
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero::before {
+  top: -6rem;
+  right: -4rem;
+  width: 14rem;
+  height: 14rem;
+  background: var(--cor-coral);
+}
+
+.hero::after {
+  bottom: -2.5rem;
+  left: -1.5rem;
+  width: 5rem;
+  height: 5rem;
+  background: var(--cor-amarelo);
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__saudacao {
+  margin-bottom: var(--espaco-2);
+  font-weight: 700;
+  color: var(--cor-amarelo);
+}
+
+.hero__titulo {
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.hero__descricao {
+  max-width: 32rem;
+  margin-top: var(--espaco-3);
+  font-size: 1.1rem;
+  color: #F1ECFF;
+}
+
+.hero__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-5);
+}
+
+.hero .botao--texto {
+  color: var(--cor-branco);
+}
+
+/* ---------- Painel de nível ---------- */
+.nivel {
+  padding: var(--espaco-5);
+  background: var(--cor-roxo-escuro);
+  border-radius: var(--raio-lg);
+}
+
+.nivel__topo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-4);
+  margin-bottom: var(--espaco-4);
+}
+
+.nivel__emblema {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 50%;
+  background: var(--cor-amarelo);
+  color: var(--cor-roxo-escuro);
+  font-family: var(--fonte-titulo);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.nivel__rotulo {
+  font-size: 0.85rem;
+  color: #D9D0F2;
+}
+
+.nivel__titulo {
+  font-family: var(--fonte-titulo);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.nivel .barra {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nivel .barra__preenchimento {
+  background: var(--cor-amarelo);
+}
+
+.nivel__xp {
+  margin-top: var(--espaco-3);
+  font-weight: 700;
+}
+
+.nivel__total {
+  font-size: 0.875rem;
+  color: #D9D0F2;
+}
+
+/* ---------- Desafio diário ---------- */
+.desafio__data {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.desafio__descricao {
+  margin: var(--espaco-2) 0 var(--espaco-5);
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Missões ---------- */
+.missao__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-2);
+}
+
+.missao__progresso {
+  margin-top: var(--espaco-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cor-texto-suave);
+}
+
+.item--missao {
+  display: block;
+}
+
+/* ---------- Categorias ---------- */
+.grid-categorias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--espaco-4);
+}
+
+.card-categoria {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+}
+
+.card-categoria__nome {
+  margin-top: var(--espaco-2);
+  font-size: 1.1rem;
+}
+
+.card-categoria__descricao {
+  flex: 1;
+  font-size: 0.925rem;
+  color: var(--cor-texto-suave);
+}
+
+.card-categoria__meta {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cor-roxo);
+}
+
+/* ---------- Estatísticas ---------- */
+.grid-estatisticas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--espaco-4);
+}
+
+.estatistica {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-1);
+}
+
+.estatistica .icone-caixa {
+  margin-bottom: var(--espaco-2);
+}
+
+.estatistica__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.estatistica__rotulo {
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
