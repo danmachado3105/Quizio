@@ -1,0 +1,264 @@
+:root {
+  /* Versões mais escuras de acerto/erro para texto com bom contraste */
+  --cor-acerto-texto: #1B6B45;
+  --cor-erro-texto: #A8323B;
+}
+
+.jogo-pagina {
+  width: min(100% - 2rem, 46rem);
+}
+
+.jogo {
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.jogo__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+}
+
+.jogo__status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--espaco-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  background: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pilula);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.chip--ativo {
+  background: var(--cor-amarelo-claro);
+  border-color: var(--cor-amarelo);
+}
+
+.jogo__contador {
+  margin-bottom: var(--espaco-2);
+  font-weight: 700;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Pergunta ---------- */
+.pergunta {
+  padding: var(--espaco-6);
+}
+
+.pergunta__marcas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+  margin-bottom: var(--espaco-4);
+}
+
+.pergunta__enunciado {
+  margin-bottom: var(--espaco-5);
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.3;
+  outline: none;
+}
+
+/* ---------- Alternativas ---------- */
+.alternativas {
+  display: grid;
+  gap: var(--espaco-3);
+}
+
+.alternativa {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  font-size: 1.02rem;
+  font-weight: 500;
+  text-align: left;
+  transition: border-color var(--transicao-rapida), background-color var(--transicao-rapida),
+    transform var(--transicao-rapida), opacity var(--transicao-rapida);
+}
+
+.alternativa:hover:not(:disabled) {
+  border-color: var(--cor-roxo);
+  background: #F7F4FF;
+  transform: translateX(3px);
+}
+
+.alternativa:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.alternativa:disabled {
+  cursor: default;
+}
+
+.alternativa__letra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--cor-roxo-claro);
+  color: var(--cor-roxo-profundo);
+  font-family: var(--fonte-titulo);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.alternativa__texto {
+  flex: 1;
+}
+
+.alternativa__estado {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.alternativa--correta {
+  border-color: var(--cor-acerto);
+  background: var(--cor-acerto-claro);
+}
+
+.alternativa--correta .alternativa__letra {
+  background: var(--cor-acerto-texto);
+  color: var(--cor-branco);
+}
+
+.alternativa--correta .alternativa__estado {
+  color: var(--cor-acerto-texto);
+}
+
+.alternativa--incorreta {
+  border-color: var(--cor-erro);
+  background: var(--cor-erro-claro);
+  animation: tremer 0.35s ease;
+}
+
+.alternativa--incorreta .alternativa__letra {
+  background: var(--cor-erro-texto);
+  color: var(--cor-branco);
+}
+
+.alternativa--incorreta .alternativa__estado {
+  color: var(--cor-erro-texto);
+}
+
+.alternativa--neutra {
+  opacity: 0.55;
+}
+
+/* ---------- Feedback ---------- */
+.feedback {
+  margin-top: var(--espaco-5);
+  padding: var(--espaco-4) var(--espaco-5);
+  border-left: 6px solid;
+  border-radius: var(--raio-md);
+  animation: surgir 0.3s ease;
+}
+
+.feedback--acerto {
+  background: var(--cor-acerto-claro);
+  border-color: var(--cor-acerto);
+}
+
+.feedback--erro {
+  background: var(--cor-erro-claro);
+  border-color: var(--cor-erro);
+}
+
+.feedback__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.feedback--acerto .feedback__titulo {
+  color: var(--cor-acerto-texto);
+}
+
+.feedback--erro .feedback__titulo {
+  color: var(--cor-erro-texto);
+}
+
+.feedback__detalhe {
+  margin-top: var(--espaco-1);
+  font-weight: 700;
+}
+
+.feedback__explicacao {
+  margin-top: var(--espaco-2);
+}
+
+.feedback__acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--espaco-4);
+}
+
+.jogo__dica {
+  margin-top: var(--espaco-4);
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Sem partida ---------- */
+.sem-partida__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+}
+
+@keyframes tremer {
+  0%, 100% { transform: none; }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 36rem) {
+  .jogo-pagina {
+    width: min(100% - 1.5rem, 46rem);
+  }
+
+  .pergunta {
+    padding: var(--espaco-4);
+  }
+
+  .feedback {
+    padding: var(--espaco-4);
+  }
+
+  .feedback__acoes .botao {
+    width: 100%;
+  }
+}
+
+/* A dica de teclado não faz sentido em telas de toque */
+@media (hover: none) {
+  .jogo__dica {
+    display: none;
+  }
+}

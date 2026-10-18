@@ -1,0 +1,221 @@
+.pagina__cabecalho {
+  max-width: 40rem;
+}
+
+.pagina__titulo {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+}
+
+.pagina__descricao {
+  margin-top: var(--espaco-2);
+  font-size: 1.1rem;
+}
+
+/* Categorias à esquerda, configuração à direita */
+.configurador {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22rem;
+  gap: var(--espaco-6);
+  align-items: start;
+}
+
+.configurador__painel {
+  position: sticky;
+  top: 5.75rem;
+  display: grid;
+  gap: var(--espaco-5);
+}
+
+.grupo {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.grupo__titulo {
+  display: block;
+  padding: 0;
+  margin-bottom: var(--espaco-3);
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.grupo--principal .grupo__titulo {
+  font-size: 1.5rem;
+  margin-bottom: var(--espaco-4);
+}
+
+.grid-opcoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+  gap: var(--espaco-3);
+}
+
+/* ---------- Opções (radios estilizados) ---------- */
+.opcao {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+/* O input cobre a opção inteira, invisível, mas continua acessível por teclado */
+.opcao__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.opcao__input:disabled {
+  cursor: not-allowed;
+}
+
+.opcao__conteudo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+  height: 100%;
+  padding: var(--espaco-4);
+  background: var(--cor-branco);
+  border: 2px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  transition: border-color var(--transicao-rapida), background-color var(--transicao-rapida),
+    box-shadow var(--transicao-rapida);
+}
+
+.opcao:hover .opcao__conteudo {
+  border-color: #bfb0e6;
+}
+
+.opcao__input:checked + .opcao__conteudo {
+  border-color: var(--cor-roxo);
+  background: #F7F4FF;
+  box-shadow: 0 0 0 3px rgba(114, 84, 216, 0.18);
+}
+
+.opcao__input:focus-visible + .opcao__conteudo {
+  outline: 3px solid var(--cor-roxo-escuro);
+  outline-offset: 2px;
+}
+
+.opcao__input:disabled + .opcao__conteudo {
+  opacity: 0.6;
+  background: #F6EFE5;
+}
+
+/* Marca de seleção nos cards de categoria (não depende só da cor) */
+.opcao__conteudo--categoria::after {
+  content: "✓";
+  position: absolute;
+  top: var(--espaco-3);
+  right: var(--espaco-3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--cor-roxo);
+  color: var(--cor-branco);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.opcao__input:checked + .opcao__conteudo--categoria::after {
+  display: inline-flex;
+}
+
+.opcao__conteudo--categoria .icone-caixa {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.opcao__titulo {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.opcao__descricao {
+  font-size: 0.875rem;
+  color: var(--cor-texto-suave);
+}
+
+.opcao__meta {
+  margin-top: auto;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--cor-roxo-profundo);
+}
+
+.opcoes-linha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+}
+
+.opcoes-coluna {
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.opcao--compacta .opcao__conteudo {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--raio-pilula);
+  font-weight: 700;
+}
+
+.opcoes-coluna .opcao__conteudo {
+  padding: var(--espaco-3);
+}
+
+/* ---------- Resumo ---------- */
+.resumo-partida {
+  display: grid;
+  gap: var(--espaco-2);
+  padding: var(--espaco-4);
+  background: var(--cor-creme);
+  border-radius: var(--raio-md);
+  font-size: 0.95rem;
+}
+
+.resumo-partida__aviso {
+  padding: var(--espaco-2) var(--espaco-3);
+  background: var(--cor-amarelo-claro);
+  border-radius: var(--raio-sm);
+  font-size: 0.875rem;
+}
+
+.botao--bloco {
+  width: 100%;
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 64rem) {
+  .configurador {
+    grid-template-columns: 1fr;
+  }
+
+  .configurador__painel {
+    position: static;
+  }
+}
+
+@media (max-width: 36rem) {
+  .grid-opcoes {
+    grid-template-columns: 1fr;
+  }
+
+  .grupo--principal .grupo__titulo {
+    font-size: 1.3rem;
+  }
+}

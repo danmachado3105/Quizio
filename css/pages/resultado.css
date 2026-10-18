@@ -1,0 +1,186 @@
+:root {
+  --cor-acerto-texto: #1B6B45;
+  --cor-erro-texto: #A8323B;
+}
+
+.resultado-pagina {
+  width: min(100% - 2rem, 52rem);
+}
+
+.resultado > * + * {
+  margin-top: var(--espaco-5);
+}
+
+/* ---------- Cabeçalho do resultado ---------- */
+.resultado__hero {
+  padding: var(--espaco-7) var(--espaco-5);
+  background: var(--cor-roxo);
+  border: 0;
+  box-shadow: var(--sombra-md);
+  color: var(--cor-branco);
+  text-align: center;
+}
+
+.resultado__emblema {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--cor-amarelo);
+  color: var(--cor-roxo-escuro);
+}
+
+.resultado__titulo {
+  margin-top: var(--espaco-4);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+}
+
+.resultado__contexto {
+  margin-top: var(--espaco-1);
+  color: #F1ECFF;
+}
+
+.resultado__pontos {
+  margin-top: var(--espaco-5);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(3rem, 10vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cor-amarelo);
+}
+
+.resultado__pontos-rotulo {
+  font-weight: 700;
+  color: #F1ECFF;
+}
+
+.resultado__selo {
+  margin-top: var(--espaco-4);
+}
+
+/* ---------- Números da partida ---------- */
+.resultado__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: var(--espaco-3);
+}
+
+.dado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-1);
+  padding: var(--espaco-4);
+}
+
+.dado .icone-caixa {
+  margin-bottom: var(--espaco-2);
+}
+
+.dado__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.dado__rotulo {
+  font-size: 0.875rem;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Progresso ---------- */
+.resultado__colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espaco-5);
+}
+
+.xp-total {
+  font-family: var(--fonte-titulo);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--cor-roxo);
+}
+
+.lista-xp {
+  display: grid;
+  gap: var(--espaco-2);
+  margin-top: var(--espaco-3);
+}
+
+.lista-xp li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  padding-bottom: var(--espaco-2);
+  border-bottom: 1px solid var(--cor-borda);
+  font-size: 0.95rem;
+}
+
+.lista-xp li span:last-child {
+  font-weight: 700;
+}
+
+.destaque {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--cor-amarelo-claro);
+  border: 1px solid var(--cor-amarelo);
+  border-radius: var(--raio-md);
+  font-weight: 700;
+}
+
+.recorde__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.recorde__texto {
+  margin-top: var(--espaco-1);
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Ações ---------- */
+.resultado__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+}
+
+.sem-resultado__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 44rem) {
+  .resultado__colunas {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 36rem) {
+  .resultado-pagina {
+    width: min(100% - 1.5rem, 52rem);
+  }
+
+  .resultado__hero {
+    padding: var(--espaco-6) var(--espaco-4);
+  }
+
+  .resultado__acoes .botao {
+    width: 100%;
+  }
+}
