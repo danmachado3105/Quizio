@@ -1,0 +1,53 @@
+import { renderizarCabecalho, renderizarRodape } from "./components/header.js";
+import { hidratarIcones } from "./utils/icones.js";
+import { criarElemento } from "./utils/dom.js";
+
+/*
+ * Cada página HTML declara <body data-pagina="..." data-base="...">.
+ * O módulo da página só é carregado quando ela é aberta.
+ * Os arquivos de categorias, jogo, resultado, perfil e conquistas serão criados nas próximas etapas.
+ */
+const CARREGADORES_DE_PAGINA = {
+  home: () => import("./pages/home.js"),
+  categorias: () => import("./pages/categorias.js"),
+  jogo: () => import("./pages/jogo.js"),
+  resultado: () => import("./pages/resultado.js"),
+  perfil: () => import("./pages/perfil.js"),
+  conquistas: () => import("./pages/conquistas.js"),
+};
+
+function mostrarErroDeCarregamento() {
+  const conteudo = document.getElementById("conteudo");
+  if (!conteudo) return;
+
+  conteudo.replaceChildren(
+    criarElemento("p", {
+      classe: "estado-vazio__texto",
+      texto: "Algo deu errado ao carregar esta página. Abra o projeto com o Live Server e confira o console do navegador.",
+    })
+  );
+}
+
+async function iniciarAplicacao() {
+  const { pagina, base = "" } = document.body.dataset;
+
+  renderizarCabecalho({ base, paginaAtual: pagina });
+  renderizarRodape();
+  hidratarIcones(document);
+
+  const carregarPagina = CARREGADORES_DE_PAGINA[pagina];
+  if (!carregarPagina) {
+    console.error(`Quizio: página "${pagina}" não registrada em app.js.`);
+    return;
+  }
+
+  try {
+    const modulo = await carregarPagina();
+    modulo.iniciar({ base });
+  } catch (erro) {
+    console.error(`Quizio: falha ao iniciar a página "${pagina}".`, erro);
+    mostrarErroDeCarregamento();
+  }
+}
+
+iniciarAplicacao();
