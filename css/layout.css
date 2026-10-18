@@ -1,0 +1,122 @@
+.container {
+  width: min(100% - 2rem, var(--largura-maxima));
+  margin-inline: auto;
+}
+
+/* Espaçamento vertical entre as seções de uma página */
+.pagina {
+  padding-block: var(--espaco-6) var(--espaco-8);
+}
+
+.pagina > * + * {
+  margin-top: var(--espaco-7);
+}
+
+.secao__cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espaco-4);
+  margin-bottom: var(--espaco-4);
+}
+
+.secao__titulo {
+  font-size: 1.5rem;
+}
+
+/* Grades reutilizáveis */
+.grid-duas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espaco-5);
+}
+
+/* ---------- Cabeçalho ---------- */
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 248, 239, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.cabecalho__interno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-4);
+  min-height: 4.25rem;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+
+.nav__lista {
+  display: flex;
+  gap: var(--espaco-1);
+}
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--raio-pilula);
+  font-weight: 500;
+  color: var(--cor-texto-suave);
+  transition: background-color var(--transicao-rapida), color var(--transicao-rapida);
+}
+
+.nav__link:hover {
+  background: var(--cor-roxo-claro);
+  color: var(--cor-roxo-escuro);
+}
+
+.nav__link[aria-current="page"] {
+  background: var(--cor-roxo-claro);
+  color: var(--cor-roxo-profundo);
+  font-weight: 700;
+}
+
+.cabecalho__acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+}
+
+.botao-menu {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--raio-sm);
+  color: var(--cor-roxo-escuro);
+}
+
+.botao-menu:hover {
+  background: var(--cor-roxo-claro);
+}
+
+/* ---------- Rodapé ---------- */
+.rodape {
+  border-top: 1px solid var(--cor-borda);
+  padding-block: var(--espaco-5);
+  color: var(--cor-texto-suave);
+  font-size: 0.875rem;
+}
+
+.rodape__interno {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--espaco-2) var(--espaco-5);
+}
