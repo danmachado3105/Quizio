@@ -1,0 +1,59 @@
+/* Sistema visual do Quizio: todas as cores, medidas e sombras vêm daqui */
+:root {
+  /* Paleta base */
+  --cor-creme: #FFF8EF;
+  --cor-roxo: #7254D8;
+  --cor-coral: #FF786B;
+  --cor-amarelo: #FFD166;
+  --cor-roxo-escuro: #35254F;
+  --cor-branco: #FFFFFF;
+  --cor-acerto: #27865B;
+  --cor-erro: #D94F58;
+
+  /* Variações (sombras de botão, fundos suaves) */
+  --cor-roxo-profundo: #4B35A3;
+  --cor-roxo-claro: #ECE7FB;
+  --cor-coral-profundo: #D9574A;
+  --cor-coral-claro: #FFE7E3;
+  --cor-amarelo-profundo: #D9A93A;
+  --cor-amarelo-claro: #FFF2CF;
+  --cor-acerto-claro: #E0F2EA;
+  --cor-erro-claro: #FBE6E8;
+
+  /* Texto e superfícies */
+  --cor-texto: var(--cor-roxo-escuro);
+  --cor-texto-suave: #655878;
+  --cor-borda: #EBDFD0;
+  --cor-superficie: var(--cor-branco);
+
+  /* Tipografia */
+  --fonte-titulo: "Sora", system-ui, sans-serif;
+  --fonte-corpo: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Espaçamentos */
+  --espaco-1: 0.25rem;
+  --espaco-2: 0.5rem;
+  --espaco-3: 0.75rem;
+  --espaco-4: 1rem;
+  --espaco-5: 1.5rem;
+  --espaco-6: 2rem;
+  --espaco-7: 3rem;
+  --espaco-8: 4rem;
+
+  /* Raios */
+  --raio-sm: 0.625rem;
+  --raio-md: 1rem;
+  --raio-lg: 1.5rem;
+  --raio-pilula: 999px;
+
+  /* Sombras suaves e consistentes */
+  --sombra-sm: 0 1px 2px rgba(53, 37, 79, 0.06), 0 4px 12px rgba(53, 37, 79, 0.06);
+  --sombra-md: 0 2px 4px rgba(53, 37, 79, 0.06), 0 12px 28px rgba(53, 37, 79, 0.1);
+
+  /* Transições */
+  --transicao-rapida: 150ms ease;
+  --transicao: 250ms ease;
+
+  /* Layout */
+  --largura-maxima: 72rem;
+}
