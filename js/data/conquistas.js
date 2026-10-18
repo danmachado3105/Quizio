@@ -29,7 +29,7 @@ export const CONQUISTAS = [
   {
     id: "partida-perfeita",
     titulo: "Sem errar nada",
-    descricao: "Termine uma partida acertando todas as perguntas.",
+    descricao: "Termine uma partida com pelo menos 5 perguntas acertando todas.",
     icone: "star",
     condicao: (dados) => dados.estatisticas.partidasPerfeitas >= 1,
   },
@@ -38,7 +38,9 @@ export const CONQUISTAS = [
     titulo: "Explorador",
     descricao: "Jogue em 5 categorias diferentes.",
     icone: "compass",
-    condicao: (dados) => Object.keys(dados.estatisticas.porCategoria).length >= 5,
+    // "todas" é a mistura de temas, não conta como uma categoria própria
+    condicao: (dados) =>
+      Object.keys(dados.estatisticas.porCategoria).filter((id) => id !== "todas").length >= 5,
   },
   {
     id: "nivel-5",
