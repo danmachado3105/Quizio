@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Escolha categoria, dificuldade e quantidade de perguntas para montar sua partida no Quizio.">
+  <meta name="theme-color" content="#7254D8">
+  <title>Monte sua partida | Quizio</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%237254D8'/%3E%3Ccircle cx='15' cy='15' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M19 19l5 5' stroke='%23FF786B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/categorias.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+
+<body data-pagina="categorias" data-base="../">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="cabecalho" id="cabecalho"></header>
+
+  <main class="container pagina" id="conteudo">
+    <header class="pagina__cabecalho">
+      <h1 class="pagina__titulo">Monte sua partida</h1>
+      <p class="pagina__descricao texto-suave">Escolha o tema, a dificuldade e quantas perguntas você quer responder.</p>
+    </header>
+
+    <form class="configurador" id="form-partida" novalidate>
+      <fieldset class="grupo grupo--principal">
+        <legend class="grupo__titulo">1. Categoria</legend>
+        <div class="grid-opcoes" id="opcoes-categoria"></div>
+      </fieldset>
+
+      <aside class="card configurador__painel" aria-label="Configuração da partida">
+        <fieldset class="grupo">
+          <legend class="grupo__titulo">2. Dificuldade</legend>
+          <div class="opcoes-linha" id="opcoes-dificuldade"></div>
+        </fieldset>
+
+        <fieldset class="grupo">
+          <legend class="grupo__titulo">3. Quantidade de perguntas</legend>
+          <div class="opcoes-linha" id="opcoes-quantidade"></div>
+        </fieldset>
+
+        <fieldset class="grupo">
+          <legend class="grupo__titulo">4. Modo de jogo</legend>
+          <div class="opcoes-coluna" id="opcoes-modo"></div>
+        </fieldset>
+
+        <div class="resumo-partida" id="resumo-partida" aria-live="polite"></div>
+        <p class="campo__erro" id="erro-formulario" role="alert"></p>
+
+        <button class="botao botao--primario botao--grande botao--bloco" type="submit" id="botao-iniciar" data-icone="play">Iniciar partida</button>
+      </aside>
+    </form>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <noscript>
+    <p style="padding:1rem;text-align:center">O Quizio precisa de JavaScript ativado para funcionar.</p>
+  </noscript>
+
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7254D8">
+  <title>Partida | Quizio</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%237254D8'/%3E%3Ccircle cx='15' cy='15' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M19 19l5 5' stroke='%23FF786B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/jogo.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+
+<body data-pagina="jogo" data-base="../">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="cabecalho" id="cabecalho"></header>
+
+  <main class="container pagina jogo-pagina" id="conteudo">
+    <section class="jogo" id="jogo" aria-label="Partida em andamento" hidden>
+      <div class="jogo__topo">
+        <button class="botao botao--texto" type="button" id="botao-sair" data-icone="x" data-tamanho-icone="18">Sair</button>
+        <div class="jogo__status">
+          <span class="chip" id="chip-pontos"></span>
+          <span class="chip" id="chip-combo"></span>
+        </div>
+      </div>
+
+      <div>
+        <p class="jogo__contador" id="contador-pergunta"></p>
+        <div id="barra-progresso"></div>
+      </div>
+
+      <article class="card pergunta">
+        <div class="pergunta__marcas" id="pergunta-marcas"></div>
+        <h1 class="pergunta__enunciado" id="pergunta-enunciado" tabindex="-1"></h1>
+        <div class="alternativas" id="alternativas" role="group" aria-labelledby="pergunta-enunciado"></div>
+        <div id="feedback" aria-live="polite" hidden></div>
+        <p class="jogo__dica">Dica: use as teclas 1 a 4 para responder.</p>
+      </article>
+    </section>
+
+    <section id="sem-partida" hidden></section>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <noscript>
+    <p style="padding:1rem;text-align:center">O Quizio precisa de JavaScript ativado para funcionar.</p>
+  </noscript>
+
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>
