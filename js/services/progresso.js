@@ -1,47 +1,46 @@
-import { atualizarDados } from "./storage.js";
-import { CONQUISTAS } from "../data/conquistas.js";
-import { calcularNivel } from "../utils/pontuacao.js";
-import { dataLocalISO } from "../utils/formatacao.js";
+import {
+  LIMITE_HISTORICO,
+  LIMITE_IDS_REGISTRADOS,
+  atualizarDados,
+  reiniciarMissoesSeNecessario,
+} from "./storage.js";
+import { aplicarPartidaNasMissoes, concederRecompensasDeMissoes } from "./missoes.js";
+import { CONQUISTAS, estaConcluida } from "../data/conquistas.js";
+import { calcularNivel } from "../utils/progressao.js";
 
-const LIMITE_HISTORICO = 50;
-
-function numeroSeguro(valor) {
-  return Number.isFinite(valor) ? valor : 0;
-}
+const numeroSeguro = (valor) => (Number.isFinite(valor) ? valor : 0);
 
 /**
- * Grava o resultado de uma partida concluída: XP, estatísticas, recorde da
- * categoria, progresso das missões, histórico e conquistas.
+ * Grava, numa única transação, tudo o que uma partida CONCLUÍDA muda:
+ * histórico, estatísticas, recorde, XP, nível, missões e conquistas.
+ * Serve para todos os modos de jogo.
  *
- * É idempotente: se o id da partida já estiver no histórico, nada é gravado
- * de novo e a função retorna null (isso impede XP duplicado).
+ * É idempotente: se o id da partida já consta em registroDePartidas, nada é
+ * gravado de novo e a função retorna null. Isso impede XP duplicado ao
+ * recarregar páginas ou clicar duas vezes. Partidas abandonadas nunca chegam aqui.
  */
 export function registrarPartida(resultado) {
   let efeitos = null;
 
   atualizarDados((dados) => {
-    if (dados.historico.some((partida) => partida.id === resultado.id)) return;
+    // 1. Partida já registrada? Então não faz nada
+    if (dados.registroDePartidas.includes(resultado.id)) return;
 
-    // Missões são diárias: se virou o dia com a página aberta, recomeçam
-    const hoje = dataLocalISO();
-    if (dados.missoes.data !== hoje) {
-      dados.missoes = { data: hoje, progresso: {}, resgatadas: {} };
-    }
+    reiniciarMissoesSeNecessario(dados);
 
-    const nivelAnterior = calcularNivel(dados.progresso.xp).nivel;
     const estatisticas = dados.estatisticas;
-    const chave = resultado.config.categoriaId;
+    const categoriaId = resultado.config.categoriaId;
+    const xpAntes = dados.progresso.xp;
+    const nivelAnterior = calcularNivel(xpAntes).nivel;
 
-    // Registro da categoria (inclui "todas"), com valores sempre numéricos
-    const anterior = estatisticas.porCategoria[chave] ?? {};
-    const categoriaNova = chave !== "todas" && !estatisticas.porCategoria[chave];
+    // 2. Recorde da categoria (inclui "todas")
+    const anterior = estatisticas.porCategoria[categoriaId] ?? {};
     const registro = {
       partidas: numeroSeguro(anterior.partidas),
       respondidas: numeroSeguro(anterior.respondidas),
       acertos: numeroSeguro(anterior.acertos),
       melhorPontuacao: numeroSeguro(anterior.melhorPontuacao),
     };
-
     const recordeAnterior = registro.melhorPontuacao;
     const ehNovoRecorde = resultado.pontuacao > recordeAnterior;
 
@@ -49,64 +48,78 @@ export function registrarPartida(resultado) {
     registro.respondidas += resultado.total;
     registro.acertos += resultado.acertos;
     registro.melhorPontuacao = Math.max(recordeAnterior, resultado.pontuacao);
-    estatisticas.porCategoria[chave] = registro;
+    estatisticas.porCategoria[categoriaId] = registro;
 
-    // Estatísticas gerais
+    // 3. Estatísticas acumuladas
     estatisticas.partidas += 1;
     estatisticas.perguntasRespondidas += resultado.total;
     estatisticas.acertos += resultado.acertos;
     estatisticas.melhorPontuacao = Math.max(estatisticas.melhorPontuacao, resultado.pontuacao);
     estatisticas.melhorCombo = Math.max(estatisticas.melhorCombo, resultado.melhorCombo);
     if (resultado.perfeita) estatisticas.partidasPerfeitas += 1;
+    // Superar o recorde só vale quando já existia um recorde anterior
+    if (ehNovoRecorde && recordeAnterior > 0) estatisticas.recordesSuperados += 1;
 
-    // Progresso das missões do dia (a recompensa das missões vem na Etapa 3)
-    const progressoMissoes = dados.missoes.progresso;
-    const somar = (metrica, valor) => {
-      progressoMissoes[metrica] = numeroSeguro(progressoMissoes[metrica]) + valor;
-    };
-    somar("perguntasRespondidas", resultado.total);
-    somar("acertos", resultado.acertos);
-    somar("partidas", 1);
-    if (categoriaNova) somar("categoriasNovas", 1);
+    // Perguntas respondidas por categoria da PERGUNTA (vale também para "Todas")
+    for (const [id, contagem] of Object.entries(resultado.perguntasPorCategoria ?? {})) {
+      if (id === "__proto__") continue;
+      estatisticas.perguntasPorCategoria[id] =
+        numeroSeguro(estatisticas.perguntasPorCategoria[id]) + numeroSeguro(contagem?.respondidas);
+    }
 
-    // XP e nível
+    // 4. XP da partida e 5. missões (o XP das missões concluídas entra aqui também)
     dados.progresso.xp += resultado.xp;
-    const nivelNovo = calcularNivel(dados.progresso.xp).nivel;
+    aplicarPartidaNasMissoes(dados, resultado);
+    const missoesConcluidas = concederRecompensasDeMissoes(dados);
+    const xpMissoes = missoesConcluidas.reduce((soma, missao) => soma + missao.xp, 0);
 
-    // Histórico (mais recente primeiro)
-    dados.historico.unshift({
-      id: resultado.id,
-      categoriaId: chave,
-      modoId: resultado.config.modoId,
-      pontuacao: resultado.pontuacao,
-      acertos: resultado.acertos,
-      total: resultado.total,
-      xp: resultado.xp,
-      data: new Date().toISOString(),
-    });
-    dados.historico = dados.historico.slice(0, LIMITE_HISTORICO);
+    // 6. Nível
+    const xpDepois = dados.progresso.xp;
+    const nivelNovo = calcularNivel(xpDepois).nivel;
 
-    // Conquistas: só desbloqueia quando a condição real foi cumprida
+    // 7. Conquistas: só desbloqueia o que ainda não estava desbloqueado
     const novasConquistas = [];
     const agora = new Date().toISOString();
     for (const conquista of CONQUISTAS) {
-      if (!dados.conquistas[conquista.id] && conquista.condicao(dados)) {
+      if (!dados.conquistas[conquista.id] && estaConcluida(conquista, dados)) {
         dados.conquistas[conquista.id] = agora;
         novasConquistas.push(conquista.id);
       }
     }
 
+    // 8. Histórico (mais recente primeiro, com limite) e registro do id
+    dados.historico.unshift({
+      id: resultado.id,
+      data: agora,
+      categoriaId,
+      modoId: resultado.config.modoId,
+      dificuldade: resultado.config.dificuldade,
+      total: resultado.total,
+      acertos: resultado.acertos,
+      erros: resultado.erros,
+      pontuacao: resultado.pontuacao,
+      xp: resultado.xp + xpMissoes,
+      duracaoMs: resultado.duracaoMs,
+    });
+    dados.historico = dados.historico.slice(0, LIMITE_HISTORICO);
+    dados.registroDePartidas.push(resultado.id);
+    dados.registroDePartidas = dados.registroDePartidas.slice(-LIMITE_IDS_REGISTRADOS);
+
     efeitos = {
+      xpAntes,
+      xpDepois,
+      xpMissoes,
       nivelAnterior,
       nivelNovo,
       subiuDeNivel: nivelNovo > nivelAnterior,
+      missoesConcluidas,
+      novasConquistas,
       recorde: {
-        categoriaId: chave,
+        categoriaId,
         anterior: recordeAnterior,
         atual: registro.melhorPontuacao,
         ehNovo: ehNovoRecorde,
       },
-      novasConquistas,
     };
   });
 

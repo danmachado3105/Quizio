@@ -208,12 +208,33 @@ export function avancar(partida) {
   return "proxima";
 }
 
+/** Conta, por categoria da pergunta, quantas foram respondidas e acertadas. */
+function contarPorCategoriaDaPergunta(respostas) {
+  const contagem = {};
+  for (const resposta of respostas) {
+    const categoria = obterPerguntaPorId(resposta.perguntaId)?.categoria;
+    if (!categoria) continue;
+
+    contagem[categoria] ??= { respondidas: 0, acertos: 0 };
+    contagem[categoria].respondidas += 1;
+    if (resposta.acertou) contagem[categoria].acertos += 1;
+  }
+  return contagem;
+}
+
 /**
  * Encerra a partida: calcula o resultado, grava o progresso permanente
  * (uma única vez) e guarda o resultado para a tela final.
  */
 export function concluirPartida(partida) {
   if (partida.respostas.length !== partida.questoes.length) return null;
+
+  // Se esta partida já foi concluída (ex.: falha antes de limpar a sessão), reaproveita
+  const existente = obterResultado();
+  if (existente && existente.id === partida.id) {
+    removerSessao(CHAVE_PARTIDA);
+    return existente;
+  }
 
   const total = partida.questoes.length;
   const acertos = partida.respostas.filter((resposta) => resposta.acertou).length;
@@ -232,6 +253,8 @@ export function concluirPartida(partida) {
     xp: xp.total,
     xpDetalhe: xp,
     perfeita: ehPartidaPerfeita(acertos, total),
+    perguntasPorCategoria: contarPorCategoriaDaPergunta(partida.respostas),
+    notificado: false,
     progresso: null,
   };
 
@@ -260,4 +283,17 @@ export function obterResultado() {
     [resultado.total, resultado.acertos, resultado.erros, resultado.pontuacao, resultado.xp].every(Number.isFinite);
 
   return valido ? resultado : null;
+}
+
+/** Marca que as notificações deste resultado já foram exibidas (não repetem ao recarregar). */
+export function marcarResultadoNotificado() {
+  const resultado = obterResultado();
+  if (!resultado || resultado.notificado) return;
+
+  resultado.notificado = true;
+  gravarSessao(CHAVE_RESULTADO, resultado);
+}
+
+export function limparResultado() {
+  removerSessao(CHAVE_RESULTADO);
 }
