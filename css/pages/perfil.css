@@ -1,0 +1,169 @@
+.perfil__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-5);
+}
+
+.perfil__resumo {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.perfil__nome {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.perfil__colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espaco-5);
+  align-items: start;
+}
+
+/* ---------- Formulário ---------- */
+.perfil__form {
+  display: grid;
+  gap: var(--espaco-4);
+  margin-top: var(--espaco-4);
+}
+
+.perfil__grupo {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.perfil__grupo .campo__rotulo {
+  padding: 0;
+}
+
+.opcoes-avatar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-3);
+}
+
+.avatar-opcao {
+  position: relative;
+  cursor: pointer;
+}
+
+/* O input cobre a opção, invisível, mas continua acessível por teclado */
+.avatar-opcao__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.avatar-opcao__visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 5rem;
+  padding: 0.6rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  transition: border-color var(--transicao-rapida), background-color var(--transicao-rapida);
+}
+
+.avatar-opcao:hover .avatar-opcao__visual {
+  border-color: #bfb0e6;
+}
+
+.avatar-opcao__input:checked + .avatar-opcao__visual {
+  border-color: var(--cor-roxo);
+  background: #F7F4FF;
+  box-shadow: 0 0 0 3px rgba(114, 84, 216, 0.18);
+}
+
+.avatar-opcao__input:focus-visible + .avatar-opcao__visual {
+  outline: 3px solid var(--cor-roxo-escuro);
+  outline-offset: 2px;
+}
+
+.avatar-opcao__nome {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.mensagem-perfil {
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.mensagem-perfil--ok {
+  color: #1B6B45;
+}
+
+.mensagem-perfil--erro {
+  color: #A8323B;
+}
+
+/* ---------- Categorias mais jogadas ---------- */
+.lista-categorias {
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.categoria-linha {
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.categoria-linha__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+}
+
+.categoria-linha__nome {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  font-weight: 700;
+}
+
+/* ---------- Dados ---------- */
+.zona-dados {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-4);
+}
+
+.sugestao__acoes {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--espaco-3);
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 56rem) {
+  .perfil__colunas {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 36rem) {
+  .perfil__cabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .zona-dados .botao {
+    width: 100%;
+  }
+}

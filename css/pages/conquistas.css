@@ -1,0 +1,67 @@
+.grade-conquistas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--espaco-4);
+}
+
+.cartao-conquista {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4);
+  background: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-sm);
+}
+
+/* Bloqueadas: fundo mais apagado e borda tracejada, mas o texto continua legível */
+.cartao-conquista--bloqueada {
+  background: #FBF5EC;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.cartao-conquista__corpo {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.cartao-conquista__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espaco-2);
+}
+
+.cartao-conquista__titulo {
+  font-size: 1.05rem;
+}
+
+.cartao-conquista__descricao {
+  font-size: 0.925rem;
+  color: var(--cor-texto-suave);
+}
+
+.cartao-conquista__progresso {
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.cartao-conquista__detalhe {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cor-texto-suave);
+}
+
+@media (max-width: 36rem) {
+  .grade-conquistas {
+    grid-template-columns: 1fr;
+  }
+
+  .cartao-conquista__topo {
+    flex-direction: column;
+  }
+}

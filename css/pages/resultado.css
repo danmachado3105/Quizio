@@ -68,35 +68,12 @@
   gap: var(--espaco-3);
 }
 
-.dado {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--espaco-1);
-  padding: var(--espaco-4);
-}
-
-.dado .icone-caixa {
-  margin-bottom: var(--espaco-2);
-}
-
-.dado__valor {
-  font-family: var(--fonte-titulo);
-  font-size: 1.6rem;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.dado__rotulo {
-  font-size: 0.875rem;
-  color: var(--cor-texto-suave);
-}
-
 /* ---------- Progresso ---------- */
 .resultado__colunas {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--espaco-5);
+  align-items: start;
 }
 
 .xp-total {
@@ -125,6 +102,16 @@
   font-weight: 700;
 }
 
+.nivel-resultado {
+  display: grid;
+  gap: var(--espaco-2);
+  margin-top: var(--espaco-4);
+}
+
+.nivel-resultado__titulo {
+  font-weight: 700;
+}
+
 .destaque {
   display: flex;
   align-items: center;
@@ -135,6 +122,17 @@
   border: 1px solid var(--cor-amarelo);
   border-radius: var(--raio-md);
   font-weight: 700;
+}
+
+/* Pulso discreto, uma única vez, ao subir de nível */
+.destaque--nivel {
+  animation: pulso-nivel 0.9s ease 0.4s 1 both;
+}
+
+@keyframes pulso-nivel {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 .recorde__valor {
