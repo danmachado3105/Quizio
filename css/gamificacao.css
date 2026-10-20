@@ -1,0 +1,180 @@
+/* Estilos compartilhados por perfil, conquistas e resultado */
+
+/* ---------- Cabeçalho de página ---------- */
+.pagina__cabecalho {
+  max-width: 40rem;
+}
+
+.pagina__titulo {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+}
+
+.pagina__descricao {
+  margin-top: var(--espaco-2);
+  font-size: 1.1rem;
+}
+
+/* ---------- Cards de dados ---------- */
+.grade-dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: var(--espaco-3);
+}
+
+.dado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-1);
+  padding: var(--espaco-4);
+}
+
+.dado .icone-caixa {
+  margin-bottom: var(--espaco-2);
+}
+
+.dado__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.dado__rotulo {
+  font-size: 0.875rem;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Avatares ---------- */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.avatar--roxo { background: var(--cor-roxo); color: var(--cor-branco); }
+.avatar--coral { background: var(--cor-coral); color: var(--cor-roxo-escuro); }
+.avatar--amarelo { background: var(--cor-amarelo); color: var(--cor-roxo-escuro); }
+.avatar--verde { background: var(--cor-acerto); color: var(--cor-branco); }
+.avatar--escuro { background: var(--cor-roxo-escuro); color: var(--cor-amarelo); }
+.avatar--neutro { background: #EFE8DD; color: var(--cor-roxo-escuro); }
+
+/* ---------- Aviso ---------- */
+.aviso {
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--cor-amarelo-claro);
+  border: 1px solid var(--cor-amarelo);
+  border-radius: var(--raio-md);
+  font-size: 0.925rem;
+  font-weight: 500;
+}
+
+/* ---------- Missões (usadas em mais de uma página) ---------- */
+.item--missao {
+  display: block;
+}
+
+.missao__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-2);
+}
+
+.missao__descricao {
+  margin-bottom: var(--espaco-2);
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+
+.missao__progresso {
+  margin-top: var(--espaco-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Notificações ---------- */
+.notificacoes {
+  position: fixed;
+  right: var(--espaco-4);
+  bottom: var(--espaco-4);
+  z-index: 90;
+  display: grid;
+  gap: var(--espaco-3);
+  width: min(23rem, calc(100vw - 2rem));
+  pointer-events: none; /* a área não bloqueia cliques na página */
+}
+
+.notificacao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-3);
+  padding: 0.85rem 1rem;
+  background: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-left: 6px solid var(--cor-amarelo);
+  border-radius: var(--raio-md);
+  box-shadow: var(--sombra-md);
+  pointer-events: auto;
+  animation: entrar-notificacao 0.35s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.notificacao--nivel { border-left-color: var(--cor-roxo); }
+.notificacao--missao { border-left-color: var(--cor-acerto); }
+
+.notificacao--saindo {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.notificacao__corpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.notificacao__titulo {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.notificacao__texto {
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+
+.notificacao__fechar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.25rem 0 0;
+  border-radius: var(--raio-sm);
+  color: var(--cor-texto-suave);
+}
+
+.notificacao__fechar:hover {
+  background: var(--cor-roxo-claro);
+  color: var(--cor-roxo-escuro);
+}
+
+@keyframes entrar-notificacao {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 36rem) {
+  .notificacoes {
+    left: var(--espaco-3);
+    right: var(--espaco-3);
+    bottom: var(--espaco-3);
+    width: auto;
+  }
+}
