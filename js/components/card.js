@@ -49,7 +49,7 @@ export function criarCardCategoria(categoria, estatistica, base) {
   );
 }
 
-/** Card de estatística: ícone, valor grande e rótulo. */
+/** Card de estatística da página inicial: ícone, valor grande e rótulo. */
 export function criarCardEstatistica({ icone, cor, valor, rotulo }) {
   return criarElemento("div", { classe: "card estatistica" }, [
     criarElemento("span", { classe: `icone-caixa icone-caixa--${cor}` }, [criarIcone(icone, 22)]),
@@ -58,32 +58,55 @@ export function criarCardEstatistica({ icone, cor, valor, rotulo }) {
   ]);
 }
 
-/** Item de missão com barra de progresso. */
-export function criarItemMissao(missao, progresso) {
+/** Card de dado (perfil e resultado). Estilos em css/gamificacao.css. */
+export function criarCardDado({ icone, cor, valor, rotulo }) {
+  return criarElemento("div", { classe: "card dado" }, [
+    criarElemento("span", { classe: `icone-caixa icone-caixa--${cor}` }, [criarIcone(icone, 22)]),
+    criarElemento("p", { classe: "dado__valor", texto: String(valor) }),
+    criarElemento("p", { classe: "dado__rotulo", texto: rotulo }),
+  ]);
+}
+
+/**
+ * Item de missão com barra de progresso.
+ * detalhada: mostra também a descrição completa (página de conquistas).
+ */
+export function criarItemMissao(missao, progresso, { detalhada = false } = {}) {
   const valor = Math.min(Number(progresso) || 0, missao.meta);
   const completa = valor >= missao.meta;
 
-  const badge = completa
+  const selo = completa
     ? criarElemento("span", { classe: "badge badge--sucesso" }, [criarIcone("check", 14), "Concluída"])
     : criarElemento("span", { classe: "badge badge--destaque", texto: `+${missao.xp} XP` });
 
-  return criarElemento("li", { classe: "item item--missao" }, [
+  const textoProgresso = completa
+    ? `${valor} de ${missao.meta}`
+    : `${valor} de ${missao.meta} · faltam ${missao.meta - valor}`;
+
+  const filhos = [
     criarElemento("div", { classe: "missao__linha" }, [
       criarElemento("p", { classe: "item__titulo", texto: missao.titulo }),
-      badge,
+      selo,
     ]),
+  ];
+  if (detalhada && missao.descricao) {
+    filhos.push(criarElemento("p", { classe: "missao__descricao", texto: missao.descricao }));
+  }
+  filhos.push(
     criarBarraProgresso({
       percentual: (valor / missao.meta) * 100,
       rotulo: missao.titulo,
       completo: completa,
     }),
-    criarElemento("p", { classe: "missao__progresso", texto: `${valor} de ${missao.meta}` }),
-  ]);
+    criarElemento("p", { classe: "missao__progresso", texto: textoProgresso })
+  );
+
+  return criarElemento("li", { classe: "item item--missao" }, filhos);
 }
 
 /**
- * Item de conquista. Sem desbloqueadaEm, aparece como bloqueada
- * (será usada na página de conquistas, na Etapa 3).
+ * Item compacto de conquista (home, perfil e resultado).
+ * Sem desbloqueadaEm, aparece como bloqueada.
  */
 export function criarItemConquista(conquista, desbloqueadaEm) {
   const desbloqueada = Boolean(desbloqueadaEm);
@@ -102,23 +125,74 @@ export function criarItemConquista(conquista, desbloqueadaEm) {
   ]);
 }
 
+/**
+ * Card completo de conquista (página de conquistas).
+ * avaliacao: { atual, meta, concluida } vindo de avaliarConquista().
+ */
+export function criarCardConquista(conquista, avaliacao, desbloqueadaEm) {
+  const desbloqueada = Boolean(desbloqueadaEm);
+
+  const selo = desbloqueada
+    ? criarElemento("span", { classe: "badge badge--sucesso" }, [criarIcone("check", 14), "Desbloqueada"])
+    : criarElemento("span", { classe: "badge" }, [criarIcone("lock", 14), "Bloqueada"]);
+
+  let rodape;
+  if (desbloqueada) {
+    rodape = criarElemento("p", {
+      classe: "cartao-conquista__detalhe",
+      texto: `Desbloqueada em ${formatarDataCurta(desbloqueadaEm)}`,
+    });
+  } else if (avaliacao.concluida) {
+    rodape = criarElemento("p", {
+      classe: "cartao-conquista__detalhe",
+      texto: "Requisito cumprido! Será registrada ao concluir a próxima partida.",
+    });
+  } else {
+    rodape = criarElemento("div", { classe: "cartao-conquista__progresso" }, [
+      criarBarraProgresso({
+        percentual: (avaliacao.atual / avaliacao.meta) * 100,
+        rotulo: `Progresso de ${conquista.titulo}`,
+      }),
+      criarElemento("p", {
+        classe: "cartao-conquista__detalhe",
+        texto: `${formatarNumero(avaliacao.atual)} de ${formatarNumero(avaliacao.meta)}`,
+      }),
+    ]);
+  }
+
+  return criarElemento("li", { classe: `cartao-conquista${desbloqueada ? "" : " cartao-conquista--bloqueada"}` }, [
+    criarElemento("span", { classe: `icone-caixa icone-caixa--${desbloqueada ? "amarelo" : "cinza"}` }, [
+      criarIcone(conquista.icone, 24),
+    ]),
+    criarElemento("div", { classe: "cartao-conquista__corpo" }, [
+      criarElemento("div", { classe: "cartao-conquista__topo" }, [
+        criarElemento("h3", { classe: "cartao-conquista__titulo", texto: conquista.titulo }),
+        selo,
+      ]),
+      criarElemento("p", { classe: "cartao-conquista__descricao", texto: conquista.descricao }),
+      rodape,
+    ]),
+  ]);
+}
+
 /** Item do histórico de partidas. Valida os campos antes de exibir. */
 export function criarItemHistorico(partida) {
   const categoria = obterCategoriaPorId(partida.categoriaId);
   const acertos = Number(partida.acertos) || 0;
   const total = Number(partida.total) || 0;
   const pontuacao = Number(partida.pontuacao) || 0;
+  const xp = Number(partida.xp) || 0;
+
+  let detalhe = `${obterNomeDoModo(partida.modoId)} · ${acertos}/${total} acertos · ${formatarNumero(pontuacao)} pts`;
+  if (xp > 0) detalhe += ` · +${formatarNumero(xp)} XP`;
 
   return criarElemento("li", { classe: "item" }, [
     criarElemento("span", { classe: `icone-caixa icone-caixa--${categoria?.cor ?? "cinza"}` }, [
       criarIcone(categoria?.icone ?? "star", 22),
     ]),
     criarElemento("div", { classe: "item__corpo" }, [
-      criarElemento("p", { classe: "item__titulo", texto: categoria?.nome ?? "Partida" }),
-      criarElemento("p", {
-        classe: "item__detalhe",
-        texto: `${obterNomeDoModo(partida.modoId)} · ${acertos}/${total} acertos · ${formatarNumero(pontuacao)} pts`,
-      }),
+      criarElemento("p", { classe: "item__titulo", texto: categoria?.nome ?? "Todas as categorias" }),
+      criarElemento("p", { classe: "item__detalhe", texto: detalhe }),
     ]),
     criarElemento("span", { classe: "item__detalhe", texto: formatarDataCurta(partida.data) }),
   ]);
