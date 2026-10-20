@@ -4,8 +4,17 @@ import { obterCategoriaPorId } from "../data/categorias.js";
 import { obterConquistaPorId } from "../data/conquistas.js";
 import { obterNomeDoModo } from "../data/modos.js";
 import { CATEGORIA_TODAS, DIFICULDADE_MISTA, DIFICULDADES } from "../data/perguntas.js";
-import { criarEstadoVazio, criarItemConquista } from "../components/card.js";
-import { criarPartida, obterResultado } from "../services/partida.js";
+import {
+  criarBarraProgresso,
+  criarCardDado,
+  criarEstadoVazio,
+  criarItemConquista,
+} from "../components/card.js";
+import { mostrarNotificacao } from "../components/toast.js";
+import { criarPartida, marcarResultadoNotificado, obterResultado } from "../services/partida.js";
+import { obterDados } from "../services/storage.js";
+import { calcularNivel } from "../utils/progressao.js";
+import { animarBarra, animarNumero } from "../utils/animacao.js";
 import { formatarNumero } from "../utils/formatacao.js";
 
 function formatarDuracao(milissegundos) {
@@ -63,36 +72,43 @@ function renderizarCabecalho(resultado) {
 }
 
 function renderizarDados(resultado) {
-  const dados = [
-    { icone: "check", cor: "verde", valor: String(resultado.acertos), rotulo: "Acertos" },
-    { icone: "x", cor: "coral", valor: String(resultado.erros), rotulo: "Erros" },
-    { icone: "percent", cor: "roxo", valor: `${Number(resultado.percentual) || 0}%`, rotulo: "Aproveitamento" },
-    { icone: "clock", cor: "amarelo", valor: formatarDuracao(resultado.duracaoMs), rotulo: "Tempo total" },
-    { icone: "flame", cor: "coral", valor: String(Number(resultado.melhorCombo) || 0), rotulo: "Melhor sequência" },
-  ];
-
   porId("resultado-dados").replaceChildren(
-    ...dados.map((dado) =>
-      criarElemento("div", { classe: "card dado" }, [
-        criarElemento("span", { classe: `icone-caixa icone-caixa--${dado.cor}` }, [criarIcone(dado.icone, 22)]),
-        criarElemento("p", { classe: "dado__valor", texto: dado.valor }),
-        criarElemento("p", { classe: "dado__rotulo", texto: dado.rotulo }),
-      ])
-    )
+    criarCardDado({ icone: "check", cor: "verde", valor: resultado.acertos, rotulo: "Acertos" }),
+    criarCardDado({ icone: "x", cor: "coral", valor: resultado.erros, rotulo: "Erros" }),
+    criarCardDado({ icone: "percent", cor: "roxo", valor: `${Number(resultado.percentual) || 0}%`, rotulo: "Aproveitamento" }),
+    criarCardDado({ icone: "clock", cor: "amarelo", valor: formatarDuracao(resultado.duracaoMs), rotulo: "Tempo total" }),
+    criarCardDado({ icone: "flame", cor: "coral", valor: Number(resultado.melhorCombo) || 0, rotulo: "Melhor sequência" })
   );
 }
 
+/** Card de XP com número e barra animados. Retorna o card e a função que dispara as animações. */
 function criarCardXp(resultado) {
+  const progresso = resultado.progresso;
   const detalhe = resultado.xpDetalhe;
+  const xpMissoes = Number(progresso?.xpMissoes) || 0;
+  const totalXp = resultado.xp + xpMissoes;
+
   const linhas = [
     ["Respostas corretas", Number(detalhe.acertos) || 0],
     ["Partida concluída", Number(detalhe.conclusao) || 0],
     ["Partida perfeita", Number(detalhe.perfeita) || 0],
+    ["Missões concluídas", xpMissoes],
   ].filter(([, valor]) => valor > 0);
+
+  // Sem "progresso" (partida já registrada antes), mostra o estado atual sem animar
+  const nivelDepois = calcularNivel(progresso ? progresso.xpDepois : obterDados().progresso.xp);
+  const nivelAntes = progresso ? calcularNivel(progresso.xpAntes) : nivelDepois;
+  const subiu = Boolean(progresso?.subiuDeNivel);
+
+  const valorXp = criarElemento("p", { classe: "xp-total", texto: `+${formatarNumero(totalXp)} XP` });
+  const barra = criarBarraProgresso({
+    percentual: nivelAntes.percentual,
+    rotulo: `Progresso no nível ${nivelDepois.nivel}`,
+  });
 
   const filhos = [
     criarElemento("h2", { classe: "card__titulo", texto: "XP conquistado" }),
-    criarElemento("p", { classe: "xp-total", texto: `+${resultado.xp} XP` }),
+    valorXp,
     criarElemento(
       "ul",
       { classe: "lista-xp" },
@@ -100,18 +116,40 @@ function criarCardXp(resultado) {
         criarElemento("li", {}, [criarElemento("span", { texto: rotulo }), criarElemento("span", { texto: `+${valor}` })])
       )
     ),
+    criarElemento("div", { classe: "nivel-resultado" }, [
+      criarElemento("p", { classe: "nivel-resultado__titulo", texto: `Nível ${nivelDepois.nivel}` }),
+      barra,
+      criarElemento("p", {
+        classe: "texto-pequeno texto-suave",
+        texto: `${formatarNumero(nivelDepois.xpNoNivel)} / ${formatarNumero(nivelDepois.xpNecessario)} XP para o nível ${nivelDepois.nivel + 1}`,
+      }),
+    ]),
   ];
 
-  const progresso = resultado.progresso;
-  if (progresso?.subiuDeNivel) {
+  if (subiu) {
     filhos.push(
-      criarElemento("p", { classe: "destaque" }, [criarIcone("trending-up", 22), `Você subiu para o nível ${progresso.nivelNovo}!`])
+      criarElemento("p", { classe: "destaque destaque--nivel" }, [
+        criarIcone("trending-up", 22),
+        `Você subiu para o nível ${progresso.nivelNovo}!`,
+      ])
     );
-  } else if (progresso) {
-    filhos.push(criarElemento("p", { classe: "texto-suave texto-pequeno", texto: `Você está no nível ${progresso.nivelNovo}.` }));
+  } else if (!progresso) {
+    filhos.push(
+      criarElemento("p", { classe: "texto-pequeno texto-suave", texto: "O progresso desta partida já havia sido contabilizado." })
+    );
   }
 
-  return criarElemento("section", { classe: "card" }, filhos);
+  const animar = () => {
+    animarNumero(valorXp, { de: 0, para: totalXp, formatar: (valor) => `+${formatarNumero(valor)} XP` });
+    animarBarra(barra.firstElementChild, {
+      de: nivelAntes.percentual,
+      para: nivelDepois.percentual,
+      passouDeNivel: subiu,
+    });
+    barra.setAttribute("aria-valuenow", String(nivelDepois.percentual));
+  };
+
+  return { elemento: criarElemento("section", { classe: "card" }, filhos), animar };
 }
 
 function criarCardRecorde(resultado) {
@@ -133,9 +171,31 @@ function criarCardRecorde(resultado) {
   ]);
 }
 
+function criarCardMissoes(resultado) {
+  const concluidas = resultado.progresso?.missoesConcluidas ?? [];
+  if (concluidas.length === 0) return null;
+
+  return criarElemento("section", { classe: "card" }, [
+    criarElemento("h2", { classe: "card__titulo", texto: "Missões concluídas", atributos: { style: "margin-bottom:1rem" } }),
+    criarElemento(
+      "ul",
+      { classe: "lista" },
+      concluidas.map((missao) =>
+        criarElemento("li", { classe: "item" }, [
+          criarElemento("span", { classe: "icone-caixa icone-caixa--verde" }, [criarIcone("check", 22)]),
+          criarElemento("div", { classe: "item__corpo" }, [criarElemento("p", { classe: "item__titulo", texto: String(missao.titulo) })]),
+          criarElemento("span", { classe: "badge badge--destaque", texto: `+${Number(missao.xp) || 0} XP` }),
+        ])
+      )
+    ),
+  ]);
+}
+
 function renderizarProgresso(resultado) {
-  const cards = [criarCardXp(resultado), criarCardRecorde(resultado)].filter(Boolean);
+  const cardXp = criarCardXp(resultado);
+  const cards = [cardXp.elemento, criarCardRecorde(resultado), criarCardMissoes(resultado)].filter(Boolean);
   porId("resultado-progresso").replaceChildren(...cards);
+  cardXp.animar(); // só depois de o card estar na página
 
   const conquistas = (resultado.progresso?.novasConquistas ?? [])
     .map((id) => obterConquistaPorId(id))
@@ -154,6 +214,34 @@ function renderizarProgresso(resultado) {
       criarElemento("ul", { classe: "lista" }, conquistas.map((conquista) => criarItemConquista(conquista, agora))),
     ])
   );
+}
+
+/** Notificações de recompensa: aparecem uma única vez por partida e não bloqueiam a página. */
+function notificarRecompensas(resultado) {
+  const progresso = resultado.progresso;
+  if (!progresso || resultado.notificado) return;
+
+  const fila = [];
+
+  for (const id of progresso.novasConquistas ?? []) {
+    const conquista = obterConquistaPorId(id);
+    if (conquista) {
+      fila.push({ icone: conquista.icone, titulo: "Conquista desbloqueada!", texto: conquista.titulo, tipo: "conquista" });
+    }
+  }
+  if (progresso.subiuDeNivel) {
+    fila.push({ icone: "trending-up", titulo: `Nível ${progresso.nivelNovo}!`, texto: "Você subiu de nível.", tipo: "nivel" });
+  }
+  for (const missao of progresso.missoesConcluidas ?? []) {
+    fila.push({ icone: "target", titulo: "Missão concluída!", texto: `${missao.titulo} (+${missao.xp} XP)`, tipo: "missao" });
+  }
+
+  fila.forEach((notificacao, posicao) => {
+    setTimeout(() => mostrarNotificacao(notificacao), 700 + posicao * 500);
+  });
+
+  // Marca já, para não repetir se a página for recarregada
+  marcarResultadoNotificado();
 }
 
 function renderizarAcoes(resultado, base) {
@@ -236,4 +324,5 @@ export function iniciar({ base }) {
   renderizarDados(resultado);
   renderizarProgresso(resultado);
   renderizarAcoes(resultado, base);
+  notificarRecompensas(resultado);
 }
