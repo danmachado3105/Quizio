@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Conquistas e missões diárias do Quizio.">
+  <meta name="theme-color" content="#7254D8">
+  <title>Conquistas e missões | Quizio</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%237254D8'/%3E%3Ccircle cx='15' cy='15' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M19 19l5 5' stroke='%23FF786B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/gamificacao.css">
+  <link rel="stylesheet" href="../css/pages/conquistas.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+
+<body data-pagina="conquistas" data-base="../">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="cabecalho" id="cabecalho"></header>
+
+  <main class="container pagina" id="conteudo">
+    <header class="pagina__cabecalho">
+      <h1 class="pagina__titulo">Conquistas e missões</h1>
+      <p class="pagina__descricao texto-suave">Cumpra desafios, ganhe XP e acompanhe tudo o que já desbloqueou.</p>
+    </header>
+
+    <section class="card" id="resumo-conquistas" aria-label="Resumo das conquistas"></section>
+
+    <section aria-labelledby="missoes-titulo">
+      <div class="secao__cabecalho">
+        <h2 class="secao__titulo" id="missoes-titulo">Missões de hoje</h2>
+      </div>
+      <div class="card">
+        <p class="texto-suave texto-pequeno" id="info-missoes"></p>
+        <ul class="lista" id="lista-missoes" style="margin-top:1rem"></ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="conquistas-titulo">
+      <div class="secao__cabecalho">
+        <h2 class="secao__titulo" id="conquistas-titulo">Todas as conquistas</h2>
+      </div>
+      <ul class="grade-conquistas" id="grade-conquistas"></ul>
+    </section>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <noscript>
+    <p style="padding:1rem;text-align:center">O Quizio precisa de JavaScript ativado para funcionar.</p>
+  </noscript>
+
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>
