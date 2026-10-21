@@ -1,26 +1,45 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
 body {
-  background: var(--cor-creme);
+  background-color: var(--cor-creme);
+  /* textura discreta de pontos */
+  background-image: radial-gradient(rgba(53, 37, 79, 0.08) 1px, transparent 1.2px);
+  background-size: 24px 24px;
   color: var(--cor-texto);
   font-family: var(--fonte-corpo);
-  font-size: 1rem;
+  font-size: var(--texto-base);
+}
+
+::selection {
+  background: var(--cor-coral);
+  color: var(--tinta);
 }
 
 h1,
 h2,
 h3 {
   font-family: var(--fonte-titulo);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
-/* Foco visível para navegação por teclado */
-:focus-visible {
-  outline: 3px solid var(--cor-roxo-escuro);
-  outline-offset: 2px;
+/* ---------- Utilitários tipográficos ---------- */
+.rotulo {
+  font-family: var(--fonte-mono);
+  font-size: var(--texto-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-body.modal-aberto {
-  overflow: hidden;
+.titulo-secao {
+  font-size: var(--texto-3xl);
+  letter-spacing: -0.035em;
 }
 
 .texto-suave {
@@ -28,7 +47,21 @@ body.modal-aberto {
 }
 
 .texto-pequeno {
-  font-size: 0.875rem;
+  font-size: var(--texto-sm);
+}
+
+/* ---------- Foco visível ---------- */
+:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 3px;
+}
+
+.fundo-escuro :focus-visible {
+  outline-color: var(--cor-amarelo);
+}
+
+body.modal-aberto {
+  overflow: hidden;
 }
 
 /* Visível apenas para leitores de tela */
@@ -44,19 +77,65 @@ body.modal-aberto {
   border: 0;
 }
 
-/* Link para pular direto ao conteúdo (aparece ao focar com Tab) */
 .skip-link {
   position: absolute;
-  top: -4rem;
+  top: -5rem;
   left: var(--espaco-4);
   z-index: 200;
   padding: var(--espaco-2) var(--espaco-4);
-  background: var(--cor-roxo-escuro);
-  color: var(--cor-branco);
+  background: var(--tinta);
+  color: var(--cor-creme);
   border-radius: var(--raio-sm);
-  transition: top var(--transicao-rapida);
+  font-weight: 700;
+  transition: top var(--dur-1) var(--ease-saida);
 }
 
 .skip-link:focus {
   top: var(--espaco-2);
+}
+
+/* =====================================================================
+   MOTION
+   Regras: só transform e opacity; curvas e durações vêm dos tokens;
+   nada bloqueia a interação; prefers-reduced-motion desliga tudo
+   (ver reset.css e revelar.js).
+   ===================================================================== */
+
+/* Entrada das páginas internas */
+.pagina {
+  animation: pagina-entrar var(--dur-3) var(--ease-saida) both;
+}
+
+@keyframes pagina-entrar {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Revelação ao rolar: o JS adiciona .revelado quando o elemento aparece */
+.js [data-revelar] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s var(--ease-saida) var(--atraso, 0ms),
+    transform 0.7s var(--ease-saida) var(--atraso, 0ms);
+}
+
+.js [data-revelar].revelado {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes flutuar {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* Transição suave entre páginas (navegadores que suportam) */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
 }

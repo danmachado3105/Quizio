@@ -1,9 +1,9 @@
 .container {
-  width: min(100% - 2rem, var(--largura-maxima));
+  width: min(100% - 2 * var(--gutter), var(--largura-maxima));
   margin-inline: auto;
 }
 
-/* Espaçamento vertical entre as seções de uma página */
+/* Páginas internas */
 .pagina {
   padding-block: var(--espaco-6) var(--espaco-8);
 }
@@ -21,10 +21,9 @@
 }
 
 .secao__titulo {
-  font-size: 1.5rem;
+  font-size: var(--texto-2xl);
 }
 
-/* Grades reutilizáveis */
 .grid-duas {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -35,88 +34,258 @@
 .cabecalho {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: rgba(255, 248, 239, 0.94);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--cor-borda);
+  z-index: var(--z-cabecalho);
+  background: rgba(255, 248, 239, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--tinta);
 }
 
 .cabecalho__interno {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--espaco-4);
+  gap: var(--espaco-5);
   min-height: 4.25rem;
 }
 
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: var(--espaco-2);
+  gap: 0.55rem;
   font-family: var(--fonte-titulo);
+  font-size: 1.6rem;
   font-weight: 800;
-  font-size: 1.4rem;
-  letter-spacing: -0.02em;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.logo svg {
+  transition: transform var(--dur-2) var(--ease-pulo);
+}
+
+.logo:hover svg {
+  transform: rotate(-8deg) scale(1.07);
+}
+
+.nav {
+  margin-inline: auto;
 }
 
 .nav__lista {
   display: flex;
-  gap: var(--espaco-1);
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
 }
 
 .nav__link {
   display: inline-flex;
   align-items: center;
-  min-height: 2.5rem;
-  padding: 0.4rem 0.95rem;
+  min-height: 2.25rem;
+  padding: 0.3rem 1rem;
   border-radius: var(--raio-pilula);
-  font-weight: 500;
-  color: var(--cor-texto-suave);
-  transition: background-color var(--transicao-rapida), color var(--transicao-rapida);
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: background-color var(--dur-1) var(--ease-saida), color var(--dur-1) var(--ease-saida);
 }
 
 .nav__link:hover {
-  background: var(--cor-roxo-claro);
-  color: var(--cor-roxo-escuro);
+  background: var(--cor-amarelo);
 }
 
 .nav__link[aria-current="page"] {
-  background: var(--cor-roxo-claro);
-  color: var(--cor-roxo-profundo);
-  font-weight: 700;
+  background: var(--tinta);
+  color: var(--cor-creme);
 }
 
 .cabecalho__acoes {
   display: flex;
   align-items: center;
-  gap: var(--espaco-2);
+  gap: var(--espaco-3);
 }
 
-.botao-menu {
-  display: none;
+/* Nível do jogador no cabeçalho */
+.chip-nivel {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--raio-sm);
-  color: var(--cor-roxo-escuro);
+  gap: 0.5rem;
+  padding: 0.2rem 0.9rem 0.2rem 0.25rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  transition: background-color var(--dur-1) var(--ease-saida), transform var(--dur-1) var(--ease-saida);
 }
 
-.botao-menu:hover {
+.chip-nivel:hover {
+  background: var(--cor-amarelo-claro);
+  transform: translateY(-1px);
+}
+
+.chip-nivel__texto {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 3.4rem;
+}
+
+.chip-nivel__nivel {
+  font-family: var(--fonte-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.chip-nivel__barra {
+  height: 0.35rem;
   background: var(--cor-roxo-claro);
+  border-radius: var(--raio-pilula);
+  overflow: hidden;
+}
+
+.chip-nivel__barra span {
+  display: block;
+  height: 100%;
+  background: var(--cor-roxo);
+}
+
+/* ---------- Barra de abas (celular) ---------- */
+.abas {
+  display: none;
+}
+
+@media (max-width: 52rem) {
+  .nav,
+  .cabecalho__cta {
+    display: none;
+  }
+
+  .cabecalho__interno {
+    justify-content: space-between;
+  }
+
+  body {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  .abas {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: var(--z-abas);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: end;
+    padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom));
+    background: var(--cor-branco);
+    border-top: 2px solid var(--tinta);
+  }
+
+  .aba {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 3.5rem;
+    border-radius: var(--raio-md);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--cor-texto-suave);
+    transition: background-color var(--dur-1) var(--ease-saida);
+  }
+
+  .aba[aria-current="page"] {
+    background: var(--cor-amarelo);
+    color: var(--tinta);
+  }
+
+  .aba--jogar {
+    transform: translateY(-0.9rem);
+    min-height: 0;
+    color: var(--tinta);
+  }
+
+  .aba--jogar .aba__icone {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    background: var(--cor-coral);
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
+    box-shadow: 0 3px 0 var(--tinta);
+  }
+
+  /* Durante a partida, a navegação some para não distrair */
+  body[data-pagina="jogo"] .abas {
+    display: none;
+  }
+
+  body[data-pagina="jogo"] {
+    padding-bottom: 0;
+  }
 }
 
 /* ---------- Rodapé ---------- */
 .rodape {
-  border-top: 1px solid var(--cor-borda);
-  padding-block: var(--espaco-5);
-  color: var(--cor-texto-suave);
-  font-size: 0.875rem;
+  padding-block: var(--espaco-8) var(--espaco-6);
+  background: var(--tinta);
+  color: var(--cor-creme);
+  overflow: hidden;
 }
 
-.rodape__interno {
+.rodape__grade {
+  display: grid;
+  gap: var(--espaco-6);
+}
+
+.rodape__marca {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(4.5rem, 20vw, 14rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--cor-amarelo);
+  user-select: none;
+}
+
+.rodape__linha {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: var(--espaco-2) var(--espaco-5);
+  gap: var(--espaco-5);
+}
+
+.rodape__frase {
+  max-width: 24rem;
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-xl);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rodape__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-5);
+}
+
+.rodape__links a {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--dur-1) var(--ease-saida);
+}
+
+.rodape__links a:hover {
+  text-decoration-color: var(--cor-amarelo);
+}
+
+.rodape__nota {
+  max-width: 36rem;
+  font-size: var(--texto-sm);
+  color: rgba(255, 248, 239, 0.75);
 }
