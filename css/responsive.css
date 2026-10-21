@@ -1,61 +1,18 @@
-/* ---------- Tablet ---------- */
+/* Ajustes globais de tela. Regras específicas de cada página ficam no CSS da própria página. */
 @media (max-width: 56rem) {
   .grid-duas {
     grid-template-columns: 1fr;
   }
+}
 
-  .grid-estatisticas {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .hero {
-    grid-template-columns: 1fr;
-    padding: var(--espaco-5);
-  }
-
-  /* Formas decorativas saem em telas menores para não atrapalhar a leitura */
-  .hero::before,
-  .hero::after {
-    display: none;
-  }
-
-  /* Menu vira painel suspenso */
-  .botao-menu {
-    display: inline-flex;
-  }
-
-  .nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    padding: var(--espaco-3) var(--espaco-4) var(--espaco-4);
-    background: var(--cor-creme);
-    border-bottom: 1px solid var(--cor-borda);
-    box-shadow: var(--sombra-md);
-  }
-
-  .nav--aberta {
-    display: block;
-  }
-
-  .nav__lista {
-    flex-direction: column;
-  }
-
-  .nav__link {
-    width: 100%;
-    min-height: 3rem;
+@media (max-width: 52rem) {
+  /* A barra de abas ocupa a base da tela: notificações sobem acima dela */
+  .notificacoes {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
   }
 }
 
-/* ---------- Celular ---------- */
 @media (max-width: 36rem) {
-  .container {
-    width: min(100% - 1.5rem, var(--largura-maxima));
-  }
-
   .pagina {
     padding-block: var(--espaco-5) var(--espaco-7);
   }
@@ -65,31 +22,11 @@
   }
 
   .secao__titulo {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
   .card {
     padding: var(--espaco-4);
-  }
-
-  .hero {
-    padding: var(--espaco-5) var(--espaco-4);
-  }
-
-  .hero__acoes .botao--grande {
-    width: 100%;
-  }
-
-  .cabecalho__cta {
-    display: none;
-  }
-
-  .grid-categorias {
-    grid-template-columns: 1fr;
-  }
-
-  .estatistica__valor {
-    font-size: 1.5rem;
   }
 
   .modal__acoes .botao {
