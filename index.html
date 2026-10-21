@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Quizio: quizzes de conhecimentos gerais com categorias, níveis, conquistas e desafio diário.">
-  <meta name="theme-color" content="#7254D8">
-  <title>Quizio | Teste o que você sabe</title>
+  <meta name="description" content="Quizio: quizzes de conhecimentos gerais com 12 temas, explicação em cada resposta, níveis, missões e conquistas.">
+  <meta name="theme-color" content="#FFF8EF">
+  <title>Quizio | Responda, erre, aprenda, repita</title>
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%237254D8'/%3E%3Ccircle cx='15' cy='15' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M19 19l5 5' stroke='%23FF786B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='12' fill='%237254D8' stroke='%2335254F' stroke-width='2.5'/%3E%3Ccircle cx='20' cy='19' r='9' fill='%23FFD166' stroke='%2335254F' stroke-width='2.5'/%3E%3Cpath d='M16.8 16.6a3.3 3.3 0 1 1 4.7 3c-1 .5-1.5 1.1-1.5 2.1' fill='none' stroke='%2335254F' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='20' cy='24.4' r='1.3' fill='%2335254F'/%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 
+  <!-- As fontes são carregadas pelo @import dentro de css/variables.css -->
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/global.css">
@@ -20,6 +20,9 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/pages/home.css">
   <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Marca a página como "com JavaScript" antes da primeira pintura (evita piscar) -->
+  <script>document.documentElement.classList.add("js");</script>
 </head>
 
 <!-- data-base: caminho até a raiz do projeto ("" aqui, "../" nas páginas dentro de pages/) -->
@@ -28,69 +31,18 @@
 
   <header class="cabecalho" id="cabecalho"></header>
 
-  <main class="container pagina" id="conteudo">
+  <main id="conteudo">
+    <section class="abertura" id="abertura" aria-label="Apresentação"></section>
 
-    <section class="card hero" aria-labelledby="hero-titulo">
-      <div class="hero__texto">
-        <p class="hero__saudacao" id="hero-saudacao"></p>
-        <h1 class="hero__titulo" id="hero-titulo">Olá, jogador!</h1>
-        <p class="hero__descricao">Escolha uma categoria, teste o que você sabe e suba de nível a cada partida.</p>
-        <div class="hero__acoes">
-          <a class="botao botao--amarelo botao--grande" href="pages/categorias.html" data-icone="play">Começar a jogar</a>
-          <button class="botao botao--texto" type="button" id="botao-editar-nome">Alterar nome</button>
-        </div>
-      </div>
-      <div class="nivel" id="resumo-nivel" aria-live="polite"></div>
-    </section>
+    <!-- Faixa decorativa: os temas estão listados com detalhes mais abaixo -->
+    <div class="faixa" id="faixa-temas" aria-hidden="true"></div>
 
-    <div class="grid-duas">
-      <section class="card" id="desafio-diario" aria-labelledby="desafio-titulo"></section>
-
-      <section class="card" aria-labelledby="missoes-titulo">
-        <div class="card__cabecalho">
-          <span class="icone-caixa icone-caixa--roxo"><span data-icone="target"></span></span>
-          <div>
-            <h2 class="card__titulo" id="missoes-titulo">Missões de hoje</h2>
-            <p class="texto-suave texto-pequeno">Reiniciam todos os dias.</p>
-          </div>
-        </div>
-        <ul class="lista" id="lista-missoes"></ul>
-      </section>
-    </div>
-
-    <section aria-labelledby="categorias-titulo">
-      <div class="secao__cabecalho">
-        <h2 class="secao__titulo" id="categorias-titulo">Categorias em destaque</h2>
-        <a class="link-acao" href="pages/categorias.html" data-icone="arrow-right">Ver todas</a>
-      </div>
-      <div class="grid-categorias" id="categorias-destaque"></div>
-    </section>
-
-    <section aria-labelledby="estatisticas-titulo">
-      <div class="secao__cabecalho">
-        <h2 class="secao__titulo" id="estatisticas-titulo">Suas estatísticas</h2>
-      </div>
-      <div class="grid-estatisticas" id="estatisticas"></div>
-    </section>
-
-    <div class="grid-duas">
-      <section class="card" aria-labelledby="conquistas-titulo">
-        <div class="card__cabecalho card__cabecalho--espacado">
-          <h2 class="card__titulo" id="conquistas-titulo">Conquistas recentes</h2>
-          <a class="link-acao" href="pages/conquistas.html">Ver todas</a>
-        </div>
-        <div id="conquistas-recentes"></div>
-      </section>
-
-      <section class="card" aria-labelledby="historico-titulo">
-        <div class="card__cabecalho card__cabecalho--espacado">
-          <h2 class="card__titulo" id="historico-titulo">Últimas partidas</h2>
-          <a class="link-acao" href="pages/perfil.html">Ver perfil</a>
-        </div>
-        <div id="historico-partidas"></div>
-      </section>
-    </div>
-
+    <section class="painel fundo-escuro" id="painel" aria-label="Seu painel"></section>
+    <section class="secao" id="categorias" aria-labelledby="categorias-titulo"></section>
+    <section class="secao secao--papel" id="modos" aria-labelledby="modos-titulo"></section>
+    <section class="secao" id="recompensas" aria-labelledby="recompensas-titulo"></section>
+    <section class="secao secao--papel" id="historia" aria-labelledby="historia-titulo" hidden></section>
+    <section class="chamada fundo-escuro" id="chamada-final" aria-label="Comece a jogar"></section>
   </main>
 
   <footer class="rodape" id="rodape"></footer>
