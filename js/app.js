@@ -1,11 +1,12 @@
 import { renderizarCabecalho, renderizarRodape } from "./components/header.js";
 import { hidratarIcones } from "./utils/icones.js";
+import { iniciarRevelacao } from "./utils/revelar.js";
 import { criarElemento } from "./utils/dom.js";
 
 /*
  * Cada página HTML declara <body data-pagina="..." data-base="...">.
- * O módulo da página só é carregado quando ela é aberta.
- * Os arquivos de categorias, jogo, resultado, perfil e conquistas serão criados nas próximas etapas.
+ * O módulo da página só é carregado quando ela é aberta e precisa
+ * exportar uma função iniciar({ base }).
  */
 const CARREGADORES_DE_PAGINA = {
   home: () => import("./pages/home.js"),
@@ -31,8 +32,11 @@ function mostrarErroDeCarregamento() {
 async function iniciarAplicacao() {
   const { pagina, base = "" } = document.body.dataset;
 
+  // O CSS só esconde elementos "data-revelar" quando esta classe existe
+  document.documentElement.classList.add("js");
+
   renderizarCabecalho({ base, paginaAtual: pagina });
-  renderizarRodape();
+  renderizarRodape({ base });
   hidratarIcones(document);
 
   const carregarPagina = CARREGADORES_DE_PAGINA[pagina];
@@ -43,11 +47,13 @@ async function iniciarAplicacao() {
 
   try {
     const modulo = await carregarPagina();
-    modulo.iniciar({ base });
+    await modulo.iniciar({ base });
   } catch (erro) {
     console.error(`Quizio: falha ao iniciar a página "${pagina}".`, erro);
     mostrarErroDeCarregamento();
   }
+
+  iniciarRevelacao();
 }
 
 iniciarAplicacao();
