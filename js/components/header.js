@@ -1,96 +1,137 @@
-import { criarElemento } from "../utils/dom.js";
+import { criarElemento as el } from "../utils/dom.js";
 import { criarIcone, criarLogo } from "../utils/icones.js";
+import { criarAvatar } from "./avatar.js";
+import { obterDados } from "../services/storage.js";
+import { calcularNivel } from "../utils/progressao.js";
 
 const LINKS = [
-  { id: "home", rotulo: "Início", caminho: "index.html" },
-  { id: "categorias", rotulo: "Categorias", caminho: "pages/categorias.html" },
-  { id: "conquistas", rotulo: "Conquistas", caminho: "pages/conquistas.html" },
-  { id: "perfil", rotulo: "Perfil", caminho: "pages/perfil.html" },
+  { id: "home", rotulo: "Início", caminho: "index.html", icone: "home" },
+  { id: "categorias", rotulo: "Explorar", caminho: "pages/categorias.html", icone: "compass" },
+  { id: "conquistas", rotulo: "Conquistas", caminho: "pages/conquistas.html", icone: "trophy" },
+  { id: "perfil", rotulo: "Perfil", caminho: "pages/perfil.html", icone: "user" },
 ];
 
-/** Monta o cabeçalho com menu responsivo dentro de <header id="cabecalho">. */
+function criarChipDeNivel(base) {
+  const dados = obterDados();
+  const { nivel, percentual } = calcularNivel(dados.progresso.xp);
+
+  const barra = el("span", { classe: "chip-nivel__barra", atributos: { "aria-hidden": "true" } }, [el("span")]);
+  barra.firstElementChild.style.width = `${percentual}%`;
+
+  return el(
+    "a",
+    {
+      classe: "chip-nivel",
+      atributos: {
+        href: `${base}pages/perfil.html`,
+        "aria-label": `Seu perfil: nível ${nivel}, ${percentual}% do caminho para o próximo`,
+      },
+    },
+    [
+      criarAvatar(dados.perfil.avatar, 30),
+      el("span", { classe: "chip-nivel__texto" }, [el("span", { classe: "chip-nivel__nivel", texto: `NV ${nivel}` }), barra]),
+    ]
+  );
+}
+
+/** Barra de abas fixa na base da tela, só em celulares (ver layout.css). */
+function criarAbas(base, paginaAtual) {
+  const itens = [
+    LINKS[0],
+    LINKS[1],
+    { id: "jogar", rotulo: "Jogar", caminho: "pages/categorias.html", icone: "play" },
+    LINKS[2],
+    LINKS[3],
+  ];
+
+  return el(
+    "nav",
+    { classe: "abas", atributos: { id: "abas", "aria-label": "Navegação rápida" } },
+    itens.map((item) =>
+      el(
+        "a",
+        {
+          classe: `aba${item.id === "jogar" ? " aba--jogar" : ""}`,
+          atributos: {
+            href: base + item.caminho,
+            "aria-current": item.id === paginaAtual ? "page" : null,
+          },
+        },
+        [el("span", { classe: "aba__icone" }, [criarIcone(item.icone, item.id === "jogar" ? 26 : 22)]), el("span", { texto: item.rotulo })]
+      )
+    )
+  );
+}
+
+/** Monta o cabeçalho e a barra de abas. Chamada pelo app.js em todas as páginas. */
 export function renderizarCabecalho({ base, paginaAtual }) {
   const cabecalho = document.getElementById("cabecalho");
   if (!cabecalho) return;
 
-  const itens = LINKS.map((link) =>
-    criarElemento("li", {}, [
-      criarElemento("a", {
-        classe: "nav__link",
-        texto: link.rotulo,
-        atributos: {
-          href: base + link.caminho,
-          "aria-current": link.id === paginaAtual ? "page" : null,
-        },
-      }),
-    ])
+  const logo = el(
+    "a",
+    { classe: "logo", atributos: { href: `${base}index.html`, "aria-label": "Quizio, página inicial" } },
+    [criarLogo(36), el("span", { texto: "quizio" })]
   );
 
-  const nav = criarElemento(
+  const nav = el(
     "nav",
-    { classe: "nav", atributos: { id: "menu-principal", "aria-label": "Navegação principal" } },
-    [criarElemento("ul", { classe: "nav__lista" }, itens)]
+    { classe: "nav", atributos: { "aria-label": "Navegação principal" } },
+    [
+      el(
+        "ul",
+        { classe: "nav__lista" },
+        LINKS.map((link) =>
+          el("li", {}, [
+            el("a", {
+              classe: "nav__link",
+              texto: link.rotulo,
+              atributos: { href: base + link.caminho, "aria-current": link.id === paginaAtual ? "page" : null },
+            }),
+          ])
+        )
+      ),
+    ]
   );
 
-  const botaoMenu = criarElemento(
-    "button",
-    {
-      classe: "botao-menu",
-      atributos: { type: "button", "aria-expanded": "false", "aria-controls": "menu-principal", "aria-label": "Abrir menu" },
-    },
-    [criarIcone("menu", 24)]
-  );
-
-  function definirMenu(aberto) {
-    nav.classList.toggle("nav--aberta", aberto);
-    botaoMenu.setAttribute("aria-expanded", String(aberto));
-    botaoMenu.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
-    botaoMenu.replaceChildren(criarIcone(aberto ? "x" : "menu", 24));
-  }
-
-  botaoMenu.addEventListener("click", () => definirMenu(!nav.classList.contains("nav--aberta")));
-  nav.addEventListener("click", (evento) => {
-    if (evento.target.closest("a")) definirMenu(false);
-  });
-  document.addEventListener("keydown", (evento) => {
-    if (evento.key === "Escape" && nav.classList.contains("nav--aberta")) {
-      definirMenu(false);
-      botaoMenu.focus();
-    }
-  });
-
-  const logo = criarElemento(
+  const botaoJogar = el(
     "a",
-    { classe: "logo", atributos: { href: base + "index.html", "aria-label": "Quizio, página inicial" } },
-    [criarLogo(36), criarElemento("span", { texto: "Quizio" })]
-  );
-
-  const botaoJogar = criarElemento(
-    "a",
-    {
-      classe: "botao botao--primario botao--pequeno cabecalho__cta",
-      atributos: { href: base + "pages/categorias.html" },
-    },
+    { classe: "botao botao--primario botao--pequeno cabecalho__cta", atributos: { href: `${base}pages/categorias.html` } },
     [criarIcone("play", 16), "Jogar"]
   );
 
   cabecalho.replaceChildren(
-    criarElemento("div", { classe: "container cabecalho__interno" }, [
+    el("div", { classe: "container cabecalho__interno" }, [
       logo,
       nav,
-      criarElemento("div", { classe: "cabecalho__acoes" }, [botaoJogar, botaoMenu]),
+      el("div", { classe: "cabecalho__acoes" }, [criarChipDeNivel(base), botaoJogar]),
     ])
   );
+
+  document.getElementById("abas")?.remove();
+  document.body.append(criarAbas(base, paginaAtual));
 }
 
-export function renderizarRodape() {
+export function renderizarRodape({ base = "" } = {}) {
   const rodape = document.getElementById("rodape");
   if (!rodape) return;
 
+  rodape.classList.add("fundo-escuro");
   rodape.replaceChildren(
-    criarElemento("div", { classe: "container rodape__interno" }, [
-      criarElemento("p", { texto: `© ${new Date().getFullYear()} Quizio. Feito com HTML, CSS e JavaScript.` }),
-      criarElemento("p", { texto: "Seu progresso fica salvo apenas neste navegador." }),
+    el("div", { classe: "container rodape__grade" }, [
+      el("p", { classe: "rodape__marca", texto: "quizio", atributos: { "aria-hidden": "true" } }),
+      el("div", { classe: "rodape__linha" }, [
+        el("p", { classe: "rodape__frase", texto: "Perguntas boas merecem respostas melhores." }),
+        el(
+          "nav",
+          { classe: "rodape__links", atributos: { "aria-label": "Rodapé" } },
+          LINKS.map((link) => el("a", { texto: link.rotulo, atributos: { href: base + link.caminho } }))
+        ),
+      ]),
+      el("p", {
+        classe: "rodape__nota",
+        texto: `© ${new Date().getFullYear()} Quizio. Feito com HTML, CSS e JavaScript puro. Seu progresso fica salvo apenas neste navegador.`,
+      }),
     ])
   );
 }
