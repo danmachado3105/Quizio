@@ -1,0 +1,92 @@
+export default [
+  {
+    id: "cm-001", categoria: "comida-culinaria", dificuldade: "facil",
+    enunciado: "De qual país é originária a pizza?",
+    alternativas: ["França", "Itália", "Grécia", "Espanha"], correta: 1,
+    explicacao: "A pizza como a conhecemos surgiu em Nápoles, na Itália.",
+  },
+  {
+    id: "cm-002", categoria: "comida-culinaria", dificuldade: "facil",
+    enunciado: "Qual é o principal ingrediente do guacamole?",
+    alternativas: ["Abacate", "Pepino", "Ervilha", "Banana"], correta: 0,
+    explicacao: "O guacamole é um molho mexicano feito de abacate amassado, geralmente com cebola, tomate e limão.",
+  },
+  {
+    id: "cm-003", categoria: "comida-culinaria", dificuldade: "facil",
+    enunciado: "Qual prato brasileiro é feito com feijão-preto e vários tipos de carne de porco?",
+    alternativas: ["Moqueca", "Feijoada", "Baião de dois", "Vatapá"], correta: 1,
+    explicacao: "A feijoada costuma ser servida com arroz, couve, farofa e laranja.",
+  },
+  {
+    id: "cm-004", categoria: "comida-culinaria", dificuldade: "facil",
+    enunciado: "Qual alimento é a base do sushi tradicional, ao lado do peixe?",
+    alternativas: ["Arroz", "Batata", "Milho", "Aveia"], correta: 0,
+    explicacao: "O arroz temperado com vinagre é o que dá ao sushi o seu sabor característico.",
+  },
+  {
+    id: "cm-005", categoria: "comida-culinaria", dificuldade: "facil",
+    enunciado: "De qual planta vem o chocolate?",
+    alternativas: ["Café", "Cacau", "Baunilha", "Castanha"], correta: 1,
+    explicacao: "O chocolate é feito das sementes do cacaueiro.",
+  },
+  {
+    id: "cm-006", categoria: "comida-culinaria", dificuldade: "medio",
+    enunciado: "Qual país é a origem do queijo parmesão (parmigiano reggiano)?",
+    alternativas: ["Itália", "Suíça", "Holanda", "França"], correta: 0,
+    explicacao: "O parmigiano reggiano é produzido em regiões da Itália, como Parma e Reggio Emilia.",
+  },
+  {
+    id: "cm-007", categoria: "comida-culinaria", dificuldade: "medio",
+    enunciado: "Qual prato espanhol é feito com arroz, açafrão e carnes ou frutos do mar, típico de Valência?",
+    alternativas: ["Gazpacho", "Paella", "Tortilha", "Churrasco"], correta: 1,
+    explicacao: "A paella leva o nome da panela larga e rasa em que é preparada.",
+  },
+  {
+    id: "cm-008", categoria: "comida-culinaria", dificuldade: "medio",
+    enunciado: "Qual especiaria, extraída das flores de um tipo de crocus, é conhecida por ser uma das mais caras do mundo?",
+    alternativas: ["Cúrcuma", "Açafrão", "Canela", "Cardamomo"], correta: 1,
+    explicacao: "Cada flor rende apenas alguns fios, colhidos à mão, por isso o açafrão é tão caro.",
+  },
+  {
+    id: "cm-009", categoria: "comida-culinaria", dificuldade: "medio",
+    enunciado: "De qual país vem o prato pad thai?",
+    alternativas: ["Vietnã", "Tailândia", "Índia", "Coreia do Sul"], correta: 1,
+    explicacao: "O pad thai é um macarrão de arroz salteado, com ovos, amendoim e molho agridoce.",
+  },
+  {
+    id: "cm-010", categoria: "comida-culinaria", dificuldade: "medio",
+    enunciado: "Qual bebida brasileira é um destilado do caldo de cana fermentado?",
+    alternativas: ["Cachaça", "Vinho", "Saquê", "Tequila"], correta: 0,
+    explicacao: "A cachaça é a base da caipirinha. O saquê é feito de arroz e a tequila, de agave.",
+  },
+  {
+    id: "cm-011", categoria: "comida-culinaria", dificuldade: "dificil",
+    enunciado: "De qual planta é extraída a tequila?",
+    alternativas: ["Cacto nopal", "Agave azul", "Cana-de-açúcar", "Milho"], correta: 1,
+    explicacao: "A tequila é produzida a partir do coração da agave azul, principalmente no estado mexicano de Jalisco.",
+  },
+  {
+    id: "cm-012", categoria: "comida-culinaria", dificuldade: "dificil",
+    enunciado: "Como se chama o pão achatado indiano tradicionalmente assado no tandoor?",
+    alternativas: ["Naan", "Pita", "Tortilla", "Ciabatta"], correta: 0,
+    explicacao: "O tandoor é um forno de argila. O naan é assado colado na parede quente dele.",
+  },
+  {
+    id: "cm-013", categoria: "comida-culinaria", dificuldade: "dificil",
+    enunciado: "Qual molho francês clássico, feito de gemas, manteiga e limão, acompanha o prato ovos Benedict?",
+    alternativas: ["Holandês", "Bechamel", "Vinagrete", "Bearnês"], correta: 0,
+    explicacao: "O molho holandês é uma emulsão de gemas e manteiga. O bearnês é parecido, mas leva estragão e chalota.",
+  },
+  {
+    id: "cm-014", categoria: "comida-culinaria", dificuldade: "dificil",
+    enunciado: "Como se chama a técnica de cozinhar alimentos embalados a vácuo em água com temperatura baixa e controlada?",
+    alternativas: ["Flambagem", "Sous-vide", "Gratinar", "Branquear"], correta: 1,
+    explicacao: "Sous-vide significa \"sob vácuo\" em francês. A temperatura constante deixa a carne uniformemente macia.",
+  },
+  {
+    id: "cm-015", categoria: "comida-culinaria", dificuldade: "dificil",
+    enunciado: "Qual queijo francês de massa azulada, feito com leite de ovelha, é maturado em cavernas?",
+    alternativas: ["Brie", "Roquefort", "Camembert", "Gruyère"], correta: 1,
+    explicacao: "O roquefort amadurece nas cavernas de Roquefort-sur-Soulzon, no sul da França.",
+  },
+];
