@@ -1,0 +1,92 @@
+export default [
+  {
+    id: "ec-001", categoria: "economia-negocios", dificuldade: "facil",
+    enunciado: "Qual é a moeda oficial do Brasil?",
+    alternativas: ["Dólar", "Real", "Peso", "Euro"], correta: 1,
+    explicacao: "O real foi criado em 1994, com o Plano Real.",
+  },
+  {
+    id: "ec-002", categoria: "economia-negocios", dificuldade: "facil",
+    enunciado: "Como se chama o aumento geral e contínuo dos preços?",
+    alternativas: ["Deflação", "Inflação", "Recessão", "Câmbio"], correta: 1,
+    explicacao: "Com a inflação, o mesmo dinheiro compra menos coisas ao longo do tempo.",
+  },
+  {
+    id: "ec-003", categoria: "economia-negocios", dificuldade: "facil",
+    enunciado: "Qual é a moeda usada em grande parte dos países da União Europeia?",
+    alternativas: ["Libra", "Euro", "Franco", "Marco"], correta: 1,
+    explicacao: "O euro circula desde 2002 e é usado por vários países, como Alemanha, França e Itália.",
+  },
+  {
+    id: "ec-004", categoria: "economia-negocios", dificuldade: "facil",
+    enunciado: "O que significa a sigla PIB?",
+    alternativas: ["Produto Interno Bruto", "Preço Interno Básico", "Produção Industrial Bruta", "Programa de Investimento Brasileiro"], correta: 0,
+    explicacao: "O PIB mede o valor de tudo o que um país produz em bens e serviços durante um período.",
+  },
+  {
+    id: "ec-005", categoria: "economia-negocios", dificuldade: "facil",
+    enunciado: "Como se chama o dinheiro que uma pessoa guarda para usar no futuro?",
+    alternativas: ["Dívida", "Poupança", "Imposto", "Taxa"], correta: 1,
+    explicacao: "Poupar é separar uma parte da renda em vez de gastar tudo.",
+  },
+  {
+    id: "ec-006", categoria: "economia-negocios", dificuldade: "medio",
+    enunciado: "Qual órgão brasileiro define a taxa básica de juros, a Selic?",
+    alternativas: ["Receita Federal", "Copom, do Banco Central", "BNDES", "IBGE"], correta: 1,
+    explicacao: "O Comitê de Política Monetária (Copom) se reúne periodicamente para decidir a meta da Selic.",
+  },
+  {
+    id: "ec-007", categoria: "economia-negocios", dificuldade: "medio",
+    enunciado: "O que é uma ação negociada na bolsa de valores?",
+    alternativas: ["Um empréstimo ao governo", "Uma pequena parte de uma empresa", "Um tipo de imposto", "Uma moeda estrangeira"], correta: 1,
+    explicacao: "Quem compra uma ação se torna sócio da empresa, ainda que com uma fração muito pequena.",
+  },
+  {
+    id: "ec-008", categoria: "economia-negocios", dificuldade: "medio",
+    enunciado: "Como é chamada, pela definição técnica mais comum, a queda da atividade econômica por dois trimestres seguidos?",
+    alternativas: ["Inflação", "Recessão", "Superávit", "Câmbio"], correta: 1,
+    explicacao: "Uma recessão costuma vir acompanhada de queda na produção, no consumo e no emprego.",
+  },
+  {
+    id: "ec-009", categoria: "economia-negocios", dificuldade: "medio",
+    enunciado: "Quando as receitas do governo são maiores que as despesas, há:",
+    alternativas: ["Déficit", "Superávit", "Inflação", "Recessão"], correta: 1,
+    explicacao: "Superávit é o saldo positivo. Quando as despesas superam as receitas, o saldo negativo se chama déficit.",
+  },
+  {
+    id: "ec-010", categoria: "economia-negocios", dificuldade: "medio",
+    enunciado: "Quem escreveu A Riqueza das Nações, em 1776?",
+    alternativas: ["Karl Marx", "Adam Smith", "John Maynard Keynes", "David Ricardo"], correta: 1,
+    explicacao: "Adam Smith é considerado o pai da economia moderna e falou da \"mão invisível\" do mercado.",
+  },
+  {
+    id: "ec-011", categoria: "economia-negocios", dificuldade: "dificil",
+    enunciado: "O que é um monopólio?",
+    alternativas: ["Muitos vendedores disputando clientes", "Um único vendedor domina o mercado", "Um único comprador domina o mercado", "Mercado sem nenhuma regra"], correta: 1,
+    explicacao: "No monopólio, sem concorrência, a empresa pode impor preços e condições com mais facilidade.",
+  },
+  {
+    id: "ec-012", categoria: "economia-negocios", dificuldade: "dificil",
+    enunciado: "Qual é o índice usado como medida oficial da inflação no Brasil, calculado pelo IBGE?",
+    alternativas: ["IPCA", "Selic", "CDI", "Ibovespa"], correta: 0,
+    explicacao: "O IPCA (Índice Nacional de Preços ao Consumidor Amplo) é a referência para a meta de inflação do país.",
+  },
+  {
+    id: "ec-013", categoria: "economia-negocios", dificuldade: "dificil",
+    enunciado: "Qual economista britânico defendeu que o Estado deve estimular a economia em tempos de crise?",
+    alternativas: ["John Maynard Keynes", "Milton Friedman", "Friedrich Hayek", "Adam Smith"], correta: 0,
+    explicacao: "Keynes defendia o gasto público para sustentar a demanda, ideia que ganhou força após a crise de 1929.",
+  },
+  {
+    id: "ec-014", categoria: "economia-negocios", dificuldade: "dificil",
+    enunciado: "O que é um dividendo para um acionista?",
+    alternativas: ["Parte do lucro distribuída pela empresa", "Taxa cobrada pela corretora", "Imposto sobre as ações", "Prejuízo da empresa"], correta: 0,
+    explicacao: "Quando a empresa tem lucro, pode repartir uma parte entre os acionistas na forma de dividendos.",
+  },
+  {
+    id: "ec-015", categoria: "economia-negocios", dificuldade: "dificil",
+    enunciado: "O que significa PIB per capita?",
+    alternativas: ["PIB dividido pelo número de habitantes", "PIB dividido pelas exportações", "Soma de todos os salários do país", "Total de impostos pagos"], correta: 0,
+    explicacao: "O PIB per capita dá uma ideia da riqueza média por habitante, mas não mostra como ela é distribuída.",
+  },
+];
