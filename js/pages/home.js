@@ -32,6 +32,8 @@ const LETRAS = ["A", "B", "C", "D"];
 const ORDEM_PADRAO = [
   "ciencia-espaco", "historia", "filmes-series", "games-nerd", "brasil", "musica",
   "geografia", "esportes", "tecnologia", "literatura", "natureza-animais", "conhecimentos-gerais",
+  "arte-arquitetura", "comida-culinaria", "corpo-humano", "mitologia-lendas",
+  "matematica-logica", "lingua-portuguesa", "economia-negocios", "datas-tradicoes",
 ];
 
 // Seis temas ganham destaque no mosaico, cada um com tamanho e cor próprios
@@ -439,7 +441,7 @@ function criarBlocoSemana({ dados }) {
 
 function criarBlocoPassos() {
   const passos = [
-    ["01", "Escolha um assunto", "Doze temas, três dificuldades e o tamanho de partida que couber no seu tempo."],
+    ["01", "Escolha um assunto","Vinte temas, três dificuldades e o tamanho de partida que couber no seu tempo."],
     ["02", "Responda e aprenda", "Acertando ou errando, toda resposta mostra a explicação logo em seguida."],
     ["03", "Suba de nível", "Pontos viram XP. XP vira nível, missões cumpridas e conquistas."],
   ];
