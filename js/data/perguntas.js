@@ -1,13 +1,15 @@
-import { CATEGORIAS } from "./categorias.js";
+import { CATEGORIAS, resolverIdDaCategoria } from "./categorias.js";
 
 import conhecimentosGerais from "./perguntas/conhecimentos-gerais.js";
 import cienciaEspaco from "./perguntas/ciencia-espaco.js";
 import historia from "./perguntas/historia.js";
 import geografia from "./perguntas/geografia.js";
-import filmesSeries from "./perguntas/filmes-series.js";
+import filmes from "./perguntas/filmes.js";
+import series from "./perguntas/series.js";
 import musica from "./perguntas/musica.js";
 import esportes from "./perguntas/esportes.js";
-import gamesNerd from "./perguntas/games-nerd.js";
+import jogos from "./perguntas/jogos.js";
+import animes from "./perguntas/animes.js";
 import tecnologia from "./perguntas/tecnologia.js";
 import literatura from "./perguntas/literatura.js";
 import naturezaAnimais from "./perguntas/natureza-animais.js";
@@ -20,10 +22,12 @@ import matematicaLogica from "./perguntas/matematica-logica.js";
 import linguaPortuguesa from "./perguntas/lingua-portuguesa.js";
 import economiaNegocios from "./perguntas/economia-negocios.js";
 import datasTradicoes from "./perguntas/datas-tradicoes.js";
+import invencoesDescobertas from "./perguntas/invencoes-descobertas.js";
+import expansoes from "./perguntas/expansoes.js";
 
 /*
  * Banco de perguntas. Cada categoria tem seu arquivo em js/data/perguntas/.
- * Para adicionar perguntas, abra o arquivo da categoria e inclua um objeto com id único.
+ * Perguntas extras entram pelo arquivo expansoes.js, sem mexer nos arquivos originais.
  * Este arquivo valida tudo ao carregar e ignora (com aviso no console) perguntas
  * malformadas, com id repetido ou com enunciado repetido.
  */
@@ -36,12 +40,12 @@ export const DIFICULDADES = [
   { id: "dificil", nome: "Difícil" },
 ];
 
-// Lista de pacotes de conteúdo: um por categoria
+// Lista de pacotes de conteúdo
 const PACOTES = [
-  conhecimentosGerais, cienciaEspaco, historia, geografia, filmesSeries, musica,
-  esportes, gamesNerd, tecnologia, literatura, naturezaAnimais, brasil,
-  arteArquitetura, comidaCulinaria, corpoHumano, mitologiaLendas,
-  matematicaLogica, linguaPortuguesa, economiaNegocios, datasTradicoes,
+  conhecimentosGerais, cienciaEspaco, historia, geografia, filmes, series, musica, esportes,
+  jogos, animes, tecnologia, literatura, naturezaAnimais, brasil, arteArquitetura,
+  comidaCulinaria, corpoHumano, mitologiaLendas, matematicaLogica, linguaPortuguesa,
+  economiaNegocios, datasTradicoes, invencoesDescobertas, expansoes,
 ];
 
 const IDS_DE_CATEGORIA = new Set(CATEGORIAS.map((categoria) => categoria.id));
@@ -104,9 +108,10 @@ export function obterPerguntaPorId(id) {
 
 /** Perguntas que atendem à categoria e à dificuldade ("todas" e "misto" não filtram). */
 export function filtrarPerguntas({ categoriaId = CATEGORIA_TODAS, dificuldade = DIFICULDADE_MISTA } = {}) {
+  const idAtual = resolverIdDaCategoria(categoriaId);
   return PERGUNTAS.filter(
     (pergunta) =>
-      (categoriaId === CATEGORIA_TODAS || pergunta.categoria === categoriaId) &&
+      (idAtual === CATEGORIA_TODAS || pergunta.categoria === idAtual) &&
       (dificuldade === DIFICULDADE_MISTA || pergunta.dificuldade === dificuldade)
   );
 }
@@ -132,7 +137,7 @@ export function contarPerguntasPorCategoriaEDificuldade() {
 /**
  * Resumo do banco para conferência.
  * No console do navegador:
- *   import("./js/data/perguntas.js").then((m) => console.table(m.auditarBanco().porCategoria))
+ *   import("./js/data/perguntas.js").then((m) => { const a = m.auditarBanco(); console.log(a.total, a.avisos); console.table(a.porCategoria); })
  */
 export function auditarBanco() {
   const porCategoria = contarPerguntasPorCategoriaEDificuldade();
