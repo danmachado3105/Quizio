@@ -411,3 +411,95 @@
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to { opacity: 1; transform: none; }
 }
+
+/* ---------- Roleta de temas ---------- */
+.roleta {
+  display: grid;
+  justify-items: center;
+  gap: var(--espaco-4);
+  padding-top: var(--espaco-3);
+}
+
+.roleta__palco {
+  position: relative;
+  width: min(100%, 18rem);
+  aspect-ratio: 1;
+}
+
+.roleta__disco {
+  width: 100%;
+  height: 100%;
+  transition: transform 4.6s cubic-bezier(0.12, 0.72, 0.08, 1);
+  will-change: transform;
+}
+
+.roleta__disco svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.roleta__ponteiro {
+  position: absolute;
+  top: -0.9rem;
+  left: 50%;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 0.85rem solid transparent;
+  border-right: 0.85rem solid transparent;
+  border-top: 1.7rem solid var(--tinta);
+  filter: drop-shadow(0 2px 0 var(--cor-amarelo));
+}
+
+.roleta__miolo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  transform: translate(-50%, -50%);
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: 50%;
+  box-shadow: 0 3px 0 var(--tinta);
+}
+
+.roleta__resultado {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--espaco-2);
+  width: 100%;
+  min-height: 6.5rem;
+  padding: var(--espaco-4);
+  background: var(--cor-creme-2);
+  border: 2px dashed rgba(53, 37, 79, 0.35);
+  border-radius: var(--raio-md);
+  text-align: center;
+}
+
+.roleta__resultado--pronto {
+  background: var(--cor-amarelo-claro);
+  border: 2px solid var(--tinta);
+  animation: surgir 0.35s var(--ease-pulo);
+}
+
+.roleta__nome {
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-xl);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.roleta__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-3);
+}

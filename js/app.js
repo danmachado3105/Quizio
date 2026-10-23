@@ -17,6 +17,17 @@ const CARREGADORES_DE_PAGINA = {
   conquistas: () => import("./pages/conquistas.js"),
 };
 
+/** Troca o favicon em todas as páginas, sem precisar editar cada HTML. */
+function definirFavicon(base) {
+  document.querySelectorAll('link[rel~="icon"]').forEach((link) => link.remove());
+
+  const link = document.createElement("link");
+  link.rel = "icon";
+  link.type = "image/svg+xml";
+  link.href = `${base}assets/icons/favicon.svg`;
+  document.head.append(link);
+}
+
 function mostrarErroDeCarregamento() {
   const conteudo = document.getElementById("conteudo");
   if (!conteudo) return;
@@ -35,6 +46,7 @@ async function iniciarAplicacao() {
   // O CSS só esconde elementos "data-revelar" quando esta classe existe
   document.documentElement.classList.add("js");
 
+  definirFavicon(base);
   renderizarCabecalho({ base, paginaAtual: pagina });
   renderizarRodape({ base });
   hidratarIcones(document);
