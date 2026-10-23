@@ -67,7 +67,7 @@ export default [
   },
   {
     id: "fl-012", categoria: "filmes", dificuldade: "medio",
-    enunciado: "Em qual filme da saga Star Wars Darth Vader revela ser pai de Luke Skywalker?",
+    enunciado: "Em qual filme da saga Star Wars, Darth Vader revela ser pai de Luke Skywalker?",
     alternativas: ["Uma Nova Esperança", "O Império Contra-Ataca", "O Retorno de Jedi", "A Ameaça Fantasma"], correta: 1,
     explicacao: "A revelação acontece em O Império Contra-Ataca, de 1980.",
   },
