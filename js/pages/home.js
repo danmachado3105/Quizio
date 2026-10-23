@@ -18,6 +18,8 @@ import { desafioDiarioConcluidoHoje, obterDados } from "../services/storage.js";
 import { QUANTIDADE_DESAFIO_DIARIO, XP_DESAFIO_DIARIO } from "../utils/pontuacao.js";
 import { calcularNivel } from "../utils/progressao.js";
 import { iniciarRevelacao } from "../utils/revelar.js";
+import { criarCapa } from "../utils/imagens.js";
+import { abrirRoleta } from "../components/roleta.js";
 import { embaralhar } from "../utils/sorteio.js";
 import { dataLocalISO, formatarDataLonga, formatarNumero, saudacaoPorHora } from "../utils/formatacao.js";
 
@@ -30,10 +32,11 @@ import { dataLocalISO, formatarDataLonga, formatarNumero, saudacaoPorHora } from
 const LETRAS = ["A", "B", "C", "D"];
 
 const ORDEM_PADRAO = [
-  "ciencia-espaco", "historia", "filmes-series", "games-nerd", "brasil", "musica",
-  "geografia", "esportes", "tecnologia", "literatura", "natureza-animais", "conhecimentos-gerais",
-  "arte-arquitetura", "comida-culinaria", "corpo-humano", "mitologia-lendas",
-  "matematica-logica", "lingua-portuguesa", "economia-negocios", "datas-tradicoes",
+  "ciencia-espaco", "historia", "filmes", "jogos", "brasil", "musica",
+  "series", "animes", "geografia", "esportes", "tecnologia", "literatura",
+  "natureza-animais", "conhecimentos-gerais", "arte-arquitetura", "comida-culinaria",
+  "corpo-humano", "mitologia-lendas", "matematica-logica", "lingua-portuguesa",
+  "economia-negocios", "datas-tradicoes", "invencoes-descobertas",
 ];
 
 // Seis temas ganham destaque no mosaico, cada um com tamanho e cor próprios
@@ -441,7 +444,7 @@ function criarBlocoSemana({ dados }) {
 
 function criarBlocoPassos() {
   const passos = [
-    ["01", "Escolha um assunto","Vinte temas, três dificuldades e o tamanho de partida que couber no seu tempo."],
+    ["01", "Escolha um assunto","Vinte e três temas, três dificuldades e o tamanho de partida que couber no seu tempo."],
     ["02", "Responda e aprenda", "Acertando ou errando, toda resposta mostra a explicação logo em seguida."],
     ["03", "Suba de nível", "Pontos viram XP. XP vira nível, missões cumpridas e conquistas."],
   ];
@@ -485,6 +488,8 @@ function criarTema({ categoria, formato, total, estatistica, base }) {
       atributos: { href: `${base}pages/categorias.html?categoria=${encodeURIComponent(categoria.id)}`, ...revelar(0) },
     },
     [
+      criarCapa(base, categoria),
+      el("span", { classe: "tema__glifo", atributos: { "aria-hidden": "true" } }, [criarIcone(categoria.icone, formato.icone)]),
       el("span", { classe: "tema__glifo", atributos: { "aria-hidden": "true" } }, [criarIcone(categoria.icone, formato.icone)]),
       el("div", { classe: "tema__topo" }, [el("span", { classe: "rotulo", texto: `${String(total).padStart(2, "0")} perguntas` })]),
       el("div", {}, [
@@ -554,11 +559,8 @@ function renderizarCategorias(ctx) {
           el("button", {
             classe: "botao botao--contorno",
             atributos: { type: "button" },
-            aoClicar: () => {
-              const sorteada = CATEGORIAS[Math.floor(Math.random() * CATEGORIAS.length)];
-              window.location.href = linkDeCategoria(base, sorteada.id);
-            },
-          }, [criarIcone("sparkles", 18), "Surpreenda-me"]),
+            aoClicar: () => abrirRoleta({ base }),
+          }, [criarIcone("sparkles", 18), "Girar a roleta"]),
         ]),
       ]),
     ])
