@@ -7,6 +7,11 @@ import cienciaEspaco2 from "./ciencia-espaco-2.js";
 import historia2 from "./historia-2.js";
 import geografia2 from "./geografia-2.js";
 import musica2 from "./musica-2.js";
+import esportes2 from "./esportes-2.js";
+import tecnologia2 from "./tecnologia-2.js";
+import literatura2 from "./literatura-2.js";
+import naturezaAnimais2 from "./natureza-animais-2.js";
+import brasil2 from "./brasil-2.js";
 
 export default [
   ...conhecimentosGerais2,
@@ -14,4 +19,9 @@ export default [
   ...historia2,
   ...geografia2,
   ...musica2,
+  ...esportes2,
+  ...tecnologia2,
+  ...literatura2,
+  ...naturezaAnimais2,
+  ...brasil2,
 ];
