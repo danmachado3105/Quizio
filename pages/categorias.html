@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Escolha categoria, dificuldade e quantidade de perguntas para montar sua partida no Quizio.">
+  <title>Explorar temas | Quizio</title>
+  <meta name="description" content="Busque entre os temas do Quizio, filtre por dificuldade e monte sua partida do jeito que quiser.">
   <meta name="theme-color" content="#7254D8">
-  <title>Monte sua partida | Quizio</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Explorar temas | Quizio">
+  <meta property="og:description" content="Busque entre os temas do Quizio, filtre por dificuldade e monte sua partida do jeito que quiser.">
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%237254D8'/%3E%3Ccircle cx='15' cy='15' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M19 19l5 5' stroke='%23FF786B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 
   <link rel="stylesheet" href="../css/reset.css">
   <link rel="stylesheet" href="../css/variables.css">
@@ -20,6 +22,8 @@
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/pages/categorias.css">
   <link rel="stylesheet" href="../css/responsive.css">
+
+  <script>document.documentElement.classList.add("js");</script>
 </head>
 
 <body data-pagina="categorias" data-base="../">
@@ -27,43 +31,217 @@
 
   <header class="cabecalho" id="cabecalho"></header>
 
-  <main class="container pagina" id="conteudo">
-    <header class="pagina__cabecalho">
-      <h1 class="pagina__titulo">Monte sua partida</h1>
-      <p class="pagina__descricao texto-suave">Escolha o tema, a dificuldade e quantas perguntas você quer responder.</p>
-    </header>
+  <main class="explorar" id="conteudo">
 
-    <form class="configurador" id="form-partida" novalidate>
-      <fieldset class="grupo grupo--principal">
-        <legend class="grupo__titulo">1. Categoria</legend>
-        <div class="grid-opcoes" id="opcoes-categoria"></div>
-      </fieldset>
+    <!-- Abertura -->
+    <section class="abertura-explorar" aria-labelledby="titulo-explorar">
+      <div class="container abertura-explorar__grade">
+        <div>
+          <p class="rotulo" data-revelar>Explorar</p>
+          <h1 class="explorar__titulo" id="titulo-explorar" data-revelar style="--atraso:90ms">
+            Qual será o <span class="destaque">tema</span> da rodada?
+          </h1>
+          <p class="explorar__descricao" data-revelar style="--atraso:180ms">
+            Busque por assunto, filtre por dificuldade ou deixe a sorte escolher. Toda pergunta vem com explicação.
+          </p>
+          <div class="explorar__acoes" data-revelar style="--atraso:270ms">
+            <button class="botao botao--coral botao--grande" type="button" id="botao-surpreender" data-icone="sparkles">Surpreenda-me</button>
+            <button class="botao botao--contorno botao--grande" type="button" id="botao-roleta" data-icone="refresh">Girar a roleta</button>
+            <button class="botao botao--texto" type="button" id="botao-misturar" data-icone="grid" data-tamanho-icone="18">Misturar todos os temas</button>
+          </div>
+          <p class="explorar__numeros rotulo" id="explorar-numeros"></p>
+        </div>
 
-      <aside class="card configurador__painel" aria-label="Configuração da partida">
+        <!-- Decorativo -->
+        <div class="leque" aria-hidden="true" data-revelar style="--atraso:200ms">
+          <div class="leque__carta leque__carta--1" data-icone="cat-ciencia-espaco" data-tamanho-icone="64"></div>
+          <div class="leque__carta leque__carta--2" data-icone="cat-conhecimentos-gerais" data-tamanho-icone="64"></div>
+          <div class="leque__carta leque__carta--3" data-icone="cat-filmes" data-tamanho-icone="64"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Busca e filtros -->
+    <section class="ferramentas" aria-label="Buscar e filtrar temas">
+      <div class="container">
+        <form class="busca" id="form-busca" role="search" novalidate>
+          <span class="busca__icone" data-icone="search" data-tamanho-icone="22" aria-hidden="true"></span>
+          <label class="sr-only" for="campo-busca">Buscar tema</label>
+          <input class="busca__campo" id="campo-busca" type="search" placeholder="Busque um tema ou assunto" autocomplete="off" spellcheck="false" enterkeyhint="search">
+          <button class="busca__limpar" id="busca-limpar" type="button" aria-label="Limpar busca" data-icone="x" data-tamanho-icone="18" hidden></button>
+        </form>
+
+        <div class="filtros" id="filtros">
+          <div class="filtros__grupo" role="group" aria-labelledby="rotulo-filtro-grupo">
+            <span class="rotulo" id="rotulo-filtro-grupo">Grupo</span>
+            <div class="chips" id="filtro-grupos"></div>
+          </div>
+
+          <div class="filtros__grupo" role="group" aria-labelledby="rotulo-filtro-dificuldade">
+            <span class="rotulo" id="rotulo-filtro-dificuldade">Dificuldade</span>
+            <div class="chips" id="filtro-dificuldades"></div>
+          </div>
+
+          <div class="filtros__grupo" role="group" aria-labelledby="rotulo-filtro-extras">
+            <span class="rotulo" id="rotulo-filtro-extras">Mostrar</span>
+            <div class="chips" id="filtro-extras"></div>
+          </div>
+
+          <div class="filtros__grupo filtros__ordem">
+            <label class="rotulo" for="ordenacao">Ordenar por</label>
+            <select class="seletor" id="ordenacao">
+              <option value="recomendadas">Recomendadas</option>
+              <option value="az">De A a Z</option>
+              <option value="mais-perguntas">Mais perguntas</option>
+              <option value="menos-jogadas">Menos jogadas por você</option>
+            </select>
+          </div>
+
+          <button class="botao botao--texto" type="button" id="filtros-limpar" hidden>Limpar filtros</button>
+        </div>
+
+        <p class="resumo-busca rotulo" id="resumo-busca" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- Nada encontrado -->
+    <div class="container">
+      <div class="estado-vazio explorar__vazio" id="estado-vazio" hidden>
+        <span class="icone-caixa icone-caixa--cinza" data-icone="search" data-tamanho-icone="22" aria-hidden="true"></span>
+        <p class="estado-vazio__titulo" id="vazio-titulo">Nenhum tema encontrado</p>
+        <p class="estado-vazio__texto" id="vazio-texto"></p>
+        <button class="botao botao--contorno" type="button" id="vazio-limpar">Limpar busca e filtros</button>
+      </div>
+    </div>
+
+    <!-- Seções (preenchidas por categorias.js) -->
+    <section class="secao-tema" id="secao-continue" aria-labelledby="titulo-continue" hidden>
+      <div class="container">
+        <div class="secao-tema__topo" data-revelar>
+          <div>
+            <p class="rotulo">Seu ritmo</p>
+            <h2 class="secao-tema__titulo" id="titulo-continue">Continue de onde parou</h2>
+          </div>
+          <p class="secao-tema__apoio">Os últimos temas que você jogou, a um clique de distância.</p>
+        </div>
+        <div class="trilha" id="lista-continue"></div>
+      </div>
+    </section>
+
+    <section class="secao-tema" id="secao-favoritas" aria-labelledby="titulo-favoritas" hidden>
+      <div class="container">
+        <div class="secao-tema__topo" data-revelar>
+          <div>
+            <p class="rotulo">Seus queridinhos</p>
+            <h2 class="secao-tema__titulo" id="titulo-favoritas">Favoritas</h2>
+          </div>
+        </div>
+        <div class="grade-compacta" id="lista-favoritas"></div>
+      </div>
+    </section>
+
+    <section class="secao-tema" id="secao-alta" aria-labelledby="titulo-alta" hidden>
+      <div class="container">
+        <div class="secao-tema__topo" data-revelar>
+          <div>
+            <p class="rotulo" id="rotulo-alta">Em alta</p>
+            <h2 class="secao-tema__titulo" id="titulo-alta">Por onde começar</h2>
+          </div>
+          <p class="secao-tema__apoio" id="apoio-alta">Temas para entrar no clima.</p>
+        </div>
+        <div class="mosaico-explorar" id="lista-alta"></div>
+      </div>
+    </section>
+
+    <section class="secao-tema secao-tema--faixa" id="secao-novidades" aria-labelledby="titulo-novidades" hidden>
+      <div class="container">
+        <div class="secao-tema__topo" data-revelar>
+          <div>
+            <p class="rotulo">Acabou de chegar</p>
+            <h2 class="secao-tema__titulo" id="titulo-novidades">Novidades</h2>
+          </div>
+          <p class="secao-tema__apoio">Temas novos no catálogo, com perguntas de todas as dificuldades.</p>
+        </div>
+        <div class="grade-compacta" id="lista-novidades"></div>
+      </div>
+    </section>
+
+    <section class="secao-tema" id="secao-todos" aria-labelledby="titulo-todos" hidden>
+      <div class="container">
+        <div class="secao-tema__topo" data-revelar>
+          <div>
+            <p class="rotulo">O catálogo completo</p>
+            <h2 class="secao-tema__titulo" id="titulo-todos">Todos os temas</h2>
+          </div>
+          <p class="secao-tema__apoio">Cada carta mostra quantas perguntas há em cada dificuldade.</p>
+        </div>
+        <div class="grade-temas" id="lista-todos"></div>
+      </div>
+    </section>
+
+    <section class="secao-tema" id="secao-resultados" aria-labelledby="titulo-resultados" hidden>
+      <div class="container">
+        <div class="secao-tema__topo">
+          <div>
+            <p class="rotulo">Sua busca</p>
+            <h2 class="secao-tema__titulo" id="titulo-resultados">Temas encontrados</h2>
+          </div>
+        </div>
+        <div class="grade-temas" id="lista-resultados"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <!-- Painel de configuração da partida: gaveta (desktop) ou bottom sheet (celular) -->
+  <div class="gaveta-sobreposicao" id="gaveta-sobreposicao" aria-hidden="true"></div>
+
+  <div class="gaveta" id="gaveta" role="dialog" aria-modal="true" aria-labelledby="gaveta-titulo" inert>
+    <form class="gaveta__form" id="form-partida" novalidate>
+      <header class="gaveta__topo">
+        <span class="gaveta__puxador" aria-hidden="true"></span>
+        <div class="gaveta__linha">
+          <div>
+            <p class="rotulo">Sua partida</p>
+            <h2 class="gaveta__titulo" id="gaveta-titulo">Monte sua partida</h2>
+          </div>
+          <button class="gaveta__fechar" id="gaveta-fechar" type="button" aria-label="Fechar painel" data-icone="x" data-tamanho-icone="20"></button>
+        </div>
+      </header>
+
+      <div class="gaveta__corpo">
+        <div class="grupo campo-tema">
+          <label class="grupo__titulo" for="select-categoria">Tema</label>
+          <div class="campo-tema__linha">
+            <span class="icone-caixa icone-caixa--roxo campo-tema__emblema" id="gaveta-emblema" aria-hidden="true"></span>
+            <select class="seletor" id="select-categoria" name="categoria"></select>
+          </div>
+        </div>
+
         <fieldset class="grupo">
-          <legend class="grupo__titulo">2. Dificuldade</legend>
+          <legend class="grupo__titulo">Dificuldade</legend>
           <div class="opcoes-linha" id="opcoes-dificuldade"></div>
         </fieldset>
 
         <fieldset class="grupo">
-          <legend class="grupo__titulo">3. Quantidade de perguntas</legend>
+          <legend class="grupo__titulo">Quantidade de perguntas</legend>
           <div class="opcoes-linha" id="opcoes-quantidade"></div>
         </fieldset>
 
         <fieldset class="grupo">
-          <legend class="grupo__titulo">4. Modo de jogo</legend>
+          <legend class="grupo__titulo">Modo de jogo</legend>
           <div class="opcoes-coluna" id="opcoes-modo"></div>
         </fieldset>
+      </div>
 
+      <footer class="gaveta__rodape">
         <div class="resumo-partida" id="resumo-partida" aria-live="polite"></div>
         <p class="campo__erro" id="erro-formulario" role="alert"></p>
-
         <button class="botao botao--primario botao--grande botao--bloco" type="submit" id="botao-iniciar" data-icone="play">Iniciar partida</button>
-      </aside>
+      </footer>
     </form>
-  </main>
-
-  <footer class="rodape" id="rodape"></footer>
+  </div>
 
   <noscript>
     <p style="padding:1rem;text-align:center">O Quizio precisa de JavaScript ativado para funcionar.</p>
