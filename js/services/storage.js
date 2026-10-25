@@ -1,5 +1,7 @@
 import { dataLocalISO } from "../utils/formatacao.js";
 import { AVATAR_PADRAO, avatarEhValido } from "../data/avatares.js";
+import { obterCategoriaPorId } from "../data/categorias.js";
+import { calcularMelhorSequencia, diaLocal, unirDias } from "../utils/sequencia.js";
 
 /*
  * Único ponto de acesso ao LocalStorage do Quizio.
@@ -11,6 +13,7 @@ import { AVATAR_PADRAO, avatarEhValido } from "../data/avatares.js";
  *
  * Proteções:
  *  - dados ilegíveis ganham uma cópia de segurança antes de qualquer regravação
+ *  - dados de versões anteriores ganham uma cópia antes da primeira migração
  *  - dados de uma versão mais nova do Quizio nunca são sobrescritos
  *  - se o armazenamento estiver bloqueado, o app continua funcionando só em memória
  *
@@ -20,15 +23,24 @@ import { AVATAR_PADRAO, avatarEhValido } from "../data/avatares.js";
  * perguntasPorCategoria: { [categoriaId]: quantidade de perguntas respondidas }
  * conquistas:            { [conquistaId]: "data ISO do desbloqueio" }
  * registroDePartidas:    ids das últimas partidas registradas (impede XP duplicado)
+ *
+ * Novidades da versão 3:
+ * favoritas:             ids das categorias favoritas
+ * diasJogados:           dias locais ("AAAA-MM-DD") com pelo menos uma partida concluída
+ * estatisticas.melhorSequencia: maior sequência de dias seguidos (guardada à parte)
+ * preferencias.movimento: "sistema" (segue o aparelho) ou "reduzido"
  */
 const CHAVE_STORAGE = "quizio:v1";
 const CHAVE_BACKUP = "quizio:v1:backup";
+const CHAVE_BACKUP_MIGRACAO = "quizio:v1:pre-v3";
 
-export const VERSAO_DOS_DADOS = 2;
+export const VERSAO_DOS_DADOS = 3;
 export const LIMITE_HISTORICO = 50;
 export const LIMITE_IDS_REGISTRADOS = 200;
+export const LIMITE_DIAS_JOGADOS = 400;
 export const TAMANHO_MAXIMO_NOME = 20;
 export const NOME_PADRAO = "Jogador";
+export const MOVIMENTOS_VALIDOS = ["sistema", "reduzido"];
 
 const status = { disponivel: true, gravacaoBloqueada: false, recuperadoDeErro: false };
 
@@ -37,7 +49,7 @@ function criarDadosPadrao() {
   return {
     versao: VERSAO_DOS_DADOS,
     perfil: { nome: NOME_PADRAO, avatar: AVATAR_PADRAO, boasVindasExibida: false },
-    preferencias: { som: false },
+    preferencias: { som: false, movimento: "sistema" },
     progresso: { xp: 0 },
     estatisticas: {
       partidas: 0,
@@ -47,6 +59,7 @@ function criarDadosPadrao() {
       melhorCombo: 0,
       partidasPerfeitas: 0,
       recordesSuperados: 0,
+      melhorSequencia: 0,
       porCategoria: {},
       perguntasPorCategoria: {},
     },
@@ -55,6 +68,8 @@ function criarDadosPadrao() {
     missoes: { data: "", progresso: {}, resgatadas: {}, categoriasHoje: [] },
     desafioDiario: { ultimaData: "" },
     registroDePartidas: [],
+    favoritas: [],
+    diasJogados: [],
   };
 }
 
@@ -114,17 +129,31 @@ function limparNome(valor) {
     .trim();
 }
 
+/** Mantém só ids de categorias que existem (ids antigos viram os atuais), sem repetir. */
+function limparFavoritas(lista) {
+  const favoritas = [];
+  for (const id of lista) {
+    if (typeof id !== "string") continue;
+    const categoria = obterCategoriaPorId(id);
+    if (categoria && !favoritas.includes(categoria.id)) favoritas.push(categoria.id);
+  }
+  return favoritas;
+}
+
 /** Corrige o que for inválido, sem descartar o progresso que estiver correto. */
 function sanitizarDados(dados) {
   dados.perfil.nome = limparNome(dados.perfil.nome).slice(0, TAMANHO_MAXIMO_NOME) || NOME_PADRAO;
   if (!avatarEhValido(dados.perfil.avatar)) dados.perfil.avatar = AVATAR_PADRAO;
+
+  dados.preferencias.som = dados.preferencias.som === true;
+  if (!MOVIMENTOS_VALIDOS.includes(dados.preferencias.movimento)) dados.preferencias.movimento = "sistema";
 
   dados.progresso.xp = inteiroNaoNegativo(dados.progresso.xp);
 
   const estatisticas = dados.estatisticas;
   for (const chave of [
     "partidas", "perguntasRespondidas", "acertos", "melhorPontuacao",
-    "melhorCombo", "partidasPerfeitas", "recordesSuperados",
+    "melhorCombo", "partidasPerfeitas", "recordesSuperados", "melhorSequencia",
   ]) {
     estatisticas[chave] = inteiroNaoNegativo(estatisticas[chave]);
   }
@@ -147,6 +176,16 @@ function sanitizarDados(dados) {
   dados.registroDePartidas = dados.registroDePartidas
     .filter((id) => typeof id === "string")
     .slice(-LIMITE_IDS_REGISTRADOS);
+
+  dados.favoritas = limparFavoritas(dados.favoritas);
+
+  // Dias jogados: válidos, sem repetição, em ordem e limitados. A melhor
+  // sequência nunca diminui, mesmo se dias antigos forem cortados da lista.
+  dados.diasJogados = unirDias(dados.diasJogados, [], LIMITE_DIAS_JOGADOS);
+  estatisticas.melhorSequencia = Math.max(
+    estatisticas.melhorSequencia,
+    calcularMelhorSequencia(dados.diasJogados)
+  );
 }
 
 /** Converte dados de versões antigas para o formato atual. */
@@ -161,6 +200,25 @@ function migrar(dados, versaoSalva) {
       .filter((id) => typeof id === "string")
       .reverse();
   }
+
+  if (versaoSalva < 3) {
+    // v2 -> v3: favoritas, diasJogados e melhorSequencia entram vazios na
+    // mesclagem. Aproveitamos o histórico (partidas realmente concluídas)
+    // para já preencher os dias jogados.
+    if (dados.diasJogados.length === 0) {
+      const diasDoHistorico = dados.historico
+        .map((partida) => new Date(partida.data))
+        .filter((data) => !Number.isNaN(data.getTime()))
+        .map((data) => diaLocal(data));
+
+      dados.diasJogados = unirDias([], diasDoHistorico, LIMITE_DIAS_JOGADOS);
+      dados.estatisticas.melhorSequencia = Math.max(
+        dados.estatisticas.melhorSequencia,
+        calcularMelhorSequencia(dados.diasJogados)
+      );
+    }
+  }
+
   dados.versao = VERSAO_DOS_DADOS;
 }
 
@@ -183,13 +241,18 @@ function lerTextoSalvo() {
   }
 }
 
-/** Guarda uma cópia do texto original para ele não ser perdido numa regravação. */
-function guardarBackup(texto) {
+/** Guarda uma cópia do texto original numa chave, só se ela ainda estiver vazia. */
+function guardarCopia(chave, texto) {
   try {
-    if (texto && !localStorage.getItem(CHAVE_BACKUP)) localStorage.setItem(CHAVE_BACKUP, texto);
+    if (texto && !localStorage.getItem(chave)) localStorage.setItem(chave, texto);
   } catch (erro) {
     // sem armazenamento, não há como guardar a cópia
   }
+}
+
+/** Cópia de dados ilegíveis, para não serem perdidos numa regravação. */
+function guardarBackup(texto) {
+  guardarCopia(CHAVE_BACKUP, texto);
 }
 
 function carregarDoStorage() {
@@ -220,6 +283,9 @@ function carregarDoStorage() {
     guardarBackup(texto);
     status.gravacaoBloqueada = true;
     salvo = null;
+  } else if (ehObjetoSimples(salvo) && versaoSalva < VERSAO_DOS_DADOS) {
+    // Dados de uma versão anterior: guarda uma cópia (uma vez) antes de migrar
+    guardarCopia(CHAVE_BACKUP_MIGRACAO, texto);
   }
 
   const dados = mesclarComPadrao(criarDadosPadrao(), salvo);
@@ -268,11 +334,12 @@ export function atualizarDados(alterador) {
   return structuredClone(cache);
 }
 
-/** Apaga todo o progresso (e a cópia de segurança) e volta ao estado da primeira visita. */
+/** Apaga todo o progresso (e as cópias de segurança) e volta ao estado da primeira visita. */
 export function redefinirDados() {
   try {
     localStorage.removeItem(CHAVE_STORAGE);
     localStorage.removeItem(CHAVE_BACKUP);
+    localStorage.removeItem(CHAVE_BACKUP_MIGRACAO);
   } catch (erro) {
     console.warn("Quizio: não foi possível apagar os dados salvos.", erro);
   }
@@ -325,4 +392,33 @@ export function salvarPerfil({ nome, avatar }) {
 /** O desafio diário já foi concluído na data local de hoje? */
 export function desafioDiarioConcluidoHoje() {
   return obterDados().desafioDiario.ultimaData === dataLocalISO();
+}
+
+// ---------- Favoritas ----------
+
+/** Ids das categorias favoritas (lista nova a cada chamada). */
+export function obterFavoritas() {
+  return [...obterDados().favoritas];
+}
+
+/**
+ * Favorita ou desfavorita uma categoria. Aceita ids antigos (ex.: "filmes-series").
+ * Retorna { sucesso, favorita } ou { sucesso: false, mensagem }.
+ */
+export function alternarFavorita(categoriaId) {
+  const categoria = obterCategoriaPorId(categoriaId);
+  if (!categoria) return { sucesso: false, mensagem: "Categoria não encontrada." };
+
+  let favorita = false;
+  atualizarDados((dados) => {
+    const posicao = dados.favoritas.indexOf(categoria.id);
+    if (posicao >= 0) {
+      dados.favoritas.splice(posicao, 1);
+    } else {
+      dados.favoritas.push(categoria.id);
+    }
+    favorita = posicao < 0;
+  });
+
+  return { sucesso: true, favorita };
 }
