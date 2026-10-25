@@ -1,4 +1,5 @@
 import {
+  LIMITE_DIAS_JOGADOS,
   LIMITE_HISTORICO,
   LIMITE_IDS_REGISTRADOS,
   atualizarDados,
@@ -7,12 +8,13 @@ import {
 import { aplicarPartidaNasMissoes, concederRecompensasDeMissoes } from "./missoes.js";
 import { CONQUISTAS, estaConcluida } from "../data/conquistas.js";
 import { calcularNivel } from "../utils/progressao.js";
+import { diaLocal, resumirSequencia, unirDias } from "../utils/sequencia.js";
 
 const numeroSeguro = (valor) => (Number.isFinite(valor) ? valor : 0);
 
 /**
  * Grava, numa única transação, tudo o que uma partida CONCLUÍDA muda:
- * histórico, estatísticas, recorde, XP, nível, missões e conquistas.
+ * histórico, estatísticas, recorde, dia jogado, XP, nível, missões e conquistas.
  * Serve para todos os modos de jogo.
  *
  * É idempotente: se o id da partida já consta em registroDePartidas, nada é
@@ -67,6 +69,14 @@ export function registrarPartida(resultado) {
         numeroSeguro(estatisticas.perguntasPorCategoria[id]) + numeroSeguro(contagem?.respondidas);
     }
 
+    // 3b. Dia jogado e sequência de dias (data local)
+    const hoje = diaLocal();
+    const primeiraDoDia = !dados.diasJogados.includes(hoje);
+    const melhorSequenciaAnterior = estatisticas.melhorSequencia;
+    dados.diasJogados = unirDias(dados.diasJogados, [hoje], LIMITE_DIAS_JOGADOS);
+    const sequencia = resumirSequencia(dados.diasJogados, melhorSequenciaAnterior, hoje);
+    estatisticas.melhorSequencia = sequencia.melhor;
+
     // 4. XP da partida e 5. missões (o XP das missões concluídas entra aqui também)
     dados.progresso.xp += resultado.xp;
     aplicarPartidaNasMissoes(dados, resultado);
@@ -119,6 +129,12 @@ export function registrarPartida(resultado) {
         anterior: recordeAnterior,
         atual: registro.melhorPontuacao,
         ehNovo: ehNovoRecorde,
+      },
+      sequencia: {
+        atual: sequencia.atual,
+        melhor: sequencia.melhor,
+        primeiraDoDia,
+        novaMelhor: sequencia.melhor > melhorSequenciaAnterior && sequencia.atual > 1,
       },
     };
   });
