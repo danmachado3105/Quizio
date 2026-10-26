@@ -1,82 +1,198 @@
-import { criarElemento, porId } from "../utils/dom.js";
+import { criarElemento as el, porId } from "../utils/dom.js";
 import { criarIcone } from "../utils/icones.js";
 import { obterCategoriaPorId } from "../data/categorias.js";
 import { DIFICULDADES } from "../data/perguntas.js";
 import { confirmarAcao } from "../components/modal.js";
-import { criarBarraProgresso, criarEstadoVazio } from "../components/card.js";
+import { criarEstadoVazio } from "../components/card.js";
 import {
   abandonarPartida,
   avancar,
   concluirPartida,
   obterPartidaAtiva,
   obterQuestaoAtual,
+  partidaEstaPausada,
+  pausarPartida,
   responder,
+  retomarPartida,
 } from "../services/partida.js";
+import { animarNumero } from "../utils/animacao.js";
 import { formatarNumero } from "../utils/formatacao.js";
+import { COMBO_MINIMO_PARA_BONUS } from "../utils/pontuacao.js";
 
+/*
+ * Tela de jogo.
+ * O estado da partida fica em services/partida.js (sessionStorage); esta tela
+ * só desenha e chama as funções de lá. O objeto "contexto" guarda a partida em
+ * memória, os elementos da página e duas travas:
+ *   ocupado     -> uma troca de pergunta ou de página está em andamento
+ *   confirmando -> o modal "Sair da partida?" está aberto
+ */
 const LETRAS = ["A", "B", "C", "D"];
-const COMBO_DESTACADO = 3;
+const DURACAO_DO_GANHO_MS = 1100;
+const QUANTIDADE_DE_PONTOS_DO_COMBO = 3;
 
-// ---------- Estado visual ----------
-function atualizarStatus(contexto) {
-  const { partida, elementos } = contexto;
+const respondida = (partida) => partida.respostas.length > partida.indice;
 
-  elementos.pontos.replaceChildren(criarIcone("star", 16), `${formatarNumero(partida.pontuacao)} pts`);
-  elementos.combo.replaceChildren(criarIcone("flame", 16), `Combo ×${partida.combo}`);
-  elementos.combo.classList.toggle("chip--ativo", partida.combo >= COMBO_DESTACADO);
+// ---------- Utilidades ----------
+
+/** Faz uma animação CSS recomeçar (tira a classe, força o reflow e coloca de novo). */
+function reiniciarAnimacao(elemento, classe) {
+  elemento.classList.remove(classe);
+  void elemento.offsetWidth;
+  elemento.classList.add(classe);
 }
 
-function atualizarBarra(contexto) {
-  const { partida, elementos } = contexto;
-  const percentual = Math.round((partida.respostas.length / partida.questoes.length) * 100);
+/** Pulso curto num indicador (pontos ou combo). */
+function pulsar(elemento) {
+  reiniciarAnimacao(elemento, "indicador--pulso");
+  elemento.addEventListener("animationend", () => elemento.classList.remove("indicador--pulso"), { once: true });
+}
 
-  elementos.preenchimento.style.width = `${percentual}%`;
-  elementos.barra.setAttribute("aria-valuenow", String(percentual));
+/** Avisa leitores de tela sem mexer no visual. */
+function anunciar(texto) {
+  const aviso = porId("aviso-jogo");
+  aviso.textContent = "";
+  setTimeout(() => {
+    aviso.textContent = texto;
+  }, 60);
+}
+
+// ---------- Placar, combo e progresso ----------
+function atualizarPontos(contexto, { animar = false } = {}) {
+  const { partida, elementos } = contexto;
+
+  if (animar) {
+    animarNumero(elementos.pontosValor, {
+      de: contexto.pontosExibidos,
+      para: partida.pontuacao,
+      duracaoMs: 650,
+      formatar: formatarNumero,
+    });
+  } else {
+    elementos.pontosValor.textContent = formatarNumero(partida.pontuacao);
+  }
+  contexto.pontosExibidos = partida.pontuacao;
+}
+
+function atualizarCombo(contexto) {
+  const { partida, elementos } = contexto;
+
+  elementos.comboValor.textContent = `Combo ×${partida.combo}`;
+  elementos.combo.dataset.ativo = String(partida.combo >= COMBO_MINIMO_PARA_BONUS);
+  elementos.pips.forEach((pip, indice) => {
+    pip.dataset.ativo = String(indice < partida.combo);
+  });
+}
+
+/** "+150" que sobe a partir dos indicadores quando o jogador acerta. */
+function mostrarGanho(contexto, pontos) {
+  const selo = el("span", {
+    classe: "ganho",
+    texto: `+${formatarNumero(pontos)}`,
+    atributos: { "aria-hidden": "true" },
+  });
+  contexto.elementos.status.append(selo);
+
+  const remover = () => selo.remove();
+  selo.addEventListener("animationend", remover, { once: true });
+  setTimeout(remover, DURACAO_DO_GANHO_MS + 300);
+}
+
+function atualizarProgresso(contexto) {
+  const { partida, elementos } = contexto;
+  const feitas = partida.respostas.length;
+  const total = partida.questoes.length;
+
+  contexto.segmentos.forEach((segmento, indice) => {
+    const resposta = partida.respostas[indice];
+    let estado = "pendente";
+
+    if (resposta) estado = resposta.acertou ? "acerto" : "erro";
+    else if (indice === partida.indice) estado = "atual";
+
+    if (segmento.dataset.estado !== estado) segmento.dataset.estado = estado;
+  });
+
+  elementos.barra.setAttribute("aria-valuemax", String(total));
+  elementos.barra.setAttribute("aria-valuenow", String(feitas));
+  elementos.barra.setAttribute("aria-valuetext", `${feitas} de ${total} respondidas`);
+}
+
+// ---------- Pergunta e alternativas ----------
+function criarMarcaDeDificuldade(dificuldadeId) {
+  const nivel = Math.max(1, DIFICULDADES.findIndex((item) => item.id === dificuldadeId) + 1);
+  const nome = DIFICULDADES.find((item) => item.id === dificuldadeId)?.nome ?? "";
+
+  return el("span", { classe: "dificuldade" }, [
+    el(
+      "span",
+      { classe: "dificuldade__pontos", atributos: { "aria-hidden": "true" } },
+      [1, 2, 3].map((numero) =>
+        el("span", { classe: "dificuldade__ponto", atributos: { "data-ativo": String(numero <= nivel) } })
+      )
+    ),
+    el("span", { texto: nome }),
+  ]);
 }
 
 function criarAlternativa(texto, posicao) {
-  return criarElemento(
+  return el(
     "button",
     { classe: "alternativa", atributos: { type: "button", "data-posicao": posicao } },
     [
-      criarElemento("span", { classe: "alternativa__letra", texto: LETRAS[posicao], atributos: { "aria-hidden": "true" } }),
-      criarElemento("span", { classe: "alternativa__texto", texto }),
-      criarElemento("span", { classe: "alternativa__estado" }),
+      el("span", { classe: "alternativa__letra", texto: LETRAS[posicao], atributos: { "aria-hidden": "true" } }),
+      el("span", { classe: "alternativa__texto", texto }),
+      el("span", { classe: "alternativa__estado" }),
     ]
   );
 }
 
-// ---------- Renderização da pergunta ----------
-function renderizarQuestao(contexto, focar) {
+/**
+ * Desenha a pergunta atual.
+ * animar: a carta entra com uma animação curta (troca de pergunta).
+ * focar: leva o foco ao enunciado (leitores de tela leem a nova pergunta).
+ */
+function renderizarQuestao(contexto, { animar = false, focar = false } = {}) {
   const { partida, elementos } = contexto;
   const questao = obterQuestaoAtual(partida);
+  const ehUltima = questao.numero === questao.total;
   const categoria = obterCategoriaPorId(questao.pergunta.categoria);
-  const dificuldade = DIFICULDADES.find((item) => item.id === questao.pergunta.dificuldade);
+
+  elementos.carta.dataset.ultima = String(ehUltima);
+  if (animar) reiniciarAnimacao(elementos.carta, "carta-pergunta--entrando");
+
+  const marcas = [
+    el("span", { classe: "badge", texto: categoria?.nome ?? "Pergunta" }),
+    criarMarcaDeDificuldade(questao.pergunta.dificuldade),
+  ];
+  if (ehUltima) marcas.push(el("span", { classe: "badge badge--ultima", texto: "Última pergunta" }));
+  elementos.marcas.replaceChildren(...marcas);
 
   elementos.contador.textContent = `Pergunta ${questao.numero} de ${questao.total}`;
-  elementos.marcas.replaceChildren(
-    criarElemento("span", { classe: "badge", texto: categoria?.nome ?? "Pergunta" }),
-    criarElemento("span", { classe: "badge badge--destaque", texto: dificuldade?.nome ?? "" })
-  );
   elementos.enunciado.textContent = questao.pergunta.enunciado;
   elementos.alternativas.replaceChildren(
     ...questao.alternativas.map((alternativa, posicao) => criarAlternativa(alternativa.texto, posicao))
   );
-  elementos.feedback.hidden = true;
   elementos.feedback.replaceChildren();
+  elementos.botaoPausar.hidden = false;
 
-  atualizarStatus(contexto);
-  atualizarBarra(contexto);
+  atualizarPontos(contexto);
+  atualizarCombo(contexto);
+  atualizarProgresso(contexto);
 
   // Se a página foi atualizada depois de responder, restaura o feedback
-  if (questao.resposta) aplicarResposta(contexto, questao, questao.resposta);
+  if (questao.resposta) aplicarResposta(contexto, questao, questao.resposta, { restaurando: true });
 
   if (focar) elementos.enunciado.focus();
 }
 
-function aplicarResposta(contexto, questao, resposta) {
+/** Mostra o resultado da resposta: alternativas, feedback, placar e combo. */
+function aplicarResposta(contexto, questao, resposta, { restaurando = false } = {}) {
   const { elementos } = contexto;
   const botoes = [...elementos.alternativas.querySelectorAll(".alternativa")];
+  const acertou = resposta.acertou;
+  const ehUltima = questao.numero === questao.total;
+  const textoCorreto = questao.pergunta.alternativas[questao.pergunta.correta];
 
   botoes.forEach((botao, posicao) => {
     const indiceOriginal = questao.alternativas[posicao].indiceOriginal;
@@ -85,59 +201,79 @@ function aplicarResposta(contexto, questao, resposta) {
 
     if (indiceOriginal === questao.pergunta.correta) {
       botao.classList.add("alternativa--correta");
+      if (!acertou) botao.classList.add("alternativa--revelada");
       estado.replaceChildren(
-        criarIcone("check", 22),
-        criarElemento("span", { classe: "sr-only", texto: "Resposta correta" })
+        criarIcone("check", 18),
+        el("span", { classe: "sr-only", texto: "Resposta correta" })
       );
     } else if (indiceOriginal === resposta.escolhida) {
       botao.classList.add("alternativa--incorreta");
       estado.replaceChildren(
-        criarIcone("x", 22),
-        criarElemento("span", { classe: "sr-only", texto: "Sua resposta, incorreta" })
+        criarIcone("x", 18),
+        el("span", { classe: "sr-only", texto: "Sua resposta, incorreta" })
       );
     } else {
       botao.classList.add("alternativa--neutra");
     }
   });
 
-  const acertou = resposta.acertou;
-  const ehUltima = questao.numero === questao.total;
-  const textoCorreto = questao.pergunta.alternativas[questao.pergunta.correta];
-
-  let detalhe = `A resposta correta é: ${textoCorreto}`;
-  if (acertou) {
-    detalhe = `+${resposta.pontos} pontos`;
-    if (resposta.bonus > 0) detalhe += ` (${resposta.base} + ${resposta.bonus} de bônus de combo)`;
-  }
-
-  const botaoProxima = criarElemento("button", {
+  const botaoProxima = el("button", {
     classe: "botao botao--primario",
     texto: ehUltima ? "Ver resultado" : "Próxima pergunta",
     atributos: { type: "button", id: "botao-proxima" },
     aoClicar: () => avancarParaProxima(contexto),
   });
 
-  elementos.feedback.className = `feedback ${acertou ? "feedback--acerto" : "feedback--erro"}`;
-  elementos.feedback.replaceChildren(
-    criarElemento("p", { classe: "feedback__titulo" }, [
-      criarIcone(acertou ? "check" : "x", 22),
-      acertou ? "Resposta correta!" : "Não foi dessa vez.",
-    ]),
-    criarElemento("p", { classe: "feedback__detalhe", texto: detalhe }),
-    criarElemento("p", { classe: "feedback__explicacao", texto: questao.pergunta.explicacao }),
-    criarElemento("div", { classe: "feedback__acoes" }, [botaoProxima])
-  );
-  elementos.feedback.hidden = false;
+  const detalhe = acertou
+    ? el("div", { classe: "feedback__pontos" }, [
+        el("span", { classe: "feedback__ponto", texto: `+${formatarNumero(resposta.pontos)} pts` }),
+        resposta.bonus > 0
+          ? el("span", {
+              classe: "feedback__bonus",
+              texto: `${resposta.base} base + ${resposta.bonus} de bônus de combo`,
+            })
+          : null,
+      ])
+    : el("p", { classe: "feedback__correta", texto: `A resposta certa é: ${textoCorreto}` });
 
-  atualizarStatus(contexto);
-  atualizarBarra(contexto);
-  botaoProxima.focus();
+  elementos.feedback.replaceChildren(
+    el("div", { classe: `feedback feedback--${acertou ? "acerto" : "erro"}` }, [
+      el("div", { classe: "feedback__cabecalho" }, [
+        el("span", { classe: "feedback__selo", atributos: { "aria-hidden": "true" } }, [
+          criarIcone(acertou ? "check" : "x", 20),
+        ]),
+        el("p", { classe: "feedback__titulo", texto: acertou ? "Resposta correta!" : "Não foi dessa vez." }),
+      ]),
+      detalhe,
+      el("p", { classe: "feedback__explicacao", texto: questao.pergunta.explicacao }),
+      el("div", { classe: "feedback__acoes" }, [
+        el("span", { classe: "feedback__tecla" }, [el("kbd", { texto: "Enter" }), " para continuar"]),
+        botaoProxima,
+      ]),
+    ])
+  );
+
+  elementos.botaoPausar.hidden = true;
+  atualizarPontos(contexto, { animar: !restaurando });
+  atualizarCombo(contexto);
+  atualizarProgresso(contexto);
+
+  if (!restaurando) {
+    if (acertou) {
+      pulsar(elementos.pontos);
+      if (contexto.partida.combo >= 2) pulsar(elementos.combo);
+      if (resposta.pontos > 0) mostrarGanho(contexto, resposta.pontos);
+    }
+    botaoProxima.focus();
+  }
 }
 
 // ---------- Ações ----------
-function responderAlternativa(contexto, posicao) {
+function aoEscolher(contexto, posicao) {
+  if (contexto.ocupado) return;
+
   const resposta = responder(contexto.partida, posicao);
-  if (!resposta) return; // já respondida: ignora cliques repetidos
+  if (!resposta) return; // já respondida ou pausada: ignora
 
   aplicarResposta(contexto, obterQuestaoAtual(contexto.partida), resposta);
 }
@@ -149,7 +285,7 @@ function avancarParaProxima(contexto) {
   const destino = avancar(contexto.partida);
 
   if (destino === "proxima") {
-    renderizarQuestao(contexto, true);
+    renderizarQuestao(contexto, { animar: true, focar: true });
     contexto.ocupado = false;
     return;
   }
@@ -167,7 +303,8 @@ function avancarParaProxima(contexto) {
 }
 
 async function pedirParaSair(contexto) {
-  if (contexto.ocupado) return;
+  if (contexto.ocupado || contexto.confirmando) return;
+  contexto.confirmando = true;
 
   const confirmou = await confirmarAcao({
     titulo: "Sair da partida?",
@@ -176,6 +313,7 @@ async function pedirParaSair(contexto) {
     rotuloCancelar: "Continuar jogando",
     perigo: true,
   });
+  contexto.confirmando = false;
   if (!confirmou) return;
 
   contexto.ocupado = true;
@@ -183,6 +321,91 @@ async function pedirParaSair(contexto) {
   window.location.href = `${contexto.base}index.html`;
 }
 
+// ---------- Pausa ----------
+/** Esconde a pergunta e mostra a tela de pausa (sem mexer no estado salvo). */
+function mostrarPausa(contexto, { focar = true } = {}) {
+  const { elementos } = contexto;
+  elementos.carta.hidden = true;
+  elementos.pausa.hidden = false;
+  elementos.botaoPausar.hidden = true;
+
+  if (focar) {
+    porId("pausa-titulo").focus();
+    anunciar("Partida pausada.");
+  }
+}
+
+function pausar(contexto) {
+  const { partida } = contexto;
+  if (contexto.ocupado || respondida(partida) || partidaEstaPausada(partida)) return;
+
+  pausarPartida(partida);
+  mostrarPausa(contexto);
+}
+
+function continuar(contexto) {
+  const { partida, elementos } = contexto;
+  if (!partidaEstaPausada(partida)) return;
+
+  retomarPartida(partida);
+  elementos.pausa.hidden = true;
+  elementos.carta.hidden = false;
+  elementos.botaoPausar.hidden = respondida(partida);
+  elementos.enunciado.focus();
+  anunciar("Partida retomada.");
+}
+
+// ---------- Teclado ----------
+/** Posição (0 a 3) da alternativa escolhida pela tecla, ou -1. Aceita 1 a 4 e A a D. */
+function posicaoDaTecla(tecla) {
+  if (tecla.length !== 1) return -1;
+  const numero = "1234".indexOf(tecla);
+  return numero >= 0 ? numero : "abcd".indexOf(tecla.toLowerCase());
+}
+
+function aoTeclar(contexto, evento) {
+  if (evento.ctrlKey || evento.metaKey || evento.altKey || evento.defaultPrevented) return;
+  if (document.body.classList.contains("modal-aberto")) return;
+  if (contexto.ocupado) return;
+
+  const alvo = evento.target;
+  if (alvo.closest?.("input, textarea, select, [contenteditable]")) return;
+
+  const { partida, elementos } = contexto;
+  const tecla = evento.key;
+
+  if (tecla === "Escape") {
+    evento.preventDefault();
+    pedirParaSair(contexto);
+    return;
+  }
+
+  if (tecla.toLowerCase() === "p") {
+    if (evento.repeat) return;
+    if (partidaEstaPausada(partida)) continuar(contexto);
+    else pausar(contexto);
+    return;
+  }
+
+  if (partidaEstaPausada(partida)) return;
+
+  const posicao = posicaoDaTecla(tecla);
+  if (posicao >= 0) {
+    if (evento.repeat || respondida(partida)) return;
+    const botao = elementos.alternativas.querySelectorAll(".alternativa")[posicao];
+    if (botao && !botao.disabled) botao.click();
+    return;
+  }
+
+  if ((tecla === "Enter" || tecla === " ") && respondida(partida)) {
+    // Se o foco está num botão ou link, ele mesmo trata a tecla (evita avançar duas vezes)
+    if (alvo.closest?.("button, a, [role='button']")) return;
+    evento.preventDefault();
+    if (!evento.repeat) avancarParaProxima(contexto);
+  }
+}
+
+// ---------- Sem partida ----------
 function mostrarSemPartida(base) {
   const modo = new URLSearchParams(window.location.search).get("modo");
   const modoIndisponivel = modo && modo !== "classico";
@@ -200,13 +423,13 @@ function mostrarSemPartida(base) {
   alvo.hidden = false;
   alvo.replaceChildren(
     estado,
-    criarElemento("div", { classe: "sem-partida__acoes" }, [
-      criarElemento("a", {
+    el("div", { classe: "sem-partida__acoes" }, [
+      el("a", {
         classe: "botao botao--primario",
         texto: "Montar uma partida",
         atributos: { href: `${base}pages/categorias.html` },
       }),
-      criarElemento("a", {
+      el("a", {
         classe: "botao botao--contorno",
         texto: "Voltar ao início",
         atributos: { href: `${base}index.html` },
@@ -223,45 +446,51 @@ export function iniciar({ base }) {
     return;
   }
 
-  const barra = criarBarraProgresso({ percentual: 0, rotulo: "Progresso da partida" });
-  porId("barra-progresso").replaceChildren(barra);
+  // Um segmento por pergunta
+  const segmentos = partida.questoes.map(() => el("span", { classe: "segmento" }));
+  porId("segmentos").replaceChildren(...segmentos);
 
   const contexto = {
     base,
     partida,
+    segmentos,
     ocupado: false,
+    confirmando: false,
+    pontosExibidos: partida.pontuacao,
     elementos: {
-      contador: porId("contador-pergunta"),
+      carta: porId("carta-pergunta"),
       marcas: porId("pergunta-marcas"),
       enunciado: porId("pergunta-enunciado"),
       alternativas: porId("alternativas"),
       feedback: porId("feedback"),
+      contador: porId("contador-pergunta"),
+      barra: porId("segmentos"),
+      status: porId("jogo-status"),
       pontos: porId("chip-pontos"),
+      pontosValor: porId("pontos-valor"),
       combo: porId("chip-combo"),
-      barra,
-      preenchimento: barra.firstElementChild,
+      comboValor: porId("combo-valor"),
+      pips: [...document.querySelectorAll(".combo__pip")].slice(0, QUANTIDADE_DE_PONTOS_DO_COMBO),
+      pausa: porId("tela-pausa"),
+      botaoPausar: porId("botao-pausar"),
     },
   };
 
   porId("jogo").hidden = false;
-  renderizarQuestao(contexto, false);
+  renderizarQuestao(contexto);
+  if (partidaEstaPausada(partida)) mostrarPausa(contexto, { focar: false });
 
   // Um único listener para as quatro alternativas (delegação de eventos)
   contexto.elementos.alternativas.addEventListener("click", (evento) => {
     const botao = evento.target.closest(".alternativa");
-    if (!botao || botao.disabled || contexto.ocupado) return;
-    responderAlternativa(contexto, Number(botao.dataset.posicao));
+    if (!botao || botao.disabled) return;
+    aoEscolher(contexto, Number(botao.dataset.posicao));
   });
 
   porId("botao-sair").addEventListener("click", () => pedirParaSair(contexto));
+  porId("botao-sair-pausa").addEventListener("click", () => pedirParaSair(contexto));
+  porId("botao-pausar").addEventListener("click", () => pausar(contexto));
+  porId("botao-continuar").addEventListener("click", () => continuar(contexto));
 
-  // Atalho de teclado: teclas 1 a 4 escolhem a alternativa
-  document.addEventListener("keydown", (evento) => {
-    if (evento.ctrlKey || evento.metaKey || evento.altKey) return;
-    if (document.body.classList.contains("modal-aberto")) return;
-    if (!/^[1-4]$/.test(evento.key)) return;
-
-    const botao = contexto.elementos.alternativas.querySelectorAll(".alternativa")[Number(evento.key) - 1];
-    if (botao && !botao.disabled) botao.click();
-  });
+  document.addEventListener("keydown", (evento) => aoTeclar(contexto, evento));
 }
