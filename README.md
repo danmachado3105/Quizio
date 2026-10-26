@@ -76,8 +76,8 @@ Como o projeto utiliza HTML, CSS e JavaScript puro, você pode executá-lo local
 
 ## 🗺️ Próximos passos
 
-- [ ] Expandir e revisar o banco de perguntas.
-- [ ] Aprimorar os modos de jogo e os desafios.
+- [x] Expandir e revisar o banco de perguntas.
+- [x] Aprimorar os modos de jogo e os desafios.
 - [ ] Expandir as conquistas e o sistema de progressão.
 - [ ] Refinar animações e microinterações.
 - [ ] Melhorar continuamente a experiência em dispositivos móveis.
