@@ -15,6 +15,9 @@ import { registrarPartida } from "./progresso.js";
  * Motor da partida. Guarda o estado no sessionStorage, então atualizar a
  * página não perde o jogo. As telas só chamam estas funções, sem fazer contas.
  * Os modos extras (Etapa 4) reaproveitam este mesmo motor.
+ *
+ * Pausa: pausadaEm guarda o instante em que a partida foi pausada (ou null) e
+ * pausadoMs soma o tempo já parado. O tempo pausado não conta na duração.
  */
 const CHAVE_PARTIDA = "quizio:partida";
 const CHAVE_RESULTADO = "quizio:resultado";
@@ -109,6 +112,8 @@ export function criarPartida(configBruta) {
     combo: 0,
     melhorCombo: 0,
     iniciadaEm: Date.now(),
+    pausadoMs: 0,
+    pausadaEm: null,
   };
 
   removerSessao(CHAVE_RESULTADO);
@@ -127,6 +132,13 @@ function partidaEhValida(partida) {
   if (partida.respostas.length < partida.indice || partida.respostas.length > partida.indice + 1) return false;
   if (![partida.pontuacao, partida.combo, partida.melhorCombo, partida.iniciadaEm].every(Number.isFinite)) return false;
 
+  // Campos da pausa: podem não existir em partidas salvas antes deste recurso
+  const pausadoValido =
+    partida.pausadoMs === undefined || (Number.isFinite(partida.pausadoMs) && partida.pausadoMs >= 0);
+  const pausadaEmValido =
+    partida.pausadaEm === undefined || partida.pausadaEm === null || Number.isFinite(partida.pausadaEm);
+  if (!pausadoValido || !pausadaEmValido) return false;
+
   return partida.questoes.every(
     (questao) =>
       questao && obterPerguntaPorId(questao.id) && Array.isArray(questao.ordem) && questao.ordem.length === 4
@@ -140,6 +152,10 @@ export function obterPartidaAtiva() {
     if (partida) removerSessao(CHAVE_PARTIDA);
     return null;
   }
+
+  // Partidas salvas antes do recurso de pausa não têm estes campos
+  partida.pausadoMs ??= 0;
+  partida.pausadaEm ??= null;
   return partida;
 }
 
@@ -162,9 +178,10 @@ export function obterQuestaoAtual(partida) {
 
 /**
  * Registra a resposta da pergunta atual. Retorna null se a pergunta já foi
- * respondida (protege contra cliques duplicados).
+ * respondida (protege contra cliques duplicados) ou se a partida está pausada.
  */
 export function responder(partida, posicaoExibida) {
+  if (partida.pausadaEm) return null;
   if (partida.respostas.length > partida.indice) return null;
 
   const questao = partida.questoes[partida.indice];
@@ -208,6 +225,40 @@ export function avancar(partida) {
   return "proxima";
 }
 
+// ---------- pausa e duração ----------
+
+/** A partida está pausada? */
+export function partidaEstaPausada(partida) {
+  return Boolean(partida.pausadaEm);
+}
+
+/** Pausa a partida. Retorna false se ela já estava pausada. */
+export function pausarPartida(partida) {
+  if (partida.pausadaEm) return false;
+
+  partida.pausadaEm = Date.now();
+  gravarSessao(CHAVE_PARTIDA, partida);
+  return true;
+}
+
+/** Retoma a partida e soma o tempo parado. Retorna false se ela não estava pausada. */
+export function retomarPartida(partida) {
+  if (!partida.pausadaEm) return false;
+
+  partida.pausadoMs = (partida.pausadoMs || 0) + Math.max(0, Date.now() - partida.pausadaEm);
+  partida.pausadaEm = null;
+  gravarSessao(CHAVE_PARTIDA, partida);
+  return true;
+}
+
+/** Tempo realmente jogado, sem contar as pausas (inclusive a que estiver em andamento). */
+export function calcularDuracaoMs(partida, agora = Date.now()) {
+  const pausadoAgora = partida.pausadaEm ? Math.max(0, agora - partida.pausadaEm) : 0;
+  return Math.max(0, agora - partida.iniciadaEm - (partida.pausadoMs || 0) - pausadoAgora);
+}
+
+// ---------- conclusão ----------
+
 /** Conta, por categoria da pergunta, quantas foram respondidas e acertadas. */
 function contarPorCategoriaDaPergunta(respostas) {
   const contagem = {};
@@ -249,7 +300,7 @@ export function concluirPartida(partida) {
     percentual: Math.round((acertos / total) * 100),
     pontuacao: partida.pontuacao,
     melhorCombo: partida.melhorCombo,
-    duracaoMs: Math.max(0, Date.now() - partida.iniciadaEm),
+    duracaoMs: calcularDuracaoMs(partida),
     xp: xp.total,
     xpDetalhe: xp,
     perfeita: ehPartidaPerfeita(acertos, total),
