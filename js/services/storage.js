@@ -2,6 +2,7 @@ import { dataLocalISO } from "../utils/formatacao.js";
 import { AVATAR_PADRAO, avatarEhValido } from "../data/avatares.js";
 import { obterCategoriaPorId } from "../data/categorias.js";
 import { calcularMelhorSequencia, diaLocal, unirDias } from "../utils/sequencia.js";
+import { semanaISOLocal } from "../utils/semana.js";
 
 /*
  * Único ponto de acesso ao LocalStorage do Quizio.
@@ -24,23 +25,35 @@ import { calcularMelhorSequencia, diaLocal, unirDias } from "../utils/sequencia.
  * conquistas:            { [conquistaId]: "data ISO do desbloqueio" }
  * registroDePartidas:    ids das últimas partidas registradas (impede XP duplicado)
  *
- * Novidades da versão 3:
+ * Versão 3:
  * favoritas:             ids das categorias favoritas
  * diasJogados:           dias locais ("AAAA-MM-DD") com pelo menos uma partida concluída
  * estatisticas.melhorSequencia: maior sequência de dias seguidos (guardada à parte)
  * preferencias.movimento: "sistema" (segue o aparelho) ou "reduzido"
+ *
+ * Versão 4 (modos de jogo):
+ * estatisticas.melhorSobrevivencia:  mais acertos seguidos numa partida de Sobrevivência
+ * estatisticas.melhorAcertosNoTempo: mais acertos numa partida "Contra o tempo"
+ * estatisticas.duelosVencidos:       duelos locais em que o jogador do perfil venceu
+ * estatisticas.diariosConcluidos:    desafios diários concluídos
+ * estatisticas.partidasPorModo:      { [modoId]: partidas concluídas }
+ * desafioDiario:   { ultimaData, acertos, total, pontuacao, xp, respostas } (para revisar o desafio do dia)
+ * missoesSemanais: { semana, progresso, resgatadas } (renovam a cada semana ISO)
  */
-const CHAVE_STORAGE = "quizio:v1";
-const CHAVE_BACKUP = "quizio:v1:backup";
-const CHAVE_BACKUP_MIGRACAO = "quizio:v1:pre-v3";
-
-export const VERSAO_DOS_DADOS = 3;
+export const VERSAO_DOS_DADOS = 4;
 export const LIMITE_HISTORICO = 50;
 export const LIMITE_IDS_REGISTRADOS = 200;
 export const LIMITE_DIAS_JOGADOS = 400;
+export const LIMITE_RESPOSTAS_DO_DIARIO = 20;
 export const TAMANHO_MAXIMO_NOME = 20;
 export const NOME_PADRAO = "Jogador";
 export const MOVIMENTOS_VALIDOS = ["sistema", "reduzido"];
+
+const CHAVE_STORAGE = "quizio:v1";
+const CHAVE_BACKUP = "quizio:v1:backup";
+// Cópia dos dados antes de migrar para a versão atual (feita uma única vez)
+const CHAVE_BACKUP_MIGRACAO = `quizio:v1:pre-v${VERSAO_DOS_DADOS}`;
+const CHAVES_DE_BACKUP_ANTIGAS = ["quizio:v1:pre-v3"];
 
 const status = { disponivel: true, gravacaoBloqueada: false, recuperadoDeErro: false };
 
@@ -60,13 +73,19 @@ function criarDadosPadrao() {
       partidasPerfeitas: 0,
       recordesSuperados: 0,
       melhorSequencia: 0,
+      melhorSobrevivencia: 0,
+      melhorAcertosNoTempo: 0,
+      duelosVencidos: 0,
+      diariosConcluidos: 0,
+      partidasPorModo: {},
       porCategoria: {},
       perguntasPorCategoria: {},
     },
     historico: [],
     conquistas: {},
     missoes: { data: "", progresso: {}, resgatadas: {}, categoriasHoje: [] },
-    desafioDiario: { ultimaData: "" },
+    missoesSemanais: { semana: "", progresso: {}, resgatadas: {} },
+    desafioDiario: { ultimaData: "", acertos: 0, total: 0, pontuacao: 0, xp: 0, respostas: [] },
     registroDePartidas: [],
     favoritas: [],
     diasJogados: [],
@@ -140,6 +159,19 @@ function limparFavoritas(lista) {
   return favoritas;
 }
 
+/** Resposta guardada para a revisão do desafio diário. */
+function ehRespostaDoDiario(resposta) {
+  return (
+    ehObjetoSimples(resposta) &&
+    typeof resposta.perguntaId === "string" &&
+    (resposta.escolhida === null || (Number.isInteger(resposta.escolhida) && resposta.escolhida >= 0 && resposta.escolhida <= 3)) &&
+    typeof resposta.acertou === "boolean"
+  );
+}
+
+const numeroValido = (valor) => Number.isFinite(valor) && valor >= 0;
+const textoValido = (valor) => typeof valor === "string";
+
 /** Corrige o que for inválido, sem descartar o progresso que estiver correto. */
 function sanitizarDados(dados) {
   dados.perfil.nome = limparNome(dados.perfil.nome).slice(0, TAMANHO_MAXIMO_NOME) || NOME_PADRAO;
@@ -154,27 +186,35 @@ function sanitizarDados(dados) {
   for (const chave of [
     "partidas", "perguntasRespondidas", "acertos", "melhorPontuacao",
     "melhorCombo", "partidasPerfeitas", "recordesSuperados", "melhorSequencia",
+    "melhorSobrevivencia", "melhorAcertosNoTempo", "duelosVencidos", "diariosConcluidos",
   ]) {
     estatisticas[chave] = inteiroNaoNegativo(estatisticas[chave]);
   }
   estatisticas.acertos = Math.min(estatisticas.acertos, estatisticas.perguntasRespondidas);
+  estatisticas.partidasPorModo = filtrarEntradas(estatisticas.partidasPorModo, numeroValido);
   estatisticas.porCategoria = filtrarEntradas(estatisticas.porCategoria, ehObjetoSimples);
-  estatisticas.perguntasPorCategoria = filtrarEntradas(
-    estatisticas.perguntasPorCategoria,
-    (valor) => Number.isFinite(valor) && valor >= 0
-  );
+  estatisticas.perguntasPorCategoria = filtrarEntradas(estatisticas.perguntasPorCategoria, numeroValido);
 
-  dados.conquistas = filtrarEntradas(dados.conquistas, (valor) => typeof valor === "string");
+  dados.conquistas = filtrarEntradas(dados.conquistas, textoValido);
 
-  dados.missoes.progresso = filtrarEntradas(dados.missoes.progresso, (valor) => Number.isFinite(valor) && valor >= 0);
-  dados.missoes.resgatadas = filtrarEntradas(dados.missoes.resgatadas, (valor) => typeof valor === "string");
-  dados.missoes.categoriasHoje = dados.missoes.categoriasHoje.filter((id) => typeof id === "string");
+  dados.missoes.progresso = filtrarEntradas(dados.missoes.progresso, numeroValido);
+  dados.missoes.resgatadas = filtrarEntradas(dados.missoes.resgatadas, textoValido);
+  dados.missoes.categoriasHoje = dados.missoes.categoriasHoje.filter(textoValido);
+
+  dados.missoesSemanais.progresso = filtrarEntradas(dados.missoesSemanais.progresso, numeroValido);
+  dados.missoesSemanais.resgatadas = filtrarEntradas(dados.missoesSemanais.resgatadas, textoValido);
+
+  const diario = dados.desafioDiario;
+  for (const chave of ["acertos", "total", "pontuacao", "xp"]) {
+    diario[chave] = inteiroNaoNegativo(diario[chave]);
+  }
+  diario.respostas = diario.respostas.filter(ehRespostaDoDiario).slice(0, LIMITE_RESPOSTAS_DO_DIARIO);
 
   dados.historico = dados.historico
     .filter((partida) => ehObjetoSimples(partida) && typeof partida.id === "string")
     .slice(0, LIMITE_HISTORICO);
   dados.registroDePartidas = dados.registroDePartidas
-    .filter((id) => typeof id === "string")
+    .filter(textoValido)
     .slice(-LIMITE_IDS_REGISTRADOS);
 
   dados.favoritas = limparFavoritas(dados.favoritas);
@@ -219,6 +259,9 @@ function migrar(dados, versaoSalva) {
     }
   }
 
+  // v3 -> v4: só campos novos (modos, desafio diário e missões semanais).
+  // Todos entram com o valor padrão na mesclagem, então não há o que converter.
+
   dados.versao = VERSAO_DOS_DADOS;
 }
 
@@ -228,6 +271,15 @@ export function reiniciarMissoesSeNecessario(dados) {
   if (dados.missoes.data === hoje) return false;
 
   dados.missoes = { data: hoje, progresso: {}, resgatadas: {}, categoriasHoje: [] };
+  return true;
+}
+
+/** Missões semanais: recomeçam a cada semana ISO (segunda-feira, horário local). */
+export function reiniciarMissoesSemanaisSeNecessario(dados) {
+  const semana = semanaISOLocal();
+  if (dados.missoesSemanais.semana === semana) return false;
+
+  dados.missoesSemanais = { semana, progresso: {}, resgatadas: {} };
   return true;
 }
 
@@ -292,6 +344,7 @@ function carregarDoStorage() {
   sanitizarDados(dados);
   migrar(dados, versaoSalva);
   reiniciarMissoesSeNecessario(dados);
+  reiniciarMissoesSemanaisSeNecessario(dados);
   return dados;
 }
 
@@ -337,9 +390,9 @@ export function atualizarDados(alterador) {
 /** Apaga todo o progresso (e as cópias de segurança) e volta ao estado da primeira visita. */
 export function redefinirDados() {
   try {
-    localStorage.removeItem(CHAVE_STORAGE);
-    localStorage.removeItem(CHAVE_BACKUP);
-    localStorage.removeItem(CHAVE_BACKUP_MIGRACAO);
+    for (const chave of [CHAVE_STORAGE, CHAVE_BACKUP, CHAVE_BACKUP_MIGRACAO, ...CHAVES_DE_BACKUP_ANTIGAS]) {
+      localStorage.removeItem(chave);
+    }
   } catch (erro) {
     console.warn("Quizio: não foi possível apagar os dados salvos.", erro);
   }
@@ -389,9 +442,17 @@ export function salvarPerfil({ nome, avatar }) {
   return { sucesso: true, nome: validacao.nome, avatar };
 }
 
+// ---------- Desafio diário ----------
+
 /** O desafio diário já foi concluído na data local de hoje? */
 export function desafioDiarioConcluidoHoje() {
   return obterDados().desafioDiario.ultimaData === dataLocalISO();
+}
+
+/** Resultado do desafio de hoje (para revisar as respostas), ou null se ainda não foi concluído. */
+export function obterResultadoDoDesafioDeHoje() {
+  const diario = obterDados().desafioDiario;
+  return diario.ultimaData === dataLocalISO() ? diario : null;
 }
 
 // ---------- Favoritas ----------
