@@ -46,22 +46,6 @@
   color: var(--cor-texto-suave);
 }
 
-/* ---------- Avatares ---------- */
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border-radius: 50%;
-}
-
-.avatar--roxo { background: var(--cor-roxo); color: var(--cor-branco); }
-.avatar--coral { background: var(--cor-coral); color: var(--cor-roxo-escuro); }
-.avatar--amarelo { background: var(--cor-amarelo); color: var(--cor-roxo-escuro); }
-.avatar--verde { background: var(--cor-acerto); color: var(--cor-branco); }
-.avatar--escuro { background: var(--cor-roxo-escuro); color: var(--cor-amarelo); }
-.avatar--neutro { background: #EFE8DD; color: var(--cor-roxo-escuro); }
-
 /* ---------- Aviso ---------- */
 .aviso {
   padding: var(--espaco-3) var(--espaco-4);
