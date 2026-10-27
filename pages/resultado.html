@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#7254D8">
   <title>Resultado | Quizio</title>
+  <meta name="description" content="Veja o seu desempenho, o XP conquistado e revise as respostas da partida.">
+  <meta name="theme-color" content="#7254D8">
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%237254D8'/%3E%3Ccircle cx='15' cy='15' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M19 19l5 5' stroke='%23FF786B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 
   <link rel="stylesheet" href="../css/reset.css">
   <link rel="stylesheet" href="../css/variables.css">
@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/gamificacao.css">
+  <link rel="stylesheet" href="../css/revisao.css">
   <link rel="stylesheet" href="../css/pages/resultado.css">
   <link rel="stylesheet" href="../css/responsive.css">
 </head>
@@ -30,11 +31,18 @@
   <main class="container pagina resultado-pagina" id="conteudo">
     <div class="resultado" id="resultado" hidden>
       <section class="card resultado__hero" id="resultado-hero" aria-labelledby="resultado-titulo"></section>
+
+      <!-- Só no duelo local -->
+      <section id="resultado-duelo" aria-labelledby="duelo-titulo" hidden></section>
+
       <section class="resultado__grade" id="resultado-dados" aria-label="Resumo da partida"></section>
       <div class="resultado__colunas" id="resultado-progresso"></div>
       <div id="resultado-conquistas"></div>
       <p class="campo__erro" id="erro-resultado" role="alert"></p>
       <div class="resultado__acoes" id="resultado-acoes"></div>
+
+      <!-- Revisão de respostas (abre pelo botão "Revisar respostas") -->
+      <section class="revisao-secao" id="resultado-revisao" aria-labelledby="revisao-titulo" hidden></section>
     </div>
 
     <section id="sem-resultado" hidden></section>
