@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/pages/jogo.css">
+  <link rel="stylesheet" href="../css/pages/jogo-modos.css">
+  <link rel="stylesheet" href="../css/revisao.css">
   <link rel="stylesheet" href="../css/responsive.css">
 </head>
 
@@ -53,6 +55,9 @@
               <span class="combo__pip"></span>
             </span>
           </div>
+
+          <!-- Só no duelo: um placar para cada jogador -->
+          <div class="placar-duelo" id="placar-duelo" hidden></div>
         </div>
       </div>
 
@@ -61,14 +66,22 @@
         <div class="segmentos" id="segmentos" role="progressbar" aria-label="Progresso da partida" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"></div>
       </div>
 
-      <!-- Reservado para a barra de tempo do modo "Contra o tempo" -->
+      <!-- Barra de tempo (modo "Contra o tempo") -->
       <div class="jogo__tempo" id="slot-tempo" hidden></div>
 
       <div class="palco">
         <article class="carta-pergunta" id="carta-pergunta" aria-labelledby="pergunta-enunciado">
           <div class="carta-pergunta__marcas" id="pergunta-marcas"></div>
+          <p class="vez" id="vez-jogador" role="status" data-jogador="0" hidden></p>
           <h1 class="pergunta__enunciado" id="pergunta-enunciado" tabindex="-1"></h1>
           <div class="alternativas" id="alternativas" role="group" aria-labelledby="pergunta-enunciado"></div>
+
+          <div class="acoes-pergunta" id="acoes-pergunta" hidden>
+            <button class="botao botao--texto" type="button" id="botao-pular" data-icone="arrow-right" data-tamanho-icone="18">
+              <span id="texto-pular">Pular pergunta</span>
+            </button>
+          </div>
+
           <div class="feedback-area" id="feedback" aria-live="polite"></div>
         </article>
 
@@ -81,20 +94,31 @@
             <button class="botao botao--contorno" type="button" id="botao-sair-pausa">Sair da partida</button>
           </div>
         </section>
+
+        <!-- Duelo: passar o aparelho para o convidado -->
+        <section class="pausa passagem fundo-escuro" id="tela-passagem" aria-labelledby="passagem-titulo" hidden>
+          <span class="pausa__icone" data-icone="users" data-tamanho-icone="32" aria-hidden="true"></span>
+          <h2 class="pausa__titulo" id="passagem-titulo" tabindex="-1"></h2>
+          <p class="pausa__texto" id="passagem-texto"></p>
+          <div class="pausa__acoes">
+            <button class="botao botao--amarelo botao--grande" type="button" id="botao-pronto" data-icone="play" data-tamanho-icone="20">Estou pronto</button>
+          </div>
+        </section>
       </div>
 
       <p class="jogo__dica" id="dica-teclado">
         <span><kbd>1</kbd> a <kbd>4</kbd> ou <kbd>A</kbd> a <kbd>D</kbd> respondem</span>
         <span><kbd>Enter</kbd> continua</span>
-        <span><kbd>P</kbd> pausa</span>
+        <span id="dica-pular"><kbd>S</kbd> pula</span>
+        <span id="dica-pausa"><kbd>P</kbd> pausa</span>
         <span><kbd>Esc</kbd> sai</span>
       </p>
     </section>
 
-    <!-- Sem partida -->
+    <!-- Sem partida, desafio concluído ou modo sem partida em andamento -->
     <section id="sem-partida" hidden></section>
 
-    <!-- Avisos para leitores de tela (pausa, retomada) -->
+    <!-- Avisos para leitores de tela (pausa, retomada, tempo) -->
     <p class="sr-only" id="aviso-jogo" role="status" aria-live="polite"></p>
   </main>
 
