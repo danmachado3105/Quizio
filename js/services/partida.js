@@ -36,7 +36,7 @@ const CHAVE_PARTIDA = "quizio:partida";
 const CHAVE_RESULTADO = "quizio:resultado";
 
 // Os outros modos entram aqui conforme a tela de jogo passa a suportá-los
-export const MODOS_IMPLEMENTADOS = ["classico"];
+export const MODOS_IMPLEMENTADOS = ["classico", "tempo", "sobrevivencia", "diario", "duelo"];
 export const QUANTIDADES_PADRAO = [5, 10, 15, 20];
 export const QUANTIDADE_MAXIMA = 20;
 
