@@ -1,8 +1,3 @@
-:root {
-  --cor-acerto-texto: #1B6B45;
-  --cor-erro-texto: #A8323B;
-}
-
 .resultado-pagina {
   width: min(100% - 2rem, 52rem);
 }
@@ -59,6 +54,76 @@
 
 .resultado__selo {
   margin-top: var(--espaco-4);
+}
+
+/* ---------- Placar do duelo ---------- */
+.duelo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--espaco-4);
+  align-items: stretch;
+}
+
+.duelo__titulo {
+  grid-column: 1 / -1;
+  font-size: var(--texto-xl);
+}
+
+.duelo__jogador {
+  display: grid;
+  gap: var(--espaco-2);
+  justify-items: center;
+  padding: var(--espaco-5) var(--espaco-4);
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-lg);
+  text-align: center;
+}
+
+.duelo__jogador[data-vencedor="true"] {
+  background: var(--cor-amarelo);
+  box-shadow: var(--sombra-md);
+}
+
+.duelo__nome {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--fonte-mono);
+  font-size: var(--texto-xs);
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.duelo__pontos {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2.2rem, 7vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.duelo__detalhe {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+}
+
+.duelo__jogador[data-vencedor="true"] .duelo__detalhe {
+  color: var(--tinta);
+}
+
+.duelo__vs {
+  align-self: center;
+  font-family: var(--fonte-titulo);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.duelo__nota {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-weight: 700;
 }
 
 /* ---------- Números da partida ---------- */
@@ -162,6 +227,30 @@
   margin-top: var(--espaco-4);
 }
 
+/* ---------- Revisão ---------- */
+.revisao-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+}
+
+.revisao-cabecalho .secao__titulo {
+  outline: none;
+}
+
+.revisao-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+}
+
+.revisao-filtros .botao[aria-pressed="true"] {
+  background: var(--tinta);
+  color: var(--cor-creme);
+}
+
 /* ---------- Telas menores ---------- */
 @media (max-width: 44rem) {
   .resultado__colunas {
@@ -180,5 +269,13 @@
 
   .resultado__acoes .botao {
     width: 100%;
+  }
+
+  .duelo {
+    grid-template-columns: 1fr;
+  }
+
+  .duelo__vs {
+    justify-self: center;
   }
 }
