@@ -1,7 +1,7 @@
 import { criarElemento as el, porId } from "../utils/dom.js";
 import { criarIcone } from "../utils/icones.js";
 import { CATEGORIAS, GRUPOS, obterCategoriaPorId, resolverIdDaCategoria } from "../data/categorias.js";
-import { MODOS, obterNomeDoModo } from "../data/modos.js";
+import { MODOS, calcularLimiteDePulos, obterNomeDoModo, obterRegrasDoModo } from "../data/modos.js";
 import {
   CATEGORIA_TODAS,
   DIFICULDADE_MISTA,
@@ -10,7 +10,7 @@ import {
   contarPerguntasPorCategoriaEDificuldade,
   filtrarPerguntas,
 } from "../data/perguntas.js";
-import { alternarFavorita, obterDados, obterFavoritas } from "../services/storage.js";
+import { alternarFavorita, desafioDiarioConcluidoHoje, obterDados, obterFavoritas } from "../services/storage.js";
 import {
   MODOS_IMPLEMENTADOS,
   QUANTIDADES_PADRAO,
@@ -20,6 +20,7 @@ import {
 } from "../services/partida.js";
 import { abrirRoleta } from "../components/roleta.js";
 import { criarCapa } from "../utils/imagens.js";
+import { XP_DESAFIO_DIARIO } from "../utils/pontuacao.js";
 import { embaralhar } from "../utils/sorteio.js";
 import { formatarDataCurta, formatarNumero } from "../utils/formatacao.js";
 
@@ -28,7 +29,10 @@ import { formatarDataCurta, formatarNumero } from "../utils/formatacao.js";
  *  - busca (temas e perguntas), filtros e ordenação
  *  - seções: Continue de onde parou, Favoritas, Em alta, Novidades, Todos os temas
  *  - com busca ou filtro ativo, as seções dão lugar a uma lista de resultados
- *  - gaveta de configuração da partida (bottom sheet no celular)
+ *  - gaveta de configuração da partida (bottom sheet no celular), que se adapta
+ *    às regras de cada modo (ver data/modos.js)
+ *  - "modo preferido": quando o jogador chega da home escolhendo um modo, todo
+ *    tema clicado abre a gaveta já nesse modo
  *
  * Estado da tela fica no objeto "estado". Os filtros são botões criados uma
  * única vez e só atualizados (assim o foco do teclado nunca se perde).
@@ -72,6 +76,7 @@ let elementoAnterior = null;
 let regiaoDeAviso = null;
 let temporizadorDaBusca = null;
 let indiceDePerguntas = null;
+let modoPreferido = "classico";
 
 const haystacks = new Map();
 const chips = { grupos: [], dificuldades: [], extras: {} };
@@ -120,6 +125,16 @@ function anunciar(texto) {
   setTimeout(() => {
     regiaoDeAviso.textContent = texto;
   }, 60);
+}
+
+/** Configuração inicial da gaveta para um tema, respeitando o modo preferido e o filtro de dificuldade. */
+function configuracaoParaTema(categoriaId) {
+  return {
+    categoriaId,
+    dificuldade: estado.dificuldade ?? DIFICULDADE_MISTA,
+    quantidade: null,
+    modoId: modoPreferido,
+  };
 }
 
 // ---------- Dados do jogador e do banco ----------
@@ -324,13 +339,7 @@ function criarBotaoAbrir(categoria, classe, filhos) {
         "aria-haspopup": "dialog",
         "aria-label": `Montar partida de ${categoria.nome}`,
       },
-      aoClicar: () =>
-        abrirGaveta({
-          categoriaId: categoria.id,
-          dificuldade: estado.dificuldade ?? DIFICULDADE_MISTA,
-          quantidade: null,
-          modoId: "classico",
-        }),
+      aoClicar: () => abrirGaveta(configuracaoParaTema(categoria.id)),
     },
     filhos
   );
@@ -796,6 +805,22 @@ function aoAlternarFavorita(categoria, botao) {
   if (!botao.isConnected) devolverFoco(categoria.id);
 }
 
+// ---------- Modo preferido (vindo da home) ----------
+function atualizarFaixaDoModo() {
+  const ativo = modoPreferido !== "classico";
+  porId("faixa-modo").hidden = !ativo;
+  if (ativo) porId("faixa-modo-nome").textContent = obterNomeDoModo(modoPreferido);
+}
+
+function limparParametrosDaUrl() {
+  if (!window.location.search) return;
+  try {
+    window.history.replaceState(null, "", window.location.pathname);
+  } catch (erro) {
+    // sem history API, a URL simplesmente continua com os parâmetros
+  }
+}
+
 // ---------- Gaveta de configuração ----------
 function criarOpcaoRadio({ nome, valor, marcado = false, desabilitado = false, compacta = false, classeConteudo = "", filhos = [] }) {
   const entrada = el("input", {
@@ -867,10 +892,17 @@ function renderizarDificuldadesDaGaveta(categoriaId, selecionada) {
 
 function renderizarModos(selecionado) {
   const modoMarcado = MODOS_IMPLEMENTADOS.includes(selecionado) ? selecionado : "classico";
+  const diarioConcluido = desafioDiarioConcluidoHoje();
 
   porId("opcoes-modo").replaceChildren(
     ...MODOS.map((modo) => {
       const disponivel = MODOS_IMPLEMENTADOS.includes(modo.id);
+      const concluido = modo.id === "diario" && diarioConcluido;
+
+      let selo = null;
+      if (!disponivel) selo = el("span", { classe: "badge", texto: "Em breve" });
+      else if (concluido) selo = el("span", { classe: "badge badge--sucesso" }, [criarIcone("check", 14), "Concluído hoje"]);
+
       return criarOpcaoRadio({
         nome: "modo",
         valor: modo.id,
@@ -880,7 +912,7 @@ function renderizarModos(selecionado) {
         filhos: [
           el("span", { classe: "opcao__titulo", texto: modo.nome }),
           el("span", { classe: "opcao__descricao", texto: modo.descricao }),
-          disponivel ? null : el("span", { classe: "badge", texto: "Em breve" }),
+          selo,
         ],
       });
     })
@@ -925,13 +957,77 @@ function sincronizarQuantidades(preferida = null) {
   renderizarQuantidades(opcoes, selecionada, disponiveis);
 }
 
+function rotuloDoBotao(modoId) {
+  if (modoId !== "diario") return "Iniciar partida";
+  return desafioDiarioConcluidoHoje() ? "Rever respostas" : "Aceitar desafio";
+}
+
+/** Mostra só os campos que o modo escolhido usa (ex.: o desafio diário não escolhe tema). */
+function ajustarGavetaAoModo() {
+  const { modoId } = lerSelecao();
+  const regras = obterRegrasDoModo(modoId);
+
+  porId("grupo-tema").hidden = !regras.configuravel;
+  porId("grupo-dificuldade").hidden = !regras.configuravel;
+  porId("grupo-quantidade").hidden = !regras.configuravel || regras.usaTodasAsPerguntas;
+  porId("texto-iniciar").textContent = rotuloDoBotao(modoId);
+}
+
+/** Regras do modo, em uma frase, para o resumo da partida. */
+function descreverRegras(modoId, quantidade) {
+  const regras = obterRegrasDoModo(modoId);
+
+  switch (modoId) {
+    case "tempo":
+      return `${regras.limiteSegundos} segundos por pergunta e sem pausa. Quem responde rápido ganha até 50 pontos de bônus por pergunta.`;
+    case "sobrevivencia":
+      return "A partida termina na primeira resposta errada. Seu recorde é a maior sequência de acertos.";
+    case "duelo":
+      return "Dois jogadores no mesmo aparelho: você responde primeiro e a resposta fica escondida até o convidado responder. Só o seu perfil recebe XP.";
+    default: {
+      const pulos = calcularLimiteDePulos(regras, quantidade);
+      return pulos > 0
+        ? `Sem relógio. Dá para pausar e pular ${plural(pulos, "pergunta", "perguntas")}.`
+        : "Sem relógio. Dá para pausar a qualquer momento.";
+    }
+  }
+}
+
+function atualizarResumoDoDesafio(botao, alvo) {
+  botao.disabled = false;
+  const concluido = desafioDiarioConcluidoHoje();
+
+  alvo.replaceChildren(
+    el("p", {
+      classe: "resumo-partida__frase",
+      texto: concluido
+        ? "Você já concluiu o desafio de hoje."
+        : "5 perguntas iguais para todo mundo hoje, de temas e dificuldades variados.",
+    }),
+    el("p", {
+      classe: "resumo-partida__nota",
+      texto: concluido
+        ? "Volte amanhã para um novo desafio. Por enquanto, dá para rever as suas respostas."
+        : `Vale +${XP_DESAFIO_DIARIO} XP, uma vez por dia. As perguntas sobem de dificuldade a cada rodada.`,
+    })
+  );
+}
+
 function atualizarResumo() {
   const { categoriaId, dificuldade, quantidade, modoId } = lerSelecao();
-  const disponiveis = filtrarPerguntas({ categoriaId, dificuldade }).length;
+  const regras = obterRegrasDoModo(modoId);
   const botao = porId("botao-iniciar");
   const alvo = porId("resumo-partida");
 
-  if (disponiveis === 0 || !quantidade) {
+  if (modoId === "diario") {
+    atualizarResumoDoDesafio(botao, alvo);
+    return;
+  }
+
+  const disponiveis = filtrarPerguntas({ categoriaId, dificuldade }).length;
+  const precisaDeQuantidade = !regras.usaTodasAsPerguntas;
+
+  if (disponiveis === 0 || (precisaDeQuantidade && !quantidade)) {
     botao.disabled = true;
     alvo.replaceChildren(
       el("p", {
@@ -946,16 +1042,15 @@ function atualizarResumo() {
 
   const nomeCategoria =
     categoriaId === CATEGORIA_TODAS ? "todas as categorias" : (obterCategoriaPorId(categoriaId)?.nome ?? "");
-  const nomeDificuldade =
-    dificuldade === DIFICULDADE_MISTA
-      ? "mista"
-      : (NOME_NO_SINGULAR[dificuldade] ?? "");
+  const nomeDificuldade = dificuldade === DIFICULDADE_MISTA ? "mista" : (NOME_NO_SINGULAR[dificuldade] ?? "");
+
+  const frase = regras.usaTodasAsPerguntas
+    ? `Até errar: ${plural(disponiveis, "pergunta", "perguntas")} de ${nomeCategoria}, em dificuldade ${nomeDificuldade}.`
+    : `${plural(quantidade, "pergunta", "perguntas")} de ${nomeCategoria}, em dificuldade ${nomeDificuldade}.`;
 
   const itens = [
-    el("p", {
-      classe: "resumo-partida__frase",
-      texto: `${plural(quantidade, "pergunta", "perguntas")} de ${nomeCategoria}, em dificuldade ${nomeDificuldade}.`,
-    }),
+    el("p", { classe: "resumo-partida__frase", texto: frase }),
+    el("p", { classe: "resumo-partida__nota", texto: descreverRegras(modoId, quantidade) }),
     el("p", {
       classe: "texto-suave texto-pequeno",
       texto: `Modo ${obterNomeDoModo(modoId)} · ${plural(disponiveis, "pergunta disponível", "perguntas disponíveis")} nesta combinação.`,
@@ -981,6 +1076,7 @@ function preencherFormulario({ categoriaId, dificuldade, quantidade, modoId }) {
   renderizarDificuldadesDaGaveta(categoriaId, dificuldade);
   renderizarModos(modoId);
   sincronizarQuantidades(quantidade);
+  ajustarGavetaAoModo();
   atualizarResumo();
   porId("erro-formulario").textContent = "";
 }
@@ -989,15 +1085,6 @@ function definirFundoInerte(valor) {
   for (const id of ELEMENTOS_DE_FUNDO) {
     const elemento = porId(id);
     if (elemento) elemento.inert = valor;
-  }
-}
-
-function limparParametrosDaUrl() {
-  if (!window.location.search) return;
-  try {
-    window.history.replaceState(null, "", window.location.pathname);
-  } catch (erro) {
-    // sem history API, a URL simplesmente continua com os parâmetros
   }
 }
 
@@ -1012,7 +1099,9 @@ function tratarTecladoDaGaveta(evento) {
   }
   if (evento.key !== "Tab") return;
 
-  const focaveis = [...porId("gaveta").querySelectorAll(SELETOR_FOCAVEL)].filter((elemento) => !elemento.disabled);
+  const focaveis = [...porId("gaveta").querySelectorAll(SELETOR_FOCAVEL)].filter(
+    (elemento) => !elemento.disabled && !elemento.closest("[hidden]")
+  );
   if (focaveis.length === 0) return;
 
   const primeiro = focaveis[0];
@@ -1067,6 +1156,23 @@ function fecharGaveta() {
   voltaPara.focus();
 }
 
+/** Desafio diário: começa direto (ou abre a revisão, se já foi concluído hoje). */
+function aoIniciarDesafio() {
+  if (desafioDiarioConcluidoHoje()) {
+    window.location.href = `${base}pages/jogo.html?modo=diario`;
+    return;
+  }
+
+  const { erro } = criarPartida({ modoId: "diario" });
+  if (erro) {
+    porId("erro-formulario").textContent = erro;
+    return;
+  }
+
+  porId("botao-iniciar").disabled = true;
+  window.location.href = `${base}pages/jogo.html`;
+}
+
 function ligarGaveta() {
   const formulario = porId("form-partida");
   porId("gaveta-titulo").tabIndex = -1;
@@ -1083,6 +1189,8 @@ function ligarGaveta() {
       sincronizarQuantidades();
     } else if (nome === "dificuldade") {
       sincronizarQuantidades();
+    } else if (nome === "modo") {
+      ajustarGavetaAoModo();
     }
 
     atualizarResumo();
@@ -1092,7 +1200,13 @@ function ligarGaveta() {
   formulario.addEventListener("submit", (evento) => {
     evento.preventDefault();
 
-    const { erro } = criarPartida(lerSelecao());
+    const selecao = lerSelecao();
+    if (selecao.modoId === "diario") {
+      aoIniciarDesafio();
+      return;
+    }
+
+    const { erro } = criarPartida(selecao);
     if (erro) {
       porId("erro-formulario").textContent = erro;
       return;
@@ -1108,8 +1222,13 @@ function ligarGaveta() {
   });
 }
 
-/** Lê categoria, dificuldade, quantidade e modo da URL (ex.: "Alterar configurações"). */
-function lerConfigInicial() {
+/**
+ * Lê a URL. Retorna { modoPreferido, config }:
+ *  - só "?modo=tempo" (links da home): vira o modo preferido, sem abrir a gaveta
+ *  - tema, dificuldade ou quantidade (ex.: "Alterar configurações"): abre a gaveta preenchida
+ *  - "?modo=diario": abre a gaveta no desafio diário
+ */
+function lerParametros() {
   const parametros = new URLSearchParams(window.location.search);
 
   const categoriaBruta = parametros.get("categoria");
@@ -1125,14 +1244,19 @@ function lerConfigInicial() {
 
   const modo = parametros.get("modo");
   const modoValido = MODOS_IMPLEMENTADOS.includes(modo);
+  const temConfiguracao = Boolean(categoriaId) || dificuldadeValida || quantidadeValida;
 
-  if (!categoriaId && !dificuldadeValida && !quantidadeValida && !modoValido) return null;
+  if (modoValido && modo !== "diario" && !temConfiguracao) return { modoPreferido: modo, config: null };
+  if (!temConfiguracao && !modoValido) return { modoPreferido: null, config: null };
 
   return {
-    categoriaId: categoriaId ?? CATEGORIA_TODAS,
-    dificuldade: dificuldadeValida ? dificuldadeBruta : DIFICULDADE_MISTA,
-    quantidade: quantidadeValida ? quantidade : null,
-    modoId: modoValido ? modo : "classico",
+    modoPreferido: null,
+    config: {
+      categoriaId: categoriaId ?? CATEGORIA_TODAS,
+      dificuldade: dificuldadeValida ? dificuldadeBruta : DIFICULDADE_MISTA,
+      quantidade: quantidadeValida ? quantidade : null,
+      modoId: modoValido ? modo : "classico",
+    },
   };
 }
 
@@ -1181,14 +1305,7 @@ function ligarBusca() {
     atualizar();
 
     const { itens } = calcularResultados();
-    if (estado.busca && itens.length === 1) {
-      abrirGaveta({
-        categoriaId: itens[0].categoria.id,
-        dificuldade: estado.dificuldade ?? DIFICULDADE_MISTA,
-        quantidade: null,
-        modoId: "classico",
-      });
-    }
+    if (estado.busca && itens.length === 1) abrirGaveta(configuracaoParaTema(itens[0].categoria.id));
   });
 
   porId("busca-limpar").addEventListener("click", () => {
@@ -1226,14 +1343,22 @@ function ligarAcoes() {
   porId("botao-surpreender").addEventListener("click", () => {
     const tema = sortearTemaPoucoJogado();
     anunciar(`Tema sorteado: ${tema.nome}.`);
-    abrirGaveta({ categoriaId: tema.id, dificuldade: DIFICULDADE_MISTA, quantidade: null, modoId: "classico" });
+    abrirGaveta({ categoriaId: tema.id, dificuldade: DIFICULDADE_MISTA, quantidade: null, modoId: modoPreferido });
   });
 
   porId("botao-roleta").addEventListener("click", () => abrirRoleta({ base }));
 
   porId("botao-misturar").addEventListener("click", () =>
-    abrirGaveta({ categoriaId: CATEGORIA_TODAS, dificuldade: DIFICULDADE_MISTA, quantidade: null, modoId: "classico" })
+    abrirGaveta({ categoriaId: CATEGORIA_TODAS, dificuldade: DIFICULDADE_MISTA, quantidade: null, modoId: modoPreferido })
   );
+
+  porId("faixa-modo-limpar").addEventListener("click", () => {
+    modoPreferido = "classico";
+    atualizarFaixaDoModo();
+    limparParametrosDaUrl();
+    anunciar("Modo Clássico.");
+    porId("campo-busca").focus();
+  });
 }
 
 /** Chamada pelo app.js quando a página de categorias é carregada. */
@@ -1256,13 +1381,16 @@ export function iniciar({ base: baseDaPagina }) {
   porId("explorar-numeros").textContent =
     `${CATEGORIAS.length} temas · ${formatarNumero(PERGUNTAS.length)} perguntas · 3 dificuldades`;
 
+  const { modoPreferido: modoDaUrl, config } = lerParametros();
+  if (modoDaUrl) modoPreferido = modoDaUrl;
+
   construirSelectDeCategorias();
   construirFiltros();
   ligarBusca();
   ligarAcoes();
   ligarGaveta();
+  atualizarFaixaDoModo();
   atualizar();
 
-  const configInicial = lerConfigInicial();
-  if (configInicial) abrirGaveta(configInicial);
+  if (config) abrirGaveta(config);
 }
