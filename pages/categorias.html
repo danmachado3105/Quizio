@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/pages/categorias.css">
+  <link rel="stylesheet" href="../css/pages/categorias-modos.css">
   <link rel="stylesheet" href="../css/responsive.css">
 
   <script>document.documentElement.classList.add("js");</script>
@@ -64,6 +65,14 @@
     <!-- Busca e filtros -->
     <section class="ferramentas" aria-label="Buscar e filtrar temas">
       <div class="container">
+
+        <!-- Aparece quando o jogador escolheu um modo na home (ex.: "Contra o tempo") -->
+        <div class="faixa-modo" id="faixa-modo" role="status" hidden>
+          <span class="faixa-modo__icone" data-icone="sparkles" data-tamanho-icone="18" aria-hidden="true"></span>
+          <p class="faixa-modo__texto">Modo <strong id="faixa-modo-nome"></strong>: escolha um tema para jogar.</p>
+          <button class="botao botao--texto botao--pequeno" type="button" id="faixa-modo-limpar">Voltar ao Clássico</button>
+        </div>
+
         <form class="busca" id="form-busca" role="search" novalidate>
           <span class="busca__icone" data-icone="search" data-tamanho-icone="22" aria-hidden="true"></span>
           <label class="sr-only" for="campo-busca">Buscar tema</label>
@@ -211,7 +220,7 @@
       </header>
 
       <div class="gaveta__corpo">
-        <div class="grupo campo-tema">
+        <div class="grupo campo-tema" id="grupo-tema">
           <label class="grupo__titulo" for="select-categoria">Tema</label>
           <div class="campo-tema__linha">
             <span class="icone-caixa icone-caixa--roxo campo-tema__emblema" id="gaveta-emblema" aria-hidden="true"></span>
@@ -219,17 +228,17 @@
           </div>
         </div>
 
-        <fieldset class="grupo">
+        <fieldset class="grupo" id="grupo-dificuldade">
           <legend class="grupo__titulo">Dificuldade</legend>
           <div class="opcoes-linha" id="opcoes-dificuldade"></div>
         </fieldset>
 
-        <fieldset class="grupo">
+        <fieldset class="grupo" id="grupo-quantidade">
           <legend class="grupo__titulo">Quantidade de perguntas</legend>
           <div class="opcoes-linha" id="opcoes-quantidade"></div>
         </fieldset>
 
-        <fieldset class="grupo">
+        <fieldset class="grupo" id="grupo-modo">
           <legend class="grupo__titulo">Modo de jogo</legend>
           <div class="opcoes-coluna" id="opcoes-modo"></div>
         </fieldset>
@@ -238,7 +247,7 @@
       <footer class="gaveta__rodape">
         <div class="resumo-partida" id="resumo-partida" aria-live="polite"></div>
         <p class="campo__erro" id="erro-formulario" role="alert"></p>
-        <button class="botao botao--primario botao--grande botao--bloco" type="submit" id="botao-iniciar" data-icone="play">Iniciar partida</button>
+        <button class="botao botao--primario botao--grande botao--bloco" type="submit" id="botao-iniciar" data-icone="play"><span id="texto-iniciar">Iniciar partida</span></button>
       </footer>
     </form>
   </div>
