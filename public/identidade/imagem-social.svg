@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FFF8EF"/>
+  <path d="M0 0h1200v20H0zM0 610h1200v20H0z" fill="#35254F"/>
+  <circle cx="1050" cy="85" r="190" fill="#FFD166"/>
+  <rect x="785" y="176" width="285" height="300" rx="30" fill="#FFF" stroke="#35254F" stroke-width="12" transform="rotate(7 785 176)"/>
+  <rect x="835" y="130" width="270" height="300" rx="30" fill="#7254D8" stroke="#35254F" stroke-width="12"/>
+  <path d="M1035 217a85 85 0 1 0 9 111h-58" stroke="#FFF8EF" stroke-width="24" stroke-linecap="round"/>
+  <path d="M994 290h72v72" stroke="#FFD166" stroke-width="22" stroke-linecap="round"/>
+  <text x="90" y="245" fill="#35254F" font-family="Arial,sans-serif" font-size="42" font-weight="700" letter-spacing="5">CONHECIMENTO EM JOGO</text>
+  <text x="82" y="390" fill="#35254F" font-family="Arial,sans-serif" font-size="136" font-weight="800" letter-spacing="-9">quizio</text>
+  <text x="90" y="475" fill="#655878" font-family="Arial,sans-serif" font-size="35">Uma boa pergunta muda o jogo.</text>
+</svg>

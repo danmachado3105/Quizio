@@ -19,6 +19,8 @@ npm run dev
 - `src/estilos`: CSS portado do site anterior
 - `legado/`: versão original, preservada durante a migração
 
+O script `npm run exportar-identidade` gera os favicons PNG, os ícones de instalação e a imagem Open Graph a partir dos SVGs em `public/identidade/`. Ele usa `sharp` somente na etapa de exportação de arte; o app não usa bibliotecas de interface ou animação.
+
 ## Decisões
 
 - A branch `migracao-react-ts` acompanha as fases descritas no briefing.

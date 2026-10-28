@@ -1,0 +1,102 @@
+/* Camada visual da migração. Os componentes continuam usando os tokens e a linguagem do CSS legado. */
+:root { --gutter: clamp(1rem, 3.3vw, 3.5rem); }
+
+html { scroll-padding-top: 5rem; }
+body { overflow-x: hidden; }
+.container { width: 100%; max-width: none; margin: 0; padding-inline: var(--gutter); }
+.texto-longo { max-width: 65ch; margin-inline: auto; }
+.conteudo-principal { min-height: calc(100vh - 4.25rem); padding-top: 4.25rem; }
+
+.cabecalho {
+  position: fixed;
+  inset: 0 0 auto;
+  min-height: 4.25rem;
+  background-color: var(--cor-creme);
+  background-image: radial-gradient(rgba(53, 37, 79, 0.08) 1px, transparent 1.2px);
+  background-size: 24px 24px;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.cabecalho__interno { width: 100%; min-height: 4.25rem; padding-inline: var(--gutter); }
+.logo-link { flex: 0 0 auto; }
+.logo { gap: 0.55rem; }
+.logo__marca { width: 2.15rem; height: 2.15rem; flex: 0 0 auto; }
+.logo:hover .logo__marca { transform: rotate(-7deg) scale(1.04); }
+.nav { margin-inline: auto; }
+.nav__lista { gap: 0.25rem; }
+.cabecalho__acoes { margin-left: auto; }
+.avatar { display: grid; place-items: center; width: 2rem; height: 2rem; border: 2px solid var(--tinta); border-radius: 50%; background: var(--cor-roxo-claro); }
+.avatar--coral { background: var(--cor-coral-claro); }
+.avatar--amarelo { background: var(--cor-amarelo); }
+.avatar--verde { background: var(--cor-acerto-claro); }
+.avatar--escuro { background: var(--tinta); color: var(--cor-creme); }
+.avatar--neutro { background: var(--cor-creme-2); }
+.cabecalho__cta { display: inline-flex; align-items: center; gap: 0.45rem; }
+
+.inicio__hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.8fr);
+  align-items: center;
+  gap: clamp(2rem, 7vw, 8rem);
+  min-height: calc(100vh - 4.25rem);
+  min-height: calc(100dvh - 4.25rem);
+  padding: clamp(3rem, 7vw, 7rem) calc(var(--gutter) * 2);
+  overflow: hidden;
+}
+.inicio__conteudo { position: relative; z-index: 1; max-width: 56rem; }
+.inicio__conteudo > .rotulo { margin-bottom: var(--espaco-5); color: var(--cor-roxo-profundo); }
+.inicio__hero h1 { max-width: 11ch; font-size: var(--texto-display); line-height: 0.93; }
+.inicio__hero h1 span { color: var(--cor-roxo); }
+.inicio__descricao { max-width: 39ch; margin-top: var(--espaco-5); color: var(--cor-texto-suave); font-size: clamp(1.1rem, 1rem + 0.5vw, 1.4rem); }
+.inicio__acoes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-5); margin-top: var(--espaco-6); }
+.inicio__link { font-weight: 700; text-decoration: underline; text-decoration-color: var(--cor-coral); text-decoration-thickness: 2px; text-underline-offset: 0.3em; }
+.inicio__carta { position: relative; display: grid; gap: var(--espaco-4); width: min(100%, 29rem); min-height: 23rem; justify-self: center; padding: clamp(1.5rem, 4vw, 3rem); background: var(--cor-branco); border: 2px solid var(--tinta); border-radius: var(--raio-lg); box-shadow: 8px 8px 0 var(--tinta); transform: rotate(2deg); }
+.inicio__carta > svg { color: var(--cor-roxo); }
+.inicio__carta-selo { width: fit-content; padding: 0.4rem 0.65rem; background: var(--cor-amarelo); border: 2px solid var(--tinta); border-radius: var(--raio-sm); }
+.inicio__carta > p { align-self: center; font-family: var(--fonte-titulo); font-size: clamp(1.5rem, 2vw, 2.15rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; }
+.inicio__carta-resposta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1rem; background: var(--cor-acerto-claro); border: 2px solid var(--cor-acerto); border-radius: var(--raio-sm); color: var(--cor-acerto-texto); font-weight: 700; }
+.inicio__carta-rodape { align-self: end; color: var(--cor-texto-suave); }
+.inicio__estrela { position: absolute; top: 14%; right: 7%; color: var(--cor-coral); transform: rotate(12deg); }
+
+.temas-faixa { overflow: hidden; padding-block: 1.25rem; background: var(--cor-amarelo); border-block: 2px solid var(--tinta); }
+.temas-faixa__trilho { display: flex; width: max-content; align-items: center; gap: clamp(1.4rem, 4vw, 4rem); animation: faixa-temas 36s linear infinite; }
+.temas-faixa__trilho > span { display: inline-flex; align-items: center; gap: 1.4rem; font-family: var(--fonte-mono); font-size: 0.9rem; font-weight: 500; letter-spacing: 0.08em; white-space: nowrap; }
+.temas-faixa__trilho svg { color: var(--cor-roxo-profundo); }
+@keyframes faixa-temas { to { transform: translateX(-50%); } }
+.inicio__apresentacao { display: grid; justify-items: center; gap: var(--espaco-5); padding: var(--espaco-9) var(--gutter); text-align: center; }
+.inicio__apresentacao .rotulo { color: var(--cor-roxo-profundo); }
+.inicio__apresentacao h2 { max-width: 18ch; font-size: var(--texto-3xl); }
+
+.pagina { min-height: 55vh; padding-block: var(--espaco-8) var(--espaco-9); }
+.pagina.texto-longo { width: min(100%, 65ch); padding-inline: var(--gutter); }
+.pagina > .rotulo { margin-bottom: var(--espaco-4); color: var(--cor-roxo-profundo); }
+.pagina h1 { margin-bottom: var(--espaco-5); font-size: var(--texto-3xl); }
+.pagina p + p { margin-top: var(--espaco-4); }
+.pagina .botao { margin-top: var(--espaco-5); }
+.rodape { padding-inline: var(--gutter); }
+.rodape__grade { width: 100%; }
+
+@media (max-width: 52rem) {
+  .conteudo-principal { padding-top: 4rem; }
+  .cabecalho, .cabecalho__interno { min-height: 4rem; }
+  .cabecalho__acoes .chip-nivel { display: none; }
+  .cabecalho__cta { display: none; }
+  .nav { display: none; }
+  .abas { border-top: 2px solid var(--tinta); background: var(--cor-creme); background-image: radial-gradient(rgba(53, 37, 79, 0.08) 1px, transparent 1.2px); background-size: 24px 24px; }
+  .inicio__hero { grid-template-columns: 1fr; justify-items: start; gap: 3.5rem; padding: 4rem var(--gutter) 5rem; }
+  .inicio__hero h1 { font-size: clamp(3.2rem, 15vw, 6rem); }
+  .inicio__carta { justify-self: center; min-height: 19rem; transform: rotate(1deg); }
+  .inicio__estrela { top: 3%; right: 9%; }
+}
+@media (max-width: 36rem) {
+  .inicio__hero { padding-block: 3rem 4rem; }
+  .inicio__descricao { font-size: 1.05rem; }
+  .inicio__acoes { align-items: flex-start; flex-direction: column; gap: var(--espaco-4); }
+  .inicio__carta { min-height: 18rem; }
+  .rodape__marca { font-size: clamp(4rem, 25vw, 7rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .temas-faixa__trilho { animation: none; }
+}

@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc -b --pretty",
     "test": "vitest run",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "exportar-identidade": "node scripts/exportar-identidade.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -33,6 +34,7 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "jsdom": "^25.0.1",
     "prettier": "^3.4.2",
+    "sharp": "^0.33.5",
     "typescript": "~5.7.2",
     "vitest": "^2.1.8"
   }
