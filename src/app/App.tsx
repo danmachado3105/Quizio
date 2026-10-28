@@ -10,10 +10,10 @@ import { Sobre } from '../paginas/Sobre'
 import { Jogo } from '../paginas/Jogo'
 import { Resultado } from '../paginas/Resultado'
 import { Recompensas } from '../paginas/Recompensas'
-
-function PaginaEmPreparacao({ titulo }: { titulo: string }) {
-  return <main className="pagina container texto-longo"><p className="rotulo">QUIZIO</p><h1 tabIndex={-1}>{titulo}</h1><p>Esta área está sendo preparada.</p></main>
-}
+import { Perfil } from '../paginas/Perfil'
+import { Conquistas } from '../paginas/Conquistas'
+import { useDados } from '../servicos/useDados'
+import { tocarSom } from '../servicos/som'
 
 function FocoDaRota() {
   const localizacao = useLocation()
@@ -24,19 +24,33 @@ function FocoDaRota() {
   return null
 }
 
+function PreferenciasGlobais() {
+  const dados = useDados()
+  useEffect(() => {
+    document.documentElement.dataset.movimento = dados.preferencias.movimento
+    const aoClicar = (evento: MouseEvent) => {
+      if ((evento.target as HTMLElement | null)?.closest('button, a') && dados.preferencias.som) tocarSom('clique', true)
+    }
+    document.addEventListener('click', aoClicar)
+    return () => document.removeEventListener('click', aoClicar)
+  }, [dados.preferencias.movimento, dados.preferencias.som])
+  return null
+}
+
 function Conteudo() {
   const localizacao = useLocation()
   const emJogo = localizacao.pathname === '/jogo'
   return <>
     <FocoDaRota />
+    <PreferenciasGlobais />
     {!emJogo && <Cabecalho />}
     <div id="conteudo" className="conteudo-principal"><Routes>
       <Route path="/" element={<Inicio />} />
       <Route path="/explorar" element={<Explorar />} />
       <Route path="/jogo" element={<Jogo />} />
       <Route path="/resultado" element={<Resultado />} />
-      <Route path="/perfil" element={<PaginaEmPreparacao titulo="Seu perfil" />} />
-      <Route path="/conquistas" element={<PaginaEmPreparacao titulo="Conquistas" />} />
+      <Route path="/perfil" element={<Perfil />} />
+      <Route path="/conquistas" element={<Conquistas />} />
       <Route path="/recompensas" element={<Recompensas />} />
       <Route path="/sobre" element={<Sobre />} />
       <Route path="/privacidade" element={<Privacidade />} />
