@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { Cabecalho } from '../componentes/Cabecalho'
 import { Rodape } from '../componentes/Rodape'
 import { Inicio } from '../paginas/Inicio'
+import { Explorar } from '../paginas/Explorar'
 import { NaoEncontrada } from '../paginas/NaoEncontrada'
 import { Privacidade } from '../paginas/Privacidade'
 import { Sobre } from '../paginas/Sobre'
@@ -26,7 +27,7 @@ function Conteudo() {
     <Cabecalho />
     <div id="conteudo" className="conteudo-principal"><Routes>
       <Route path="/" element={<Inicio />} />
-      <Route path="/explorar" element={<PaginaEmPreparacao titulo="Explorar temas" />} />
+      <Route path="/explorar" element={<Explorar />} />
       <Route path="/jogo" element={<PaginaEmPreparacao titulo="Sua partida" />} />
       <Route path="/resultado" element={<PaginaEmPreparacao titulo="Resultado" />} />
       <Route path="/perfil" element={<PaginaEmPreparacao titulo="Seu perfil" />} />

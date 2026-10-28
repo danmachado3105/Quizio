@@ -4,7 +4,7 @@ import {
   ChevronDown, Info, Compass, TrendingUp, Flag, Percent, History, Search,
   SlidersHorizontal, UsersRound, Timer, Heart, Shield, Swords, Pause, Sparkles,
   ArrowUpRight, RefreshCw, Volume2, VolumeX, Bookmark, Lightbulb, Rocket,
-  Globe2, Medal, Gamepad2, BookOpen, Leaf, Coins, Gift, type LucideIcon,
+  Globe2, Medal, Gamepad2, BookOpen, Leaf, Coins, Gift, Shuffle, type LucideIcon,
 } from 'lucide-react'
 
 const ICONES = {
@@ -17,7 +17,7 @@ const ICONES = {
   swords: Swords, pause: Pause, sparkles: Sparkles, 'arrow-up-right': ArrowUpRight,
   refresh: RefreshCw, 'volume-2': Volume2, 'volume-x': VolumeX, bookmark: Bookmark,
   lightbulb: Lightbulb, rocket: Rocket, globe: Globe2, medal: Medal, gamepad: Gamepad2,
-  'book-open': BookOpen, leaf: Leaf, coins: Coins, gift: Gift,
+  'book-open': BookOpen, leaf: Leaf, coins: Coins, gift: Gift, shuffle: Shuffle,
 } satisfies Record<string, LucideIcon>
 
 export type NomeIcone = keyof typeof ICONES

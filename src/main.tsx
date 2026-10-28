@@ -18,6 +18,7 @@ import './estilos/pages/resultado.css'
 import './estilos/pages/perfil.css'
 import './estilos/pages/conquistas.css'
 import './estilos/base.css'
+import './estilos/f3.css'
 
 ReactDOM.createRoot(document.getElementById('raiz')!).render(
   <React.StrictMode>
