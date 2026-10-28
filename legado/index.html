@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quizio: quizzes de conhecimentos gerais com 23 temas, explicação em cada resposta, níveis, missões e conquistas.">
+  <meta name="theme-color" content="#FFF8EF">
+  <title>Quizio | Responda, erre, aprenda, repita</title>
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Quizio | Responda, erre, aprenda, repita">
+  <meta property="og:description" content="Quizzes de conhecimentos gerais com 23 temas e explicação em cada resposta.">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- As fontes são carregadas pelo @import dentro de css/variables.css -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/home.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Marca a página como "com JavaScript" antes da primeira pintura (evita piscar) -->
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+
+<!-- data-base: caminho até a raiz do projeto ("" aqui, "../" nas páginas dentro de pages/) -->
+<body data-pagina="home" data-base="">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="cabecalho" id="cabecalho"></header>
+
+  <main id="conteudo">
+    <section class="abertura" id="abertura" aria-label="Apresentação"></section>
+
+    <!-- Faixa decorativa: os temas estão listados com detalhes mais abaixo -->
+    <div class="faixa" id="faixa-temas" aria-hidden="true"></div>
+
+    <section class="painel fundo-escuro" id="painel" aria-label="Seu painel"></section>
+    <section class="secao" id="categorias" aria-labelledby="categorias-titulo"></section>
+    <section class="secao secao--papel" id="modos" aria-labelledby="modos-titulo"></section>
+    <section class="secao" id="recompensas" aria-labelledby="recompensas-titulo"></section>
+    <section class="secao secao--papel" id="historia" aria-labelledby="historia-titulo" hidden></section>
+    <section class="chamada fundo-escuro" id="chamada-final" aria-label="Comece a jogar"></section>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <noscript>
+    <p style="padding:1rem;text-align:center">O Quizio precisa de JavaScript ativado para funcionar.</p>
+  </noscript>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

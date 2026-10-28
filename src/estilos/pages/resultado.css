@@ -1,0 +1,281 @@
+.resultado-pagina {
+  width: min(100% - 2rem, 52rem);
+}
+
+.resultado > * + * {
+  margin-top: var(--espaco-5);
+}
+
+/* ---------- Cabeçalho do resultado ---------- */
+.resultado__hero {
+  padding: var(--espaco-7) var(--espaco-5);
+  background: var(--cor-roxo);
+  border: 0;
+  box-shadow: var(--sombra-md);
+  color: var(--cor-branco);
+  text-align: center;
+}
+
+.resultado__emblema {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--cor-amarelo);
+  color: var(--cor-roxo-escuro);
+}
+
+.resultado__titulo {
+  margin-top: var(--espaco-4);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+}
+
+.resultado__contexto {
+  margin-top: var(--espaco-1);
+  color: #F1ECFF;
+}
+
+.resultado__pontos {
+  margin-top: var(--espaco-5);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(3rem, 10vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cor-amarelo);
+}
+
+.resultado__pontos-rotulo {
+  font-weight: 700;
+  color: #F1ECFF;
+}
+
+.resultado__selo {
+  margin-top: var(--espaco-4);
+}
+
+/* ---------- Placar do duelo ---------- */
+.duelo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--espaco-4);
+  align-items: stretch;
+}
+
+.duelo__titulo {
+  grid-column: 1 / -1;
+  font-size: var(--texto-xl);
+}
+
+.duelo__jogador {
+  display: grid;
+  gap: var(--espaco-2);
+  justify-items: center;
+  padding: var(--espaco-5) var(--espaco-4);
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-lg);
+  text-align: center;
+}
+
+.duelo__jogador[data-vencedor="true"] {
+  background: var(--cor-amarelo);
+  box-shadow: var(--sombra-md);
+}
+
+.duelo__nome {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--fonte-mono);
+  font-size: var(--texto-xs);
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.duelo__pontos {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2.2rem, 7vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.duelo__detalhe {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+}
+
+.duelo__jogador[data-vencedor="true"] .duelo__detalhe {
+  color: var(--tinta);
+}
+
+.duelo__vs {
+  align-self: center;
+  font-family: var(--fonte-titulo);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.duelo__nota {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ---------- Números da partida ---------- */
+.resultado__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: var(--espaco-3);
+}
+
+/* ---------- Progresso ---------- */
+.resultado__colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espaco-5);
+  align-items: start;
+}
+
+.xp-total {
+  font-family: var(--fonte-titulo);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--cor-roxo);
+}
+
+.lista-xp {
+  display: grid;
+  gap: var(--espaco-2);
+  margin-top: var(--espaco-3);
+}
+
+.lista-xp li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  padding-bottom: var(--espaco-2);
+  border-bottom: 1px solid var(--cor-borda);
+  font-size: 0.95rem;
+}
+
+.lista-xp li span:last-child {
+  font-weight: 700;
+}
+
+.nivel-resultado {
+  display: grid;
+  gap: var(--espaco-2);
+  margin-top: var(--espaco-4);
+}
+
+.nivel-resultado__titulo {
+  font-weight: 700;
+}
+
+.destaque {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--cor-amarelo-claro);
+  border: 1px solid var(--cor-amarelo);
+  border-radius: var(--raio-md);
+  font-weight: 700;
+}
+
+/* Pulso discreto, uma única vez, ao subir de nível */
+.destaque--nivel {
+  animation: pulso-nivel 0.9s ease 0.4s 1 both;
+}
+
+@keyframes pulso-nivel {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.recorde__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.recorde__texto {
+  margin-top: var(--espaco-1);
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Ações ---------- */
+.resultado__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+}
+
+.sem-resultado__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+}
+
+/* ---------- Revisão ---------- */
+.revisao-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+}
+
+.revisao-cabecalho .secao__titulo {
+  outline: none;
+}
+
+.revisao-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+}
+
+.revisao-filtros .botao[aria-pressed="true"] {
+  background: var(--tinta);
+  color: var(--cor-creme);
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 44rem) {
+  .resultado__colunas {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 36rem) {
+  .resultado-pagina {
+    width: min(100% - 1.5rem, 52rem);
+  }
+
+  .resultado__hero {
+    padding: var(--espaco-6) var(--espaco-4);
+  }
+
+  .resultado__acoes .botao {
+    width: 100%;
+  }
+
+  .duelo {
+    grid-template-columns: 1fr;
+  }
+
+  .duelo__vs {
+    justify-self: center;
+  }
+}

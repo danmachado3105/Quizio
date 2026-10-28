@@ -1,0 +1,95 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;700&display=swap");
+
+/* =====================================================================
+   DESIGN SYSTEM DO QUIZIO: todos os valores visuais nascem aqui.
+   Conceito: "cartas de jogo". Contornos e sombras duras na cor da tinta.
+   ===================================================================== */
+:root {
+  /* ---------- Paleta ---------- */
+  --cor-creme: #FFF8EF;
+  --cor-roxo: #7254D8;
+  --cor-coral: #FF786B;
+  --cor-amarelo: #FFD166;
+  --cor-roxo-escuro: #35254F;
+  --cor-branco: #FFFFFF;
+  --cor-acerto: #27865B;
+  --cor-erro: #D94F58;
+
+  /* A "tinta": texto, contornos e sombras duras */
+  --tinta: var(--cor-roxo-escuro);
+
+  /* Variações */
+  --cor-creme-2: #FFEFD9;
+  --cor-roxo-profundo: #4B35A3;
+  --cor-roxo-claro: #ECE7FB;
+  --cor-coral-profundo: #D9574A;
+  --cor-coral-claro: #FFE7E3;
+  --cor-amarelo-profundo: #D9A93A;
+  --cor-amarelo-claro: #FFF2CF;
+  --cor-acerto-claro: #E0F2EA;
+  --cor-erro-claro: #FBE6E8;
+  --cor-acerto-texto: #1B6B45;
+  --cor-erro-texto: #A8323B;
+
+  /* Texto e superfícies */
+  --cor-texto: var(--tinta);
+  --cor-texto-suave: #655878;
+  --cor-borda: rgba(53, 37, 79, 0.16);
+  --cor-superficie: var(--cor-branco);
+
+  /* ---------- Tipografia ---------- */
+  --fonte-titulo: "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --fonte-corpo: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fonte-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --texto-xs: 0.8rem;
+  --texto-sm: 0.9rem;
+  --texto-base: 1rem;
+  --texto-lg: 1.125rem;
+  --texto-xl: 1.375rem;
+  --texto-2xl: clamp(1.6rem, 1.2rem + 1.6vw, 2.25rem);
+  --texto-3xl: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --texto-display: clamp(2.9rem, 1.6rem + 6vw, 6.25rem);
+
+  /* ---------- Espaçamento ---------- */
+  --espaco-1: 0.25rem;
+  --espaco-2: 0.5rem;
+  --espaco-3: 0.75rem;
+  --espaco-4: 1rem;
+  --espaco-5: 1.5rem;
+  --espaco-6: 2rem;
+  --espaco-7: 3rem;
+  --espaco-8: 4rem;
+  --espaco-9: clamp(4rem, 8vw, 6.5rem);
+
+  /* ---------- Layout ---------- */
+  --largura-maxima: 76rem;
+  --largura-texto: 40rem;
+  --gutter: clamp(1rem, 4vw, 2rem);
+
+  /* ---------- Formas ---------- */
+  --raio-sm: 0.625rem;
+  --raio-md: 1rem;
+  --raio-lg: 1.5rem;
+  --raio-pilula: 999px;
+
+  /* ---------- Sombras (duras, sem blur) ---------- */
+  --sombra-sm: 0 1px 0 rgba(53, 37, 79, 0.08);
+  --sombra-md: 4px 4px 0 var(--tinta);
+  --sombra-lg: 6px 6px 0 var(--tinta);
+
+  /* ---------- Movimento ---------- */
+  --ease-saida: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pulo: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-1: 160ms; /* hover e foco */
+  --dur-2: 280ms; /* troca de estado */
+  --dur-3: 500ms; /* entrada de conteúdo */
+  --transicao-rapida: 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transicao: 280ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---------- Camadas ---------- */
+  --z-cabecalho: 60;
+  --z-abas: 70;
+  --z-notificacao: 90;
+  --z-modal: 100;
+}

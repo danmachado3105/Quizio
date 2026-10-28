@@ -1,0 +1,103 @@
+/* Revisão de respostas (resultado e desafio diário concluído) */
+.revisao {
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.revisao__item {
+  display: grid;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4) var(--espaco-5);
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-left-width: 8px;
+  border-radius: var(--raio-md);
+}
+
+.revisao__item--acerto { border-left-color: var(--cor-acerto); }
+.revisao__item--erro { border-left-color: var(--cor-erro); }
+.revisao__item--pulou,
+.revisao__item--tempo { border-left-color: var(--cor-amarelo-profundo); }
+
+.revisao__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-2) var(--espaco-3);
+}
+
+.revisao__numero {
+  font-family: var(--fonte-mono);
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+}
+
+.revisao__situacao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  margin-left: auto;
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+}
+
+.revisao__situacao--acerto { color: var(--cor-acerto-texto); }
+.revisao__situacao--erro { color: var(--cor-erro-texto); }
+
+.revisao__pergunta {
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.revisao__respostas {
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.revisao__respostas > div {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--espaco-2);
+  align-items: baseline;
+}
+
+.revisao__respostas dt {
+  font-family: var(--fonte-mono);
+  font-size: var(--texto-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+.revisao__respostas dd {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.revisao__explicacao {
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--cor-creme-2);
+  border-radius: var(--raio-sm);
+  font-size: var(--texto-sm);
+  line-height: 1.55;
+}
+
+.revisao-secao {
+  display: grid;
+  gap: var(--espaco-4);
+  margin-top: var(--espaco-7);
+}
+
+@media (max-width: 36rem) {
+  .revisao__item {
+    padding: var(--espaco-4);
+  }
+
+  .revisao__respostas > div {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+}

@@ -1,0 +1,44 @@
+/* =====================================================================
+   EXPLORAR: elementos dos modos de jogo
+   Carregado depois de categorias.css.
+   ===================================================================== */
+
+/* Faixa "Modo X: escolha um tema" */
+.faixa-modo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-2) var(--espaco-3);
+  margin-bottom: var(--espaco-4);
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--cor-amarelo-claro);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-md);
+}
+
+.faixa-modo__icone {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: var(--cor-amarelo);
+  border: 2px solid var(--tinta);
+  border-radius: 50%;
+}
+
+.faixa-modo__texto {
+  flex: 1;
+  min-width: 12rem;
+}
+
+/* Notas do resumo da partida (regras do modo) */
+.resumo-partida__nota {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+}
+
+/* Selo "Concluído hoje" na opção do desafio diário */
+.opcao__conteudo .badge--sucesso {
+  align-self: flex-start;
+}

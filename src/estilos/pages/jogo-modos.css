@@ -1,0 +1,165 @@
+/* =====================================================================
+   TELA DE JOGO: elementos dos modos (duelo, tempo, pular)
+   Carregado depois de jogo.css.
+   ===================================================================== */
+
+/* ---------- Barra de tempo ---------- */
+.jogo__tempo {
+  padding-block: var(--espaco-1);
+}
+
+/* ---------- Placar do duelo ---------- */
+.placar-duelo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--espaco-2);
+}
+
+.jogador-placar {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 7.5rem;
+  padding: 0.35rem 0.9rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-md);
+  transition: transform var(--dur-2) var(--ease-saida), background-color var(--dur-2) var(--ease-saida),
+    box-shadow var(--dur-2) var(--ease-saida);
+}
+
+.jogador-placar[data-ativo="true"] {
+  background: var(--cor-amarelo);
+  box-shadow: 0 3px 0 var(--tinta);
+  transform: translateY(-2px);
+}
+
+.jogador-placar__nome {
+  max-width: 10rem;
+  overflow: hidden;
+  font-family: var(--fonte-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.jogador-placar__numeros {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.jogador-placar__combo {
+  margin-left: auto;
+  font-family: var(--fonte-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ---------- "Vez de ..." ---------- */
+.vez {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--espaco-4);
+  padding: 0.35rem 0.9rem;
+  background: var(--cor-roxo);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  color: var(--cor-branco);
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+}
+
+.vez[data-jogador="1"] {
+  background: var(--cor-coral);
+  color: var(--tinta);
+}
+
+/* ---------- Passar o aparelho ---------- */
+.passagem {
+  box-shadow: 6px 6px 0 var(--cor-coral);
+}
+
+/* ---------- Pular pergunta ---------- */
+.acoes-pergunta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--espaco-4);
+}
+
+/* ---------- Quem escolheu cada alternativa (duelo) ---------- */
+.alternativa__texto {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.alternativa__quem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.alternativa__quem:empty {
+  display: none;
+}
+
+.etiqueta {
+  padding: 0.1rem 0.55rem;
+  background: var(--cor-roxo-claro);
+  border: 1.5px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  color: var(--tinta);
+  font-family: var(--fonte-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.etiqueta--convidado {
+  background: var(--cor-coral-claro);
+}
+
+/* ---------- Feedback: duelo e sobrevivência ---------- */
+.feedback__jogadores {
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.feedback__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--espaco-2);
+}
+
+.feedback__fim {
+  font-weight: 700;
+}
+
+/* ---------- Progresso: rodadas concluídas do duelo ---------- */
+.segmento[data-estado="feita"] {
+  --cor-segmento: var(--cor-roxo);
+}
+
+.segmento[data-estado="feita"]::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 36rem) {
+  .placar-duelo {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .jogador-placar {
+    flex: 1;
+    min-width: 0;
+  }
+}

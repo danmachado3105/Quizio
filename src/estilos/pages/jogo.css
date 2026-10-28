@@ -1,0 +1,709 @@
+/* =====================================================================
+   TELA DE JOGO
+   Topo (ações e indicadores), progresso em segmentos, carta da pergunta,
+   alternativas, feedback, pausa e barra de tempo.
+   Movimento: só transform e opacity.
+   ===================================================================== */
+
+.jogo-pagina {
+  width: min(100% - 2 * var(--gutter), 46rem);
+  padding-block: var(--espaco-5) calc(var(--espaco-8) + env(safe-area-inset-bottom));
+  animation: pagina-entrar var(--dur-3) var(--ease-saida) both;
+}
+
+.jogo {
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.palco {
+  min-width: 0;
+}
+
+/* ---------- Topo ---------- */
+.jogo__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-2) var(--espaco-3);
+}
+
+.jogo__acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  margin-left: calc(var(--espaco-3) * -1);
+}
+
+.jogo__status {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--espaco-2);
+}
+
+/* ---------- Indicadores (pontos e combo) ---------- */
+.indicador {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.9rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  font-family: var(--fonte-titulo);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color var(--dur-2) var(--ease-saida);
+}
+
+.indicador__valor {
+  font-variant-numeric: tabular-nums;
+}
+
+.indicador__unidade {
+  font-family: var(--fonte-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+/* Combo: as bolinhas enchem até o 3º acerto; aí o bônus liga */
+.indicador--combo[data-ativo="true"] {
+  background: var(--cor-amarelo);
+}
+
+.combo__pips {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.combo__pip {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--cor-branco);
+  border: 1.5px solid var(--tinta);
+  border-radius: 50%;
+}
+
+.combo__pip[data-ativo="true"] {
+  background: var(--cor-coral);
+}
+
+/* Pulso quando o indicador muda (a classe é colocada pelo JS) */
+.indicador--pulso {
+  --pulso: 1.12;
+  animation: pulsar 0.45s var(--ease-pulo);
+}
+
+/* "+150" que sobe até os pontos */
+.ganho {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 2;
+  margin-top: 0.3rem;
+  padding: 0.15rem 0.65rem;
+  background: var(--cor-amarelo);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  font-family: var(--fonte-titulo);
+  font-size: 0.9rem;
+  font-weight: 800;
+  pointer-events: none;
+  animation: ganho-subir 1s var(--ease-saida) forwards;
+}
+
+/* ---------- Progresso em segmentos ---------- */
+.progresso {
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.progresso__contador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-2);
+  color: var(--cor-texto-suave);
+}
+
+.segmentos {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.segmento {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 0.7rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  overflow: hidden;
+}
+
+/* O preenchimento cresce com scaleX (só transform) */
+.segmento::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--cor-segmento, transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-saida);
+}
+
+.segmento[data-estado="acerto"] {
+  --cor-segmento: var(--cor-acerto);
+}
+
+.segmento[data-estado="erro"] {
+  --cor-segmento: var(--cor-erro);
+}
+
+/* Listras no erro: a diferença não depende só da cor */
+.segmento[data-estado="erro"]::after {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 3px,
+    rgba(255, 255, 255, 0.55) 3px 5px
+  );
+}
+
+.segmento[data-estado="acerto"]::after,
+.segmento[data-estado="erro"]::after {
+  transform: scaleX(1);
+}
+
+.segmento[data-estado="atual"] {
+  background: var(--cor-amarelo);
+  animation: segmento-atual 1.2s ease-in-out infinite alternate;
+}
+
+/* ---------- Barra de tempo (modo "Contra o tempo") ---------- */
+.tempo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+}
+
+.tempo__trilho {
+  flex: 1;
+  height: 0.9rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  overflow: hidden;
+}
+
+.tempo__preenchimento {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--cor-roxo);
+  transform: scaleX(1);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.tempo[data-urgencia="media"] .tempo__preenchimento {
+  background: var(--cor-amarelo);
+}
+
+.tempo[data-urgencia="alta"] .tempo__preenchimento {
+  background: var(--cor-coral);
+}
+
+.tempo__texto {
+  min-width: 3ch;
+  font-family: var(--fonte-mono);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ---------- Carta da pergunta ---------- */
+.carta-pergunta {
+  padding: var(--espaco-6);
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-lg);
+}
+
+/* Última pergunta: borda dupla coral */
+.carta-pergunta[data-ultima="true"] {
+  box-shadow: 6px 6px 0 0 var(--cor-coral), 9px 9px 0 0 var(--tinta);
+}
+
+/* Entrada de cada nova pergunta (curta, não bloqueia a interação) */
+.carta-pergunta--entrando {
+  animation: carta-entrar 0.32s var(--ease-saida) both;
+}
+
+.carta-pergunta__marcas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-2) var(--espaco-3);
+  margin-bottom: var(--espaco-5);
+}
+
+.badge--ultima {
+  background: var(--cor-coral);
+  border: 1.5px solid var(--tinta);
+  color: var(--tinta);
+}
+
+/* Dificuldade em bolinhas + texto */
+.dificuldade {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--fonte-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dificuldade__pontos {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.dificuldade__ponto {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--cor-branco);
+  border: 1.5px solid var(--tinta);
+  border-radius: 50%;
+}
+
+.dificuldade__ponto[data-ativo="true"] {
+  background: var(--cor-roxo);
+}
+
+.pergunta__enunciado {
+  margin-bottom: var(--espaco-6);
+  font-size: clamp(1.45rem, 1.05rem + 2.1vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+/* ---------- Alternativas ---------- */
+.alternativas {
+  display: grid;
+  gap: var(--espaco-3);
+}
+
+.alternativa {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--espaco-3);
+  width: 100%;
+  min-height: 3.75rem;
+  padding: 0.7rem 1rem 0.7rem 0.8rem;
+  background: var(--cor-branco);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-md);
+  box-shadow: 0 4px 0 var(--tinta);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: left;
+  transition: transform var(--dur-1) var(--ease-saida), box-shadow var(--dur-1) var(--ease-saida),
+    background-color var(--dur-1) var(--ease-saida);
+}
+
+@media (hover: hover) {
+  .alternativa:hover:not(:disabled) {
+    background: var(--cor-amarelo-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--tinta);
+  }
+}
+
+.alternativa:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--tinta);
+}
+
+.alternativa:disabled {
+  cursor: default;
+}
+
+.alternativa__letra {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: var(--cor-roxo-claro);
+  border: 2px solid var(--tinta);
+  border-radius: 0.65rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--tinta);
+}
+
+.alternativa__texto {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.alternativa__estado {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+}
+
+.alternativa__estado:empty {
+  display: none;
+}
+
+/* Correta: pulso e check */
+.alternativa--correta {
+  background: var(--cor-acerto-claro);
+  box-shadow: 0 4px 0 var(--cor-acerto);
+  animation: pulsar 0.5s var(--ease-pulo);
+}
+
+.alternativa--correta .alternativa__letra,
+.alternativa--correta .alternativa__estado {
+  background: var(--cor-acerto-texto);
+  color: var(--cor-branco);
+}
+
+/* Correta revelada depois de um erro: o pulso espera um instante */
+.alternativa--revelada {
+  animation: pulsar 0.5s var(--ease-pulo) 0.4s both;
+}
+
+/* Incorreta: tremor e X */
+.alternativa--incorreta {
+  background: var(--cor-erro-claro);
+  box-shadow: 0 4px 0 var(--cor-erro);
+  animation: tremer 0.4s ease;
+}
+
+.alternativa--incorreta .alternativa__letra,
+.alternativa--incorreta .alternativa__estado {
+  background: var(--cor-erro-texto);
+  color: var(--cor-branco);
+}
+
+.alternativa--neutra {
+  border-color: rgba(53, 37, 79, 0.4);
+  box-shadow: 0 2px 0 rgba(53, 37, 79, 0.4);
+  opacity: 0.5;
+}
+
+/* ---------- Feedback e explicação ---------- */
+.feedback-area {
+  margin-top: var(--espaco-6);
+}
+
+.feedback-area:empty {
+  display: none;
+}
+
+.feedback {
+  display: grid;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4) var(--espaco-5);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-md);
+  animation: feedback-entrar 0.4s var(--ease-saida) both;
+}
+
+.feedback--acerto {
+  background: var(--cor-acerto-claro);
+}
+
+.feedback--erro {
+  background: var(--cor-erro-claro);
+}
+
+/* Os blocos entram em cascata */
+.feedback > * {
+  animation: item-entrar 0.4s var(--ease-saida) both;
+}
+
+.feedback > :nth-child(1) { animation-delay: 80ms; }
+.feedback > :nth-child(2) { animation-delay: 150ms; }
+.feedback > :nth-child(3) { animation-delay: 220ms; }
+.feedback > :nth-child(4) { animation-delay: 290ms; }
+
+.feedback__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+}
+
+.feedback__selo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--tinta);
+  border-radius: 50%;
+  color: var(--cor-branco);
+  animation: selo-pop 0.5s var(--ease-pulo) 0.1s both;
+}
+
+.feedback--acerto .feedback__selo {
+  background: var(--cor-acerto);
+}
+
+.feedback--erro .feedback__selo {
+  background: var(--cor-erro);
+}
+
+.feedback__titulo {
+  font-family: var(--fonte-titulo);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.feedback--acerto .feedback__titulo {
+  color: var(--cor-acerto-texto);
+}
+
+.feedback--erro .feedback__titulo {
+  color: var(--cor-erro-texto);
+}
+
+.feedback__pontos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-2);
+}
+
+.feedback__ponto {
+  padding: 0.2rem 0.75rem;
+  background: var(--cor-amarelo);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-pilula);
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+}
+
+.feedback__bonus {
+  font-family: var(--fonte-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+.feedback__correta {
+  font-weight: 700;
+}
+
+.feedback__explicacao {
+  line-height: 1.55;
+}
+
+.feedback__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-1);
+}
+
+.feedback__tecla {
+  font-size: var(--texto-xs);
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Pausa ---------- */
+.pausa {
+  display: grid;
+  justify-items: center;
+  gap: var(--espaco-4);
+  padding: var(--espaco-8) var(--espaco-5);
+  background: var(--tinta);
+  border: 2px solid var(--tinta);
+  border-radius: var(--raio-lg);
+  box-shadow: 6px 6px 0 var(--cor-amarelo);
+  color: var(--cor-creme);
+  text-align: center;
+  animation: carta-entrar 0.32s var(--ease-saida) both;
+}
+
+.pausa__icone {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  background: var(--cor-amarelo);
+  border: 2px solid var(--cor-creme);
+  border-radius: 50%;
+  color: var(--tinta);
+}
+
+.pausa__titulo {
+  font-size: var(--texto-3xl);
+}
+
+.pausa__texto {
+  max-width: 26rem;
+  color: rgba(255, 248, 239, 0.85);
+}
+
+.pausa__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-3);
+}
+
+/* Na carta escura, a sombra dos botões precisa ser mais escura que o fundo */
+.pausa .botao {
+  --sombra-botao: #1B1129;
+}
+
+/* ---------- Dicas de teclado (só com mouse) ---------- */
+.jogo__dica {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-2) var(--espaco-4);
+  font-size: var(--texto-xs);
+  color: var(--cor-texto-suave);
+}
+
+.jogo__dica kbd,
+.feedback__tecla kbd {
+  padding: 0.1rem 0.4rem;
+  background: var(--cor-branco);
+  border: 1.5px solid var(--tinta);
+  border-radius: 0.35rem;
+  box-shadow: 0 2px 0 var(--tinta);
+  font-family: var(--fonte-mono);
+  font-size: 0.75rem;
+  color: var(--tinta);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .jogo__dica,
+  .feedback__tecla {
+    display: none;
+  }
+}
+
+/* ---------- Sem partida ---------- */
+.sem-partida__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+}
+
+/* ---------- Animações ---------- */
+@keyframes carta-entrar {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pulsar {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(var(--pulso, 1.035)); }
+}
+
+@keyframes tremer {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+@keyframes feedback-entrar {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes item-entrar {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes selo-pop {
+  from { opacity: 0; transform: scale(0) rotate(-20deg); }
+  70% { opacity: 1; transform: scale(1.15) rotate(4deg); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes segmento-atual {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(1.3); }
+}
+
+@keyframes ganho-subir {
+  0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+  20% { opacity: 1; transform: none; }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 36rem) {
+  .carta-pergunta {
+    padding: var(--espaco-4);
+    box-shadow: 4px 4px 0 var(--tinta);
+  }
+
+  .carta-pergunta[data-ultima="true"] {
+    box-shadow: 4px 4px 0 0 var(--cor-coral), 6px 6px 0 0 var(--tinta);
+  }
+
+  .alternativa {
+    min-height: 3.5rem;
+    font-size: 1rem;
+  }
+
+  .feedback {
+    padding: var(--espaco-4);
+  }
+
+  .feedback__acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .feedback__acoes .botao {
+    width: 100%;
+  }
+
+  .pausa {
+    padding-block: var(--espaco-7);
+  }
+}
+
+@media (max-width: 26rem) {
+  .combo__pips {
+    display: none;
+  }
+}
