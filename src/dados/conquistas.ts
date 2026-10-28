@@ -6,6 +6,7 @@ export interface DadosConquistas {
   estatisticas: {
     partidas: number; perguntasRespondidas: number; acertos: number; melhorCombo: number
     partidasPerfeitas: number; recordesSuperados: number; melhorPontuacao: number
+    melhorSobrevivencia?: number; melhorAcertosNoTempo?: number; duelosVencidos?: number; diariosConcluidos?: number; melhorSequencia?: number
     porCategoria: Record<string, unknown>; perguntasPorCategoria: Record<string, number>
   }
 }
@@ -29,6 +30,11 @@ export const CONQUISTAS: Conquista[] = [
   { id: 'recordista', titulo: 'Recordista', descricao: 'Supere o seu próprio recorde de pontuação em uma categoria.', icone: 'trophy', meta: 1, atual: (d) => d.estatisticas.recordesSuperados },
   { id: 'placar-alto', titulo: 'Placar Alto', descricao: 'Faça 1.000 pontos em uma única partida.', icone: 'medal', meta: 1000, atual: (d) => d.estatisticas.melhorPontuacao },
   { id: 'centenario', titulo: 'Centenário', descricao: 'Acerte 100 perguntas ao todo.', icone: 'award', meta: 100, atual: (d) => d.estatisticas.acertos },
+  { id: 'sobrevivente', titulo: 'Até o fim', descricao: 'Acerte 10 perguntas em uma partida de Sobrevivência.', icone: 'shield', meta: 10, atual: (d) => d.estatisticas.melhorSobrevivencia ?? 0 },
+  { id: 'relampago', titulo: 'Relâmpago', descricao: 'Acerte 10 perguntas em uma partida Contra o tempo.', icone: 'timer', meta: 10, atual: (d) => d.estatisticas.melhorAcertosNoTempo ?? 0 },
+  { id: 'duelista', titulo: 'Dupla de respeito', descricao: 'Vença 5 duelos locais.', icone: 'swords', meta: 5, atual: (d) => d.estatisticas.duelosVencidos ?? 0 },
+  { id: 'fiel-ao-diario', titulo: 'Fiel ao diário', descricao: 'Conclua 7 desafios diários.', icone: 'calendar', meta: 7, atual: (d) => d.estatisticas.diariosConcluidos ?? 0 },
+  { id: 'constante', titulo: 'Constante', descricao: 'Mantenha uma sequência de 7 dias.', icone: 'flame', meta: 7, atual: (d) => d.estatisticas.melhorSequencia ?? 0 },
 ]
 
 export function avaliarConquista(conquista: Conquista, dados: DadosConquistas) {

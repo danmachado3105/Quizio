@@ -4,7 +4,7 @@ import { calcularMelhorSequencia, diaLocal, ehDiaValido, unirDias } from '../uti
 import { semanaISOLocal } from '../utilitarios/semana'
 import type { DadosQuizio } from '../tipos'
 
-export const VERSAO_DOS_DADOS = 4
+export const VERSAO_DOS_DADOS = 5
 export const LIMITE_HISTORICO = 50
 export const LIMITE_IDS_REGISTRADOS = 200
 export const LIMITE_DIAS_JOGADOS = 400
@@ -24,6 +24,12 @@ function criarDadosPadrao(): DadosQuizio {
     perfil: { nome: NOME_PADRAO, avatar: AVATAR_PADRAO, boasVindasExibida: false },
     preferencias: { som: false, movimento: 'sistema' },
     progresso: { xp: 0 },
+    moedas: 0,
+    itensDesbloqueados: [],
+    itensEquipados: { moldura: 'nenhuma', titulo: 'nenhum' },
+    bauDiario: { data: '', aberto: false, moedas: 0 },
+    marcosSequenciaPagos: { sequenciaInicio: '', marcos: [] },
+    medalhas: {},
     estatisticas: {
       partidas: 0, perguntasRespondidas: 0, acertos: 0, melhorPontuacao: 0, melhorCombo: 0,
       partidasPerfeitas: 0, recordesSuperados: 0, melhorSequencia: 0, melhorSobrevivencia: 0,
@@ -32,7 +38,7 @@ function criarDadosPadrao(): DadosQuizio {
     },
     historico: [], conquistas: {},
     missoes: { data: '', progresso: {}, resgatadas: {}, categoriasHoje: [] },
-    missoesSemanais: { semana: '', progresso: {}, resgatadas: {} },
+    missoesSemanais: { semana: '', progresso: {}, resgatadas: {}, categorias: [] },
     desafioDiario: { ultimaData: '', acertos: 0, total: 0, pontuacao: 0, xp: 0, respostas: [] },
     registroDePartidas: [], favoritas: [], diasJogados: [],
   }
@@ -62,6 +68,20 @@ function sanitizar(dados: DadosQuizio): DadosQuizio {
   if (dados.preferencias.movimento !== 'sistema' && dados.preferencias.movimento !== 'reduzido') dados.preferencias.movimento = 'sistema'
   dados.preferencias.som = dados.preferencias.som === true
   dados.progresso.xp = inteiro(dados.progresso.xp)
+  dados.moedas = inteiro(dados.moedas)
+  dados.itensDesbloqueados = [...new Set(dados.itensDesbloqueados.filter((item): item is string => typeof item === 'string'))]
+  if (!ehObjeto(dados.itensEquipados)) dados.itensEquipados = { moldura: 'nenhuma', titulo: 'nenhum' }
+  dados.itensEquipados.moldura = typeof dados.itensEquipados.moldura === 'string' ? dados.itensEquipados.moldura : 'nenhuma'
+  dados.itensEquipados.titulo = typeof dados.itensEquipados.titulo === 'string' ? dados.itensEquipados.titulo : 'nenhum'
+  if (!ehObjeto(dados.bauDiario)) dados.bauDiario = { data: '', aberto: false, moedas: 0 }
+  dados.bauDiario.data = typeof dados.bauDiario.data === 'string' ? dados.bauDiario.data : ''
+  dados.bauDiario.aberto = dados.bauDiario.aberto === true
+  dados.bauDiario.moedas = inteiro(dados.bauDiario.moedas)
+  if (!ehObjeto(dados.marcosSequenciaPagos)) dados.marcosSequenciaPagos = { sequenciaInicio: '', marcos: [] }
+  dados.marcosSequenciaPagos.sequenciaInicio = typeof dados.marcosSequenciaPagos.sequenciaInicio === 'string' ? dados.marcosSequenciaPagos.sequenciaInicio : ''
+  dados.marcosSequenciaPagos.marcos = Array.isArray(dados.marcosSequenciaPagos.marcos) ? [...new Set(dados.marcosSequenciaPagos.marcos.filter((item): item is number => Number.isInteger(item) && item > 0))] : []
+  const medalhasValidas = objetoSeguro(dados.medalhas)
+  dados.medalhas = Object.fromEntries(Object.entries(medalhasValidas).filter(([, grau]) => ['bronze', 'prata', 'ouro'].includes(String(grau)))) as DadosQuizio['medalhas']
   const chavesNumero = ['partidas', 'perguntasRespondidas', 'acertos', 'melhorPontuacao', 'melhorCombo', 'partidasPerfeitas', 'recordesSuperados', 'melhorSequencia', 'melhorSobrevivencia', 'melhorAcertosNoTempo', 'duelosVencidos', 'diariosConcluidos'] as const
   for (const chave of chavesNumero) dados.estatisticas[chave] = inteiro(dados.estatisticas[chave])
   dados.estatisticas.acertos = Math.min(dados.estatisticas.acertos, dados.estatisticas.perguntasRespondidas)
@@ -85,6 +105,15 @@ function migrar(dados: DadosQuizio, versao: number): void {
     const dias = dados.historico.map((item) => new Date(item.data)).filter((data) => !Number.isNaN(data.getTime())).map(diaLocal)
     dados.diasJogados = unirDias([], dias, LIMITE_DIAS_JOGADOS)
     dados.estatisticas.melhorSequencia = Math.max(dados.estatisticas.melhorSequencia, calcularMelhorSequencia(dados.diasJogados))
+  }
+  if (versao < 5) {
+    dados.moedas ??= 0
+    dados.itensDesbloqueados ??= []
+    dados.itensEquipados ??= { moldura: 'nenhuma', titulo: 'nenhum' }
+    dados.bauDiario ??= { data: '', aberto: false, moedas: 0 }
+    dados.marcosSequenciaPagos ??= { sequenciaInicio: '', marcos: [] }
+    dados.medalhas ??= {}
+    for (const id of Object.keys(dados.conquistas)) dados.medalhas[id] ??= 'bronze'
   }
   dados.versao = VERSAO_DOS_DADOS
 }
@@ -120,7 +149,8 @@ function carregar(): DadosQuizio {
   const hoje = diaLocal()
   if (dados.missoes.data !== hoje) dados.missoes = { data: hoje, progresso: {}, resgatadas: {}, categoriasHoje: [] }
   const semana = semanaISOLocal()
-  if (dados.missoesSemanais.semana !== semana) dados.missoesSemanais = { semana, progresso: {}, resgatadas: {} }
+  if (dados.missoesSemanais.semana !== semana) dados.missoesSemanais = { semana, progresso: {}, resgatadas: {}, categorias: [] }
+  else if (!Array.isArray(dados.missoesSemanais.categorias)) dados.missoesSemanais.categorias = []
   return dados
 }
 

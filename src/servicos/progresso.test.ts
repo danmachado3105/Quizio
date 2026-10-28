@@ -24,5 +24,8 @@ describe('registro de partida', () => {
     expect(dados.progresso.xp).toBe(155)
     expect(dados.estatisticas.partidas).toBe(1)
     expect(dados.historico).toHaveLength(1)
+    expect(dados.moedas).toBeGreaterThan(0)
+    expect(dados.medalhas['primeira-partida']).toBe('bronze')
+    expect(dados.itensDesbloqueados).toContain('moldura-nivel-2')
   })
 })

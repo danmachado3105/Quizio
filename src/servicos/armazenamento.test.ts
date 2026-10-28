@@ -23,7 +23,7 @@ describe('armazenamento local', () => {
     expect(dados.versao).toBe(VERSAO_DOS_DADOS)
     expect(dados.progresso.xp).toBe(35)
     expect(dados.registroDePartidas).toContain('antiga')
-    expect(localStorage.getItem('quizio:v1:pre-v4')).not.toBeNull()
+    expect(localStorage.getItem('quizio:v1:pre-v5')).not.toBeNull()
   })
 
   it.each([2, 3, 4])('preserva o perfil e o XP em um salvamento v%s', (versao) => {
@@ -32,6 +32,9 @@ describe('armazenamento local', () => {
     expect(dados.perfil).toMatchObject({ nome: 'Lia', avatar: 'coral' })
     expect(dados.progresso.xp).toBe(275)
     expect(dados.versao).toBe(VERSAO_DOS_DADOS)
+    expect(dados.moedas).toBe(0)
+    expect(dados.itensDesbloqueados).toEqual([])
+    expect(dados.medalhas).toEqual({})
   })
 
   it('faz backup de dados ilegíveis e inicia com valores seguros', () => {

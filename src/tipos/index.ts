@@ -22,6 +22,7 @@ export interface Missao {
   metrica: string
   meta: number
   xp: number
+  moedas?: number
 }
 
 export interface RespostaPartida {
@@ -48,6 +49,12 @@ export interface DadosQuizio {
   perfil: { nome: string; avatar: string; boasVindasExibida: boolean }
   preferencias: { som: boolean; movimento: 'sistema' | 'reduzido' }
   progresso: { xp: number }
+  moedas: number
+  itensDesbloqueados: string[]
+  itensEquipados: { moldura: string; titulo: string }
+  bauDiario: { data: string; aberto: boolean; moedas: number }
+  marcosSequenciaPagos: { sequenciaInicio: string; marcos: number[] }
+  medalhas: Record<string, 'bronze' | 'prata' | 'ouro'>
   estatisticas: {
     partidas: number; perguntasRespondidas: number; acertos: number; melhorPontuacao: number
     melhorCombo: number; partidasPerfeitas: number; recordesSuperados: number; melhorSequencia: number
@@ -59,7 +66,7 @@ export interface DadosQuizio {
   historico: Array<{ id: string; data: string; categoriaId: string; modoId: string; dificuldade: string; total: number; acertos: number; erros: number; pontuacao: number; xp: number; duracaoMs: number }>
   conquistas: Record<string, string>
   missoes: { data: string; progresso: Record<string, number>; resgatadas: Record<string, string>; categoriasHoje: string[] }
-  missoesSemanais: { semana: string; progresso: Record<string, number>; resgatadas: Record<string, string> }
+  missoesSemanais: { semana: string; progresso: Record<string, number>; resgatadas: Record<string, string>; categorias: string[] }
   desafioDiario: { ultimaData: string; acertos: number; total: number; pontuacao: number; xp: number; respostas: Array<{ perguntaId: string; escolhida: number | null; acertou: boolean }> }
   registroDePartidas: string[]
   favoritas: string[]

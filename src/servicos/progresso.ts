@@ -2,11 +2,12 @@ import { CONQUISTAS, estaConcluida } from '../dados/conquistas'
 import { obterModo } from '../dados/modos'
 import { calcularNivel } from '../utilitarios/progressao'
 import { XP_DESAFIO_DIARIO } from '../utilitarios/pontuacao'
-import { diaLocal, resumirSequencia, unirDias } from '../utilitarios/sequencia'
+import { diaAnterior, diaLocal, resumirSequencia, unirDias } from '../utilitarios/sequencia'
 import type { DadosConquistas, } from '../dados/conquistas'
 import type { DadosQuizio, RespostaPartida } from '../tipos'
 import { atualizarDados, LIMITE_DIAS_JOGADOS, LIMITE_HISTORICO, LIMITE_IDS_REGISTRADOS } from './armazenamento'
-import { aplicarPartidaNasMissoes, concederRecompensasDeMissoes } from './missoes'
+import { aplicarPartidaNasMissoes, aplicarPartidaNaSemana, concederRecompensasDeMissoes, concederRecompensasSemanais } from './missoes'
+import { RECOMPENSAS } from '../config/recompensas'
 
 export interface ResultadoRegistravel {
   id: string
@@ -21,6 +22,8 @@ export interface EfeitosDaPartida {
   xpAntes: number; xpDepois: number; xpMissoes: number; xpDiario: number
   nivelAnterior: number; nivelNovo: number; subiuDeNivel: boolean
   missoesConcluidas: Array<{ id: string; xp: number }>; novasConquistas: string[]
+  moedasGanham: number; moedasDesafio: number; moedasMissoes: number; moedasSemanais: number; moedasBau: number
+  itensDesbloqueados: string[]; marcosPagos: number[]
   recorde: { categoriaId: string; anterior: number; atual: number; ehNovo: boolean }
   sequencia: { atual: number; melhor: number; primeiraDoDia: boolean; novaMelhor: boolean }
 }
@@ -61,6 +64,8 @@ export function registrarPartida(resultado: ResultadoRegistravel): EfeitosDaPart
     if (modoId === 'sobrevivencia') estatisticas.melhorSobrevivencia = Math.max(estatisticas.melhorSobrevivencia, resultado.acertos)
     if (modoId === 'tempo') estatisticas.melhorAcertosNoTempo = Math.max(estatisticas.melhorAcertosNoTempo, resultado.acertos)
     if (modoId === 'duelo' && resultado.duelo?.vencedor === 'jogador') estatisticas.duelosVencidos += 1
+    const moedasGanham = resultado.respostas.reduce((total, resposta) => total + (resposta.acertou ? RECOMPENSAS.moedasPorAcerto[resposta.dificuldade] : 0), 0)
+    dados.moedas += moedasGanham
 
     const hoje = diaLocal()
     const primeiraDoDia = !dados.diasJogados.includes(hoje)
@@ -70,8 +75,11 @@ export function registrarPartida(resultado: ResultadoRegistravel): EfeitosDaPart
     estatisticas.melhorSequencia = sequencia.melhor
 
     let xpDiario = 0
+    let moedasDesafio = 0
     if (modoId === 'diario' && resultado.config.dataDesafio && dados.desafioDiario.ultimaData !== resultado.config.dataDesafio) {
       xpDiario = XP_DESAFIO_DIARIO
+      moedasDesafio = RECOMPENSAS.moedasDesafioDiario
+      dados.moedas += moedasDesafio
       estatisticas.diariosConcluidos += 1
       dados.desafioDiario = {
         ultimaData: resultado.config.dataDesafio, acertos: resultado.acertos, total: resultado.total,
@@ -83,7 +91,19 @@ export function registrarPartida(resultado: ResultadoRegistravel): EfeitosDaPart
     aplicarPartidaNasMissoes(dados, resultado)
     const missoesConcluidas = concederRecompensasDeMissoes(dados)
     const xpMissoes = missoesConcluidas.reduce((soma, item) => soma + item.xp, 0)
-    const nivelNovo = calcularNivel(dados.progresso.xp).nivel
+    aplicarPartidaNaSemana(dados, resultado)
+    const missoesSemanaisConcluidas = concederRecompensasSemanais(dados)
+    const xpSemanais = missoesSemanaisConcluidas.reduce((soma, item) => soma + item.xp, 0)
+    const moedasMissoes = missoesConcluidas.reduce((soma, item) => soma + item.moedas, 0)
+    const moedasSemanais = missoesSemanaisConcluidas.reduce((soma, item) => soma + item.moedas, 0)
+    let moedasBau = 0
+    if (dados.bauDiario.data !== hoje) dados.bauDiario = { data: hoje, aberto: false, moedas: 0 }
+    if (!dados.bauDiario.aberto && Object.keys(dados.missoes.resgatadas).length === 6) {
+      moedasBau = RECOMPENSAS.bauDiario.moedas
+      dados.moedas += moedasBau
+      dados.bauDiario = { data: hoje, aberto: true, moedas: moedasBau }
+    }
+    dados.progresso.xp += xpSemanais
     const novasConquistas: string[] = []
     const dadosParaConquistas = dados as DadosQuizio & DadosConquistas
     for (const conquista of CONQUISTAS) {
@@ -92,11 +112,35 @@ export function registrarPartida(resultado: ResultadoRegistravel): EfeitosDaPart
         novasConquistas.push(conquista.id)
       }
     }
+    if (primeiraDoDia && sequencia.atual === 1) dados.marcosSequenciaPagos = { sequenciaInicio: hoje, marcos: [] }
+    const inicioSequencia = (() => { let dia = hoje; for (let i = 1; i < sequencia.atual; i += 1) dia = diaAnterior(dia); return dia })()
+    if (dados.marcosSequenciaPagos.sequenciaInicio !== inicioSequencia) dados.marcosSequenciaPagos = { sequenciaInicio: inicioSequencia, marcos: [] }
+    const marcosPagos: number[] = []
+    for (const [texto, recompensa] of Object.entries(RECOMPENSAS.marcosSequencia)) {
+      const marco = Number(texto)
+      if (sequencia.atual >= marco && !dados.marcosSequenciaPagos.marcos.includes(marco)) {
+        dados.marcosSequenciaPagos.marcos.push(marco); marcosPagos.push(marco)
+        dados.progresso.xp += recompensa.xp; dados.moedas += recompensa.moedas
+      }
+    }
+    const nivelNovo = calcularNivel(dados.progresso.xp).nivel
+    const itensDesbloqueados: string[] = []
+    for (const item of RECOMPENSAS.itensPorNivel) {
+      if (nivelNovo >= item.nivel && !dados.itensDesbloqueados.includes(item.id)) { dados.itensDesbloqueados.push(item.id); itensDesbloqueados.push(item.id) }
+    }
+    const ordemMedalhas = { bronze: 1, prata: 2, ouro: 3 } as const
+    for (const conquista of CONQUISTAS) {
+      const metas = RECOMPENSAS.medalhas[conquista.id]
+      if (!metas) continue
+      const valor = conquista.atual(dadosParaConquistas)
+      const medalha = valor >= metas[2] ? 'ouro' : valor >= metas[1] ? 'prata' : valor >= metas[0] ? 'bronze' : null
+      if (medalha && (!dados.medalhas[conquista.id] || ordemMedalhas[medalha] > ordemMedalhas[dados.medalhas[conquista.id]])) dados.medalhas[conquista.id] = medalha
+    }
     const agora = new Date().toISOString()
     dados.historico.unshift({
       id: resultado.id, data: agora, categoriaId, modoId, dificuldade: resultado.config.dificuldade,
       total: resultado.total, acertos: resultado.acertos, erros: resultado.erros,
-      pontuacao: resultado.pontuacao, xp: resultado.xp + xpDiario + xpMissoes, duracaoMs: resultado.duracaoMs,
+      pontuacao: resultado.pontuacao, xp: resultado.xp + xpDiario + xpMissoes + xpSemanais, duracaoMs: resultado.duracaoMs,
     })
     dados.historico = dados.historico.slice(0, LIMITE_HISTORICO)
     dados.registroDePartidas.push(resultado.id)
@@ -105,6 +149,7 @@ export function registrarPartida(resultado: ResultadoRegistravel): EfeitosDaPart
       xpAntes, xpDepois: dados.progresso.xp, xpMissoes, xpDiario,
       nivelAnterior, nivelNovo, subiuDeNivel: nivelNovo > nivelAnterior,
       missoesConcluidas, novasConquistas,
+      moedasGanham, moedasDesafio, moedasMissoes, moedasSemanais, moedasBau, itensDesbloqueados, marcosPagos,
       recorde: { categoriaId, anterior: recordeAnterior, atual: registro.melhorPontuacao, ehNovo: ehNovoRecorde },
       sequencia: { atual: sequencia.atual, melhor: sequencia.melhor, primeiraDoDia, novaMelhor: sequencia.melhor > melhorAnterior && sequencia.atual > 1 },
     }
