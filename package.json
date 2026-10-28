@@ -11,7 +11,8 @@
     "typecheck": "tsc -b --pretty",
     "test": "vitest run",
     "format": "prettier --write .",
-    "exportar-identidade": "node scripts/exportar-identidade.mjs"
+    "exportar-identidade": "node scripts/exportar-identidade.mjs",
+    "auditar-perguntas": "tsx scripts/auditar-perguntas.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -36,6 +37,7 @@
     "prettier": "^3.4.2",
     "sharp": "^0.33.5",
     "typescript": "~5.7.2",
+    "tsx": "^4.19.2",
     "vitest": "^2.1.8"
   }
 }

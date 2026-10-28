@@ -1,0 +1,226 @@
+/*
+ * Categoria: corpo-humano
+ * Prefixo: cp
+ * Próximo id livre: cp-016
+ * Meta: 50 perguntas (17 fáceis / 17 médias / 16 difíceis).
+ * Checklist de qualidade: fato estável e verificável; enunciado sem ambiguidade; alternativas plausíveis;
+ * explicação educativa curta; sem tema controverso ou obscuro; evitar informação que muda com o tempo.
+ *
+ * Modelo de pergunta (exemplo estrutural, não faz parte do banco):
+ * { id: 'cp-999', categoria: 'corpo-humano', dificuldade: 'facil', enunciado: 'Enunciado escrito pelo dono?',
+ *   alternativas: ['Opção A', 'Opção B', 'Opção C', 'Opção D'], correta: 0, explicacao: 'Explicação curta.' }
+ */
+import type { Pergunta } from '../../tipos'
+
+export const perguntasCorpoHumano: Pergunta[] = [
+  {
+    "id": "cp-001",
+    "categoria": "corpo-humano",
+    "dificuldade": "facil",
+    "enunciado": "Quantos ossos tem o corpo de um adulto?",
+    "alternativas": [
+      "106",
+      "206",
+      "306",
+      "406"
+    ],
+    "correta": 1,
+    "explicacao": "Um adulto tem 206 ossos. Os bebês nascem com mais, porque alguns se fundem durante o crescimento."
+  },
+  {
+    "id": "cp-002",
+    "categoria": "corpo-humano",
+    "dificuldade": "facil",
+    "enunciado": "Qual órgão bombeia o sangue pelo corpo?",
+    "alternativas": [
+      "Pulmão",
+      "Fígado",
+      "Coração",
+      "Rim"
+    ],
+    "correta": 2,
+    "explicacao": "O coração funciona como uma bomba muscular que mantém o sangue em circulação."
+  },
+  {
+    "id": "cp-003",
+    "categoria": "corpo-humano",
+    "dificuldade": "facil",
+    "enunciado": "Quantos são os cinco sentidos tradicionais do ser humano?",
+    "alternativas": [
+      "Três",
+      "Quatro",
+      "Cinco",
+      "Seis"
+    ],
+    "correta": 2,
+    "explicacao": "Visão, audição, olfato, paladar e tato. A palavra \"cinco\" já está no nome da lista tradicional."
+  },
+  {
+    "id": "cp-004",
+    "categoria": "corpo-humano",
+    "dificuldade": "facil",
+    "enunciado": "Qual é o maior órgão do corpo humano?",
+    "alternativas": [
+      "Fígado",
+      "Pele",
+      "Intestino",
+      "Pulmão"
+    ],
+    "correta": 1,
+    "explicacao": "A pele cobre todo o corpo e funciona como uma barreira de proteção."
+  },
+  {
+    "id": "cp-005",
+    "categoria": "corpo-humano",
+    "dificuldade": "facil",
+    "enunciado": "Qual gás o corpo humano precisa respirar para viver?",
+    "alternativas": [
+      "Nitrogênio",
+      "Oxigênio",
+      "Hélio",
+      "Hidrogênio"
+    ],
+    "correta": 1,
+    "explicacao": "Os pulmões absorvem o oxigênio do ar e o sangue o leva a todas as células."
+  },
+  {
+    "id": "cp-006",
+    "categoria": "corpo-humano",
+    "dificuldade": "medio",
+    "enunciado": "Qual componente do sangue é responsável por transportar oxigênio?",
+    "alternativas": [
+      "Glóbulos brancos",
+      "Hemácias",
+      "Plaquetas",
+      "Plasma"
+    ],
+    "correta": 1,
+    "explicacao": "As hemácias (glóbulos vermelhos) carregam o oxigênio graças a uma proteína chamada hemoglobina."
+  },
+  {
+    "id": "cp-007",
+    "categoria": "corpo-humano",
+    "dificuldade": "medio",
+    "enunciado": "Qual parte do esqueleto protege o cérebro?",
+    "alternativas": [
+      "Crânio",
+      "Esterno",
+      "Fêmur",
+      "Escápula"
+    ],
+    "correta": 0,
+    "explicacao": "O crânio é formado por vários ossos unidos que envolvem e protegem o cérebro."
+  },
+  {
+    "id": "cp-008",
+    "categoria": "corpo-humano",
+    "dificuldade": "medio",
+    "enunciado": "Qual órgão produz a insulina?",
+    "alternativas": [
+      "Fígado",
+      "Pâncreas",
+      "Estômago",
+      "Baço"
+    ],
+    "correta": 1,
+    "explicacao": "O pâncreas produz a insulina, hormônio que ajuda as células a usar a glicose do sangue."
+  },
+  {
+    "id": "cp-009",
+    "categoria": "corpo-humano",
+    "dificuldade": "medio",
+    "enunciado": "Quantas câmaras tem o coração humano?",
+    "alternativas": [
+      "Duas",
+      "Três",
+      "Quatro",
+      "Cinco"
+    ],
+    "correta": 2,
+    "explicacao": "São quatro: dois átrios e dois ventrículos."
+  },
+  {
+    "id": "cp-010",
+    "categoria": "corpo-humano",
+    "dificuldade": "medio",
+    "enunciado": "Qual vitamina o corpo produz quando a pele é exposta à luz do sol?",
+    "alternativas": [
+      "Vitamina A",
+      "Vitamina C",
+      "Vitamina D",
+      "Vitamina K"
+    ],
+    "correta": 2,
+    "explicacao": "A vitamina D ajuda o corpo a absorver o cálcio e a manter os ossos fortes."
+  },
+  {
+    "id": "cp-011",
+    "categoria": "corpo-humano",
+    "dificuldade": "dificil",
+    "enunciado": "Qual é o menor osso do corpo humano?",
+    "alternativas": [
+      "Estribo",
+      "Martelo",
+      "Falange",
+      "Hioide"
+    ],
+    "correta": 0,
+    "explicacao": "O estribo fica no ouvido médio e mede cerca de 3 milímetros. Ele ajuda a transmitir o som."
+  },
+  {
+    "id": "cp-012",
+    "categoria": "corpo-humano",
+    "dificuldade": "dificil",
+    "enunciado": "Qual parte do cérebro é a principal responsável pelo equilíbrio e pela coordenação dos movimentos?",
+    "alternativas": [
+      "Cerebelo",
+      "Hipotálamo",
+      "Bulbo",
+      "Hipocampo"
+    ],
+    "correta": 0,
+    "explicacao": "O cerebelo fica na parte de trás do cérebro e ajusta a precisão dos movimentos."
+  },
+  {
+    "id": "cp-013",
+    "categoria": "corpo-humano",
+    "dificuldade": "dificil",
+    "enunciado": "Quantos pares de cromossomos tem uma célula humana comum?",
+    "alternativas": [
+      "22",
+      "23",
+      "24",
+      "46"
+    ],
+    "correta": 1,
+    "explicacao": "São 23 pares, ou seja, 46 cromossomos no total."
+  },
+  {
+    "id": "cp-014",
+    "categoria": "corpo-humano",
+    "dificuldade": "dificil",
+    "enunciado": "Qual músculo separa o tórax do abdome e é essencial para a respiração?",
+    "alternativas": [
+      "Diafragma",
+      "Bíceps",
+      "Trapézio",
+      "Glúteo"
+    ],
+    "correta": 0,
+    "explicacao": "Ao se contrair, o diafragma desce e puxa o ar para dentro dos pulmões."
+  },
+  {
+    "id": "cp-015",
+    "categoria": "corpo-humano",
+    "dificuldade": "dificil",
+    "enunciado": "Qual glândula, localizada na base do pescoço, regula o metabolismo?",
+    "alternativas": [
+      "Tireoide",
+      "Hipófise",
+      "Adrenal",
+      "Timo"
+    ],
+    "correta": 0,
+    "explicacao": "A tireoide produz hormônios que controlam a velocidade com que o corpo usa energia."
+  }
+] as Pergunta[]

@@ -1,0 +1,226 @@
+/*
+ * Categoria: invencoes-descobertas
+ * Prefixo: iv
+ * Próximo id livre: iv-016
+ * Meta: 50 perguntas (17 fáceis / 17 médias / 16 difíceis).
+ * Checklist de qualidade: fato estável e verificável; enunciado sem ambiguidade; alternativas plausíveis;
+ * explicação educativa curta; sem tema controverso ou obscuro; evitar informação que muda com o tempo.
+ *
+ * Modelo de pergunta (exemplo estrutural, não faz parte do banco):
+ * { id: 'iv-999', categoria: 'invencoes-descobertas', dificuldade: 'facil', enunciado: 'Enunciado escrito pelo dono?',
+ *   alternativas: ['Opção A', 'Opção B', 'Opção C', 'Opção D'], correta: 0, explicacao: 'Explicação curta.' }
+ */
+import type { Pergunta } from '../../tipos'
+
+export const perguntasInvencoesDescobertas: Pergunta[] = [
+  {
+    "id": "iv-001",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "facil",
+    "enunciado": "Quem patenteou o telefone, em 1876?",
+    "alternativas": [
+      "Thomas Edison",
+      "Alexander Graham Bell",
+      "Nikola Tesla",
+      "Guglielmo Marconi"
+    ],
+    "correta": 1,
+    "explicacao": "Bell patenteou o aparelho e fez a primeira ligação com seu assistente, Thomas Watson."
+  },
+  {
+    "id": "iv-002",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "facil",
+    "enunciado": "Os irmãos Wright são famosos por qual invenção?",
+    "alternativas": [
+      "Balão",
+      "Avião",
+      "Helicóptero",
+      "Planador"
+    ],
+    "correta": 1,
+    "explicacao": "Em 1903, os irmãos Wright fizeram o primeiro voo motorizado e controlado."
+  },
+  {
+    "id": "iv-003",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "facil",
+    "enunciado": "Quem aperfeiçoou e popularizou a lâmpada elétrica incandescente?",
+    "alternativas": [
+      "Nikola Tesla",
+      "Thomas Edison",
+      "Albert Einstein",
+      "Isaac Newton"
+    ],
+    "correta": 1,
+    "explicacao": "Edison desenvolveu uma lâmpada durável e comercialmente viável, por volta de 1879."
+  },
+  {
+    "id": "iv-004",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "facil",
+    "enunciado": "Qual instrumento permite enxergar coisas muito pequenas, como células?",
+    "alternativas": [
+      "Telescópio",
+      "Microscópio",
+      "Periscópio",
+      "Estetoscópio"
+    ],
+    "correta": 1,
+    "explicacao": "O microscópio amplia a imagem de objetos pequenos demais para serem vistos a olho nu."
+  },
+  {
+    "id": "iv-005",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "facil",
+    "enunciado": "Qual invenção chinesa antiga usa uma agulha magnetizada para indicar o norte?",
+    "alternativas": [
+      "Bússola",
+      "Relógio de sol",
+      "Astrolábio",
+      "Ábaco"
+    ],
+    "correta": 0,
+    "explicacao": "A bússola foi essencial para as grandes navegações."
+  },
+  {
+    "id": "iv-006",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "medio",
+    "enunciado": "Quem inventou a prensa de tipos móveis na Europa, no século XV?",
+    "alternativas": [
+      "Johannes Gutenberg",
+      "Leonardo da Vinci",
+      "Galileu Galilei",
+      "Marco Polo"
+    ],
+    "correta": 0,
+    "explicacao": "A prensa de Gutenberg tornou os livros mais baratos e ajudou a difundir o conhecimento."
+  },
+  {
+    "id": "iv-007",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "medio",
+    "enunciado": "Qual brasileiro fez um voo público em Paris com o 14-Bis, em 1906?",
+    "alternativas": [
+      "Santos Dumont",
+      "Oswaldo Cruz",
+      "Carlos Chagas",
+      "Rui Barbosa"
+    ],
+    "correta": 0,
+    "explicacao": "Alberto Santos Dumont é considerado o pai da aviação no Brasil."
+  },
+  {
+    "id": "iv-008",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "medio",
+    "enunciado": "Quem descobriu a penicilina, em 1928?",
+    "alternativas": [
+      "Louis Pasteur",
+      "Alexander Fleming",
+      "Marie Curie",
+      "Robert Koch"
+    ],
+    "correta": 1,
+    "explicacao": "Fleming notou que um fungo impedia o crescimento de bactérias. A penicilina foi o primeiro antibiótico."
+  },
+  {
+    "id": "iv-009",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "medio",
+    "enunciado": "Quem formulou a lei da gravitação universal, depois de, segundo a lenda, ver uma maçã cair?",
+    "alternativas": [
+      "Isaac Newton",
+      "Galileu Galilei",
+      "Johannes Kepler",
+      "Nicolau Copérnico"
+    ],
+    "correta": 0,
+    "explicacao": "Newton publicou a lei em 1687, em Principia Mathematica."
+  },
+  {
+    "id": "iv-010",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "medio",
+    "enunciado": "Qual cientista, nascida na Polônia e vencedora de dois prêmios Nobel, descobriu o polônio e o rádio?",
+    "alternativas": [
+      "Rosalind Franklin",
+      "Marie Curie",
+      "Ada Lovelace",
+      "Lise Meitner"
+    ],
+    "correta": 1,
+    "explicacao": "Marie Curie ganhou os Nobéis de Física (1903) e de Química (1911)."
+  },
+  {
+    "id": "iv-011",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "dificil",
+    "enunciado": "Quem é considerada a primeira programadora da história, por seu trabalho com a Máquina Analítica de Charles Babbage?",
+    "alternativas": [
+      "Ada Lovelace",
+      "Grace Hopper",
+      "Hedy Lamarr",
+      "Margaret Hamilton"
+    ],
+    "correta": 0,
+    "explicacao": "Em 1843, Ada Lovelace escreveu um algoritmo pensado para ser executado pela máquina de Babbage."
+  },
+  {
+    "id": "iv-012",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "dificil",
+    "enunciado": "Qual cientista descobriu os raios X, em 1895?",
+    "alternativas": [
+      "Wilhelm Röntgen",
+      "Henri Becquerel",
+      "Ernest Rutherford",
+      "Max Planck"
+    ],
+    "correta": 0,
+    "explicacao": "Röntgen ganhou o primeiro Prêmio Nobel de Física, em 1901, por essa descoberta."
+  },
+  {
+    "id": "iv-013",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "dificil",
+    "enunciado": "Quem inventou o para-raios e foi um dos fundadores dos Estados Unidos?",
+    "alternativas": [
+      "Benjamin Franklin",
+      "Thomas Jefferson",
+      "Samuel Morse",
+      "Alessandro Volta"
+    ],
+    "correta": 0,
+    "explicacao": "Franklin estudou a eletricidade e propôs o para-raios, em meados do século XVIII."
+  },
+  {
+    "id": "iv-014",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "dificil",
+    "enunciado": "Qual cientista criou a vacina contra a raiva, em 1885, e deu nome ao processo da pasteurização?",
+    "alternativas": [
+      "Louis Pasteur",
+      "Edward Jenner",
+      "Robert Koch",
+      "Gregor Mendel"
+    ],
+    "correta": 0,
+    "explicacao": "Pasteur também mostrou que microrganismos causam doenças e estragam alimentos."
+  },
+  {
+    "id": "iv-015",
+    "categoria": "invencoes-descobertas",
+    "dificuldade": "dificil",
+    "enunciado": "Qual invento de Alessandro Volta, de 1800, foi a primeira bateria elétrica?",
+    "alternativas": [
+      "Pilha voltaica",
+      "Gerador de Van de Graaff",
+      "Bobina de Tesla",
+      "Capacitor"
+    ],
+    "correta": 0,
+    "explicacao": "A pilha voltaica empilhava discos de metais diferentes separados por papel úmido. A unidade volt homenageia Volta."
+  }
+] as Pergunta[]

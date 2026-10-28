@@ -1,0 +1,226 @@
+/*
+ * Categoria: datas-tradicoes
+ * Prefixo: dt
+ * Próximo id livre: dt-016
+ * Meta: 50 perguntas (17 fáceis / 17 médias / 16 difíceis).
+ * Checklist de qualidade: fato estável e verificável; enunciado sem ambiguidade; alternativas plausíveis;
+ * explicação educativa curta; sem tema controverso ou obscuro; evitar informação que muda com o tempo.
+ *
+ * Modelo de pergunta (exemplo estrutural, não faz parte do banco):
+ * { id: 'dt-999', categoria: 'datas-tradicoes', dificuldade: 'facil', enunciado: 'Enunciado escrito pelo dono?',
+ *   alternativas: ['Opção A', 'Opção B', 'Opção C', 'Opção D'], correta: 0, explicacao: 'Explicação curta.' }
+ */
+import type { Pergunta } from '../../tipos'
+
+export const perguntasDatasTradicoes: Pergunta[] = [
+  {
+    "id": "dt-001",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "facil",
+    "enunciado": "Em que mês é comemorado o Natal?",
+    "alternativas": [
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+      "Janeiro"
+    ],
+    "correta": 2,
+    "explicacao": "O Natal é comemorado em 25 de dezembro."
+  },
+  {
+    "id": "dt-002",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "facil",
+    "enunciado": "Qual festa brasileira, com desfiles de escolas de samba, acontece entre fevereiro e março?",
+    "alternativas": [
+      "Carnaval",
+      "Festa junina",
+      "Páscoa",
+      "Réveillon"
+    ],
+    "correta": 0,
+    "explicacao": "A data do Carnaval muda a cada ano, pois depende da data da Páscoa."
+  },
+  {
+    "id": "dt-003",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "facil",
+    "enunciado": "Qual é a data da Independência do Brasil?",
+    "alternativas": [
+      "7 de setembro",
+      "15 de novembro",
+      "21 de abril",
+      "12 de outubro"
+    ],
+    "correta": 0,
+    "explicacao": "A independência foi proclamada em 7 de setembro de 1822, às margens do riacho do Ipiranga."
+  },
+  {
+    "id": "dt-004",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "facil",
+    "enunciado": "Qual é a data do Dia do Trabalhador?",
+    "alternativas": [
+      "1º de maio",
+      "1º de abril",
+      "7 de setembro",
+      "25 de dezembro"
+    ],
+    "correta": 0,
+    "explicacao": "O 1º de maio é lembrado em vários países como o Dia Internacional do Trabalho."
+  },
+  {
+    "id": "dt-005",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "facil",
+    "enunciado": "Em qual festa tradicional é comum dar ovos de chocolate?",
+    "alternativas": [
+      "Páscoa",
+      "Natal",
+      "Carnaval",
+      "Dia das Crianças"
+    ],
+    "correta": 0,
+    "explicacao": "O ovo é um símbolo de renovação e de vida, ligado à Páscoa."
+  },
+  {
+    "id": "dt-006",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "medio",
+    "enunciado": "Em qual mês acontecem as festas juninas no Brasil, com fogueira, quadrilha e comidas de milho?",
+    "alternativas": [
+      "Junho",
+      "Maio",
+      "Agosto",
+      "Setembro"
+    ],
+    "correta": 0,
+    "explicacao": "As festas homenageiam Santo Antônio, São João e São Pedro, que são lembrados em junho."
+  },
+  {
+    "id": "dt-007",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "medio",
+    "enunciado": "Qual feriado brasileiro lembra a Proclamação da República?",
+    "alternativas": [
+      "15 de novembro",
+      "7 de setembro",
+      "21 de abril",
+      "20 de novembro"
+    ],
+    "correta": 0,
+    "explicacao": "A República foi proclamada em 15 de novembro de 1889."
+  },
+  {
+    "id": "dt-008",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "medio",
+    "enunciado": "Qual país celebra o Dia de Ação de Graças (Thanksgiving) na quarta quinta-feira de novembro?",
+    "alternativas": [
+      "Estados Unidos",
+      "Reino Unido",
+      "Austrália",
+      "Espanha"
+    ],
+    "correta": 0,
+    "explicacao": "Nos Estados Unidos, a data reúne as famílias em torno de um jantar, tradicionalmente com peru."
+  },
+  {
+    "id": "dt-009",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "medio",
+    "enunciado": "Em que data é comemorado o Halloween (Dia das Bruxas)?",
+    "alternativas": [
+      "31 de outubro",
+      "1º de novembro",
+      "31 de dezembro",
+      "15 de agosto"
+    ],
+    "correta": 0,
+    "explicacao": "O Halloween tem origem em tradições celtas e é muito popular nos Estados Unidos."
+  },
+  {
+    "id": "dt-010",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "medio",
+    "enunciado": "Qual tradição japonesa celebra a floração das cerejeiras?",
+    "alternativas": [
+      "Hanami",
+      "Obon",
+      "Tanabata",
+      "Shichi-go-san"
+    ],
+    "correta": 0,
+    "explicacao": "No hanami, as pessoas fazem piqueniques sob as cerejeiras em flor, na primavera."
+  },
+  {
+    "id": "dt-011",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual é a data do Dia da Consciência Negra?",
+    "alternativas": [
+      "13 de maio",
+      "20 de novembro",
+      "21 de março",
+      "28 de setembro"
+    ],
+    "correta": 1,
+    "explicacao": "A data lembra Zumbi dos Palmares, líder do Quilombo dos Palmares, que morreu em 20 de novembro de 1695."
+  },
+  {
+    "id": "dt-012",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual celebração mexicana homenageia os mortos no início de novembro?",
+    "alternativas": [
+      "Dia de Muertos",
+      "Cinco de Mayo",
+      "Las Posadas",
+      "Carnaval de Veracruz"
+    ],
+    "correta": 0,
+    "explicacao": "O Dia de Muertos, em 1º e 2 de novembro, é cheio de cores, flores e altares com oferendas."
+  },
+  {
+    "id": "dt-013",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual festival indiano é conhecido como o festival das luzes?",
+    "alternativas": [
+      "Holi",
+      "Diwali",
+      "Navratri",
+      "Eid"
+    ],
+    "correta": 1,
+    "explicacao": "No Diwali, as casas são enfeitadas com lamparinas, simbolizando a vitória da luz sobre a escuridão."
+  },
+  {
+    "id": "dt-014",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual festa italiana é famosa por suas máscaras elaboradas e acontece em uma cidade de canais?",
+    "alternativas": [
+      "Carnaval de Veneza",
+      "Palio de Siena",
+      "Festa da Pizza",
+      "Calcio Storico"
+    ],
+    "correta": 0,
+    "explicacao": "O Carnaval de Veneza tem séculos de tradição e é conhecido pelos bailes de máscaras."
+  },
+  {
+    "id": "dt-015",
+    "categoria": "datas-tradicoes",
+    "dificuldade": "dificil",
+    "enunciado": "Em que data é celebrada Nossa Senhora Aparecida, padroeira do Brasil?",
+    "alternativas": [
+      "12 de outubro",
+      "2 de novembro",
+      "8 de dezembro",
+      "15 de agosto"
+    ],
+    "correta": 0,
+    "explicacao": "O 12 de outubro é feriado nacional e também Dia das Crianças."
+  }
+] as Pergunta[]

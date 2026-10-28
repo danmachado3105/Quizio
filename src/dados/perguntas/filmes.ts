@@ -1,0 +1,296 @@
+/*
+ * Categoria: filmes
+ * Prefixo: fl
+ * Próximo id livre: fl-021
+ * Meta: 50 perguntas (17 fáceis / 17 médias / 16 difíceis).
+ * Checklist de qualidade: fato estável e verificável; enunciado sem ambiguidade; alternativas plausíveis;
+ * explicação educativa curta; sem tema controverso ou obscuro; evitar informação que muda com o tempo.
+ *
+ * Modelo de pergunta (exemplo estrutural, não faz parte do banco):
+ * { id: 'fl-999', categoria: 'filmes', dificuldade: 'facil', enunciado: 'Enunciado escrito pelo dono?',
+ *   alternativas: ['Opção A', 'Opção B', 'Opção C', 'Opção D'], correta: 0, explicacao: 'Explicação curta.' }
+ */
+import type { Pergunta } from '../../tipos'
+
+export const perguntasFilmes: Pergunta[] = [
+  {
+    "id": "fl-001",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Em qual animação o protagonista é um leão chamado Simba?",
+    "alternativas": [
+      "O Rei Leão",
+      "Madagascar",
+      "Zootopia",
+      "Tarzan"
+    ],
+    "correta": 0,
+    "explicacao": "Simba é o jovem leão herdeiro do trono em O Rei Leão, de 1994."
+  },
+  {
+    "id": "fl-002",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Qual personagem é o jovem bruxo criado por J. K. Rowling e levado aos cinemas em uma série de filmes?",
+    "alternativas": [
+      "Harry Potter",
+      "Percy Jackson",
+      "Merlin",
+      "Gandalf"
+    ],
+    "correta": 0,
+    "explicacao": "Harry Potter estuda em Hogwarts e enfrenta o bruxo Voldemort."
+  },
+  {
+    "id": "fl-003",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Qual animação da Pixar tem como protagonistas o caubói Woody e o astronauta Buzz Lightyear?",
+    "alternativas": [
+      "Toy Story",
+      "Carros",
+      "Procurando Nemo",
+      "Os Incríveis"
+    ],
+    "correta": 0,
+    "explicacao": "Toy Story, de 1995, foi o primeiro longa-metragem totalmente feito em computação gráfica."
+  },
+  {
+    "id": "fl-004",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Qual saga de filmes tem o pirata Jack Sparrow como protagonista?",
+    "alternativas": [
+      "Piratas do Caribe",
+      "Peter Pan",
+      "A Ilha do Tesouro",
+      "Hook"
+    ],
+    "correta": 0,
+    "explicacao": "Jack Sparrow é interpretado por Johnny Depp na saga Piratas do Caribe."
+  },
+  {
+    "id": "fl-005",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Qual é o nome do robozinho compactador de lixo, protagonista da animação da Pixar de 2008?",
+    "alternativas": [
+      "EVA",
+      "WALL-E",
+      "R2-D2",
+      "Baymax"
+    ],
+    "correta": 1,
+    "explicacao": "WALL-E fica sozinho na Terra, limpando o planeta, até conhecer o robô EVA."
+  },
+  {
+    "id": "fl-006",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Em qual filme de Steven Spielberg um alienígena diz a frase \"E.T. telefone minha casa\"?",
+    "alternativas": [
+      "E.T. - O Extraterrestre",
+      "Contatos Imediatos do Terceiro Grau",
+      "Jurassic Park",
+      "Os Goonies"
+    ],
+    "correta": 0,
+    "explicacao": "O filme é de 1982 e conta a amizade entre o menino Elliott e um visitante de outro planeta."
+  },
+  {
+    "id": "fl-007",
+    "categoria": "filmes",
+    "dificuldade": "facil",
+    "enunciado": "Qual super-herói da Marvel usa um escudo redondo e é conhecido como Capitão?",
+    "alternativas": [
+      "Homem de Ferro",
+      "Capitão América",
+      "Thor",
+      "Hulk"
+    ],
+    "correta": 1,
+    "explicacao": "Steve Rogers é o Capitão América, e seu escudo é feito de vibranium."
+  },
+  {
+    "id": "fl-008",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Quem dirigiu o filme Titanic (1997)?",
+    "alternativas": [
+      "Steven Spielberg",
+      "James Cameron",
+      "Ridley Scott",
+      "Christopher Nolan"
+    ],
+    "correta": 1,
+    "explicacao": "James Cameron também dirigiu Avatar e O Exterminador do Futuro."
+  },
+  {
+    "id": "fl-009",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Qual filme brasileiro foi indicado ao Oscar de Melhor Filme Internacional na cerimônia de 1999?",
+    "alternativas": [
+      "Cidade de Deus",
+      "Central do Brasil",
+      "Tropa de Elite",
+      "O Auto da Compadecida"
+    ],
+    "correta": 1,
+    "explicacao": "Central do Brasil, de Walter Salles, também rendeu a Fernanda Montenegro uma indicação a Melhor Atriz."
+  },
+  {
+    "id": "fl-010",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Quem dirigiu o filme Tubarão (1975)?",
+    "alternativas": [
+      "George Lucas",
+      "Steven Spielberg",
+      "Francis Ford Coppola",
+      "Martin Scorsese"
+    ],
+    "correta": 1,
+    "explicacao": "Tubarão é considerado o primeiro grande sucesso de bilheteria de verão do cinema."
+  },
+  {
+    "id": "fl-011",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Qual ator interpretou Forrest Gump no filme de 1994?",
+    "alternativas": [
+      "Tom Hanks",
+      "Tom Cruise",
+      "Brad Pitt",
+      "Kevin Costner"
+    ],
+    "correta": 0,
+    "explicacao": "Tom Hanks ganhou o Oscar de Melhor Ator pelo papel."
+  },
+  {
+    "id": "fl-012",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Em qual filme da saga Star Wars, Darth Vader revela ser pai de Luke Skywalker?",
+    "alternativas": [
+      "Uma Nova Esperança",
+      "O Império Contra-Ataca",
+      "O Retorno de Jedi",
+      "A Ameaça Fantasma"
+    ],
+    "correta": 1,
+    "explicacao": "A revelação acontece em O Império Contra-Ataca, de 1980."
+  },
+  {
+    "id": "fl-013",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Qual animação da DreamWorks, de 2001, apresenta um ogro verde que vive em um pântano?",
+    "alternativas": [
+      "Shrek",
+      "Madagascar",
+      "Kung Fu Panda",
+      "Como Treinar o Seu Dragão"
+    ],
+    "correta": 0,
+    "explicacao": "Shrek ganhou o primeiro Oscar de Melhor Animação, em 2002."
+  },
+  {
+    "id": "fl-014",
+    "categoria": "filmes",
+    "dificuldade": "medio",
+    "enunciado": "Qual animação da Disney, de 2013, tem como personagens as irmãs Elsa e Anna?",
+    "alternativas": [
+      "Frozen: Uma Aventura Congelante",
+      "Moana",
+      "Enrolados",
+      "Valente"
+    ],
+    "correta": 0,
+    "explicacao": "A canção \"Let It Go\" ficou mundialmente famosa com esse filme."
+  },
+  {
+    "id": "fl-015",
+    "categoria": "filmes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual filme venceu o Oscar de Melhor Filme em 2020, sendo o primeiro de língua não inglesa a conquistar o prêmio?",
+    "alternativas": [
+      "Parasita",
+      "Roma",
+      "1917",
+      "Coringa"
+    ],
+    "correta": 0,
+    "explicacao": "O sul-coreano Parasita, de Bong Joon-ho, fez história na cerimônia de 2020."
+  },
+  {
+    "id": "fl-016",
+    "categoria": "filmes",
+    "dificuldade": "dificil",
+    "enunciado": "Quem interpretou o Coringa em Batman: O Cavaleiro das Trevas (2008)?",
+    "alternativas": [
+      "Joaquin Phoenix",
+      "Jack Nicholson",
+      "Heath Ledger",
+      "Jared Leto"
+    ],
+    "correta": 2,
+    "explicacao": "Heath Ledger ganhou o Oscar póstumo de Melhor Ator Coadjuvante pelo papel."
+  },
+  {
+    "id": "fl-017",
+    "categoria": "filmes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual diretor assina A Origem e Interestelar?",
+    "alternativas": [
+      "Denis Villeneuve",
+      "Christopher Nolan",
+      "David Fincher",
+      "Quentin Tarantino"
+    ],
+    "correta": 1,
+    "explicacao": "Christopher Nolan também dirigiu a trilogia O Cavaleiro das Trevas."
+  },
+  {
+    "id": "fl-018",
+    "categoria": "filmes",
+    "dificuldade": "dificil",
+    "enunciado": "Quem dirigiu o filme O Poderoso Chefão (1972)?",
+    "alternativas": [
+      "Martin Scorsese",
+      "Francis Ford Coppola",
+      "Brian De Palma",
+      "Sidney Lumet"
+    ],
+    "correta": 1,
+    "explicacao": "O filme é baseado no romance de Mario Puzo e ganhou o Oscar de Melhor Filme."
+  },
+  {
+    "id": "fl-019",
+    "categoria": "filmes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual filme de Alfred Hitchcock tem uma famosa cena de assassinato no chuveiro de um motel?",
+    "alternativas": [
+      "Os Pássaros",
+      "Janela Indiscreta",
+      "Psicose",
+      "Um Corpo que Cai"
+    ],
+    "correta": 2,
+    "explicacao": "Psicose é de 1960 e a cena do chuveiro é uma das mais analisadas da história do cinema."
+  },
+  {
+    "id": "fl-020",
+    "categoria": "filmes",
+    "dificuldade": "dificil",
+    "enunciado": "Qual cineasta japonês dirigiu A Viagem de Chihiro (2001)?",
+    "alternativas": [
+      "Hayao Miyazaki",
+      "Makoto Shinkai",
+      "Akira Kurosawa",
+      "Satoshi Kon"
+    ],
+    "correta": 0,
+    "explicacao": "Miyazaki fundou o Studio Ghibli, e A Viagem de Chihiro ganhou o Oscar de Melhor Animação."
+  }
+] as Pergunta[]
