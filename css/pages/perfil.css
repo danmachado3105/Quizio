@@ -110,6 +110,59 @@
   color: #A8323B;
 }
 
+/* ---------- Sequência de dias ---------- */
+.sequencia {
+  display: grid;
+  gap: var(--espaco-3);
+}
+
+.sequencia__topo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--espaco-3);
+}
+
+.sequencia__numero {
+  font-family: var(--fonte-titulo);
+  font-size: 3.25rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.sequencia__rotulo {
+  font-weight: 700;
+}
+
+.dias-recentes {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+
+.dia-quadrado {
+  aspect-ratio: 1;
+  background: var(--cor-creme-2);
+  border: 2px dashed rgba(53, 37, 79, 0.35);
+  border-radius: 0.4rem;
+}
+
+.dia-quadrado[data-jogou="true"] {
+  background: var(--cor-amarelo);
+  border: 2px solid var(--tinta);
+}
+
+.dia-quadrado[data-hoje="true"] {
+  outline: 2px solid var(--cor-roxo);
+  outline-offset: 2px;
+}
+
+.dias-legenda {
+  display: flex;
+  justify-content: space-between;
+  color: var(--cor-texto-suave);
+}
+
 /* ---------- Categorias mais jogadas ---------- */
 .lista-categorias {
   display: grid;
@@ -165,5 +218,9 @@
 
   .zona-dados .botao {
     width: 100%;
+  }
+
+  .dias-recentes {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 }
