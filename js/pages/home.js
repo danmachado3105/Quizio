@@ -14,20 +14,21 @@ import { abrirModalNome } from "../components/modal.js";
 import { criarBarraProgresso, criarItemHistorico } from "../components/card.js";
 import { MODOS_IMPLEMENTADOS, criarPartida, obterPartidaAtiva } from "../services/partida.js";
 import { obterEstadoDasMissoes } from "../services/missoes.js";
-import { desafioDiarioConcluidoHoje, obterDados } from "../services/storage.js";
+import { desafioDiarioConcluidoHoje, obterDados, obterResultadoDoDesafioDeHoje } from "../services/storage.js";
 import { QUANTIDADE_DESAFIO_DIARIO, XP_DESAFIO_DIARIO } from "../utils/pontuacao.js";
 import { calcularNivel } from "../utils/progressao.js";
 import { iniciarRevelacao } from "../utils/revelar.js";
 import { criarCapa } from "../utils/imagens.js";
 import { abrirRoleta } from "../components/roleta.js";
 import { embaralhar } from "../utils/sorteio.js";
-import { dataLocalISO, formatarDataLonga, formatarNumero, saudacaoPorHora } from "../utils/formatacao.js";
+import { diaLocal, resumirSequencia } from "../utils/sequencia.js";
+import { formatarDataLonga, formatarNumero, saudacaoPorHora } from "../utils/formatacao.js";
 
 /*
  * A página inicial muda conforme o jogador:
  *  - novo (nenhuma partida concluída): explica como funciona e convida a jogar
- *  - recorrente: mostra nível, semana, missões e atalhos para continuar
- * Tudo vem de dados reais (perguntas, histórico, missões, conquistas).
+ *  - recorrente: mostra nível, sequência de dias, missões e atalhos para continuar
+ * Tudo vem de dados reais (perguntas, histórico, dias jogados, missões, conquistas).
  */
 const LETRAS = ["A", "B", "C", "D"];
 
@@ -50,17 +51,22 @@ const FORMATOS_DO_MOSAICO = [
 ];
 
 const VISUAL_DOS_MODOS = {
-  classico: { icone: "book-open", regra: "Sem relógio. Erre à vontade e aprenda com a explicação de cada resposta." },
-  tempo: { icone: "timer", regra: "Cada pergunta tem tempo limitado. Quem pensa rápido pontua mais." },
+  classico: { icone: "book-open", regra: "Sem relógio, no seu ritmo. Dá para pausar e pular algumas perguntas." },
+  tempo: { icone: "timer", regra: "20 segundos por pergunta. Quanto mais rápido você acerta, mais pontos." },
   sobrevivencia: { icone: "shield", regra: "Continue enquanto acertar. A primeira resposta errada encerra a partida." },
-  diario: { icone: "calendar", regra: "As mesmas perguntas para todo mundo no dia, com bônus de XP uma vez por data." },
-  duelo: { icone: "swords", regra: "Duas pessoas no mesmo dispositivo, alternando as respostas." },
+  diario: {
+    icone: "calendar",
+    regra: `${QUANTIDADE_DESAFIO_DIARIO} perguntas iguais para todo mundo no dia, com +${XP_DESAFIO_DIARIO} XP uma vez por data.`,
+  },
+  duelo: { icone: "swords", regra: "Duas pessoas no mesmo aparelho. As respostas ficam escondidas até o fim da rodada." },
 };
 
 /** Atributos de revelação ao rolar, com atraso escalonado. */
 const revelar = (posicao = 0) => ({ "data-revelar": true, style: `--atraso:${posicao * 90}ms` });
 
 const linha = (conteudo) => el("span", { classe: "linha" }, [conteudo]);
+
+const plural = (numero, singular, varios) => `${formatarNumero(numero)} ${numero === 1 ? singular : varios}`;
 
 // ---------- Utilidades de dados ----------
 function ordenarPorInteresse(dados) {
@@ -95,11 +101,17 @@ function linkDeCategoria(base, categoriaId) {
 // ---------- Abertura ----------
 function repetirUltimaPartida(ctx, botao) {
   const ultima = ctx.dados.historico[0];
+
+  // O desafio diário só vale uma vez por data: nesse caso, repete o clássico
+  let modoId = ultima?.modoId ?? "classico";
+  if (modoId === "diario" || !MODOS_IMPLEMENTADOS.includes(modoId)) modoId = "classico";
+
   const { erro } = criarPartida({
     categoriaId: ultima?.categoriaId ?? CATEGORIA_TODAS,
     dificuldade: ultima?.dificuldade ?? DIFICULDADE_MISTA,
-    quantidade: ultima?.total ?? 10,
-    modoId: "classico",
+    // partidas muito curtas (treino, Sobrevivência que acabou cedo) voltam com 10 perguntas
+    quantidade: ultima && ultima.total >= 5 ? ultima.total : 10,
+    modoId,
   });
 
   if (erro) {
@@ -219,6 +231,7 @@ function renderizarAbertura(ctx) {
   const { dados, novo, base } = ctx;
   const { nivel } = calcularNivel(dados.progresso.xp);
   const partidaAtiva = obterPartidaAtiva();
+  const sequencia = resumirSequencia(dados.diasJogados, dados.estatisticas.melhorSequencia);
 
   const eyebrow = el("p", {
     classe: "rotulo",
@@ -248,6 +261,8 @@ function renderizarAbertura(ctx) {
     let frase = "Todas as missões de hoje estão concluídas.";
     if (partidaAtiva) {
       frase = `Sua partida está parada na pergunta ${partidaAtiva.indice + 1} de ${partidaAtiva.questoes.length}.`;
+    } else if (sequencia.emRisco) {
+      frase = `Jogue hoje para manter sua sequência de ${plural(sequencia.atual, "dia", "dias")}.`;
     } else if (faltam > 0) {
       frase = faltam === 1 ? "Falta 1 missão para fechar o dia." : `Faltam ${faltam} missões para fechar o dia.`;
     }
@@ -305,7 +320,11 @@ function renderizarAbertura(ctx) {
 
   const provas = novo
     ? [[formatarNumero(PERGUNTAS.length), "perguntas"], [CATEGORIAS.length, "temas"], [3, "níveis de dificuldade"]]
-    : [[nivel, "nível"], [formatarNumero(dados.progresso.xp), "XP acumulado"], [`${taxaDeAcerto(dados)}%`, "de acerto"]];
+    : [
+        [nivel, "nível"],
+        [sequencia.atual, sequencia.atual === 1 ? "dia seguido" : "dias seguidos"],
+        [`${taxaDeAcerto(dados)}%`, "de acerto"],
+      ];
 
   porId("abertura").replaceChildren(
     el("div", { classe: "container abertura__grade" }, [
@@ -341,6 +360,7 @@ function renderizarFaixa() {
 function criarBlocoDesafio(ctx) {
   const implementado = MODOS_IMPLEMENTADOS.includes("diario");
   const concluido = desafioDiarioConcluidoHoje();
+  const linkDoDesafio = `${ctx.base}pages/jogo.html?modo=diario`;
 
   let situacao;
   if (!implementado) {
@@ -349,13 +369,20 @@ function criarBlocoDesafio(ctx) {
       el("p", { classe: "texto-pequeno", texto: "O desafio diário está a caminho. Por enquanto, treine no modo clássico." }),
     ];
   } else if (concluido) {
+    const diario = obterResultadoDoDesafioDeHoje();
     situacao = [
       el("span", { classe: "badge badge--sucesso" }, [criarIcone("check", 14), "Concluído hoje"]),
-      el("p", { classe: "texto-pequeno", texto: "Volte amanhã para um novo desafio." }),
+      el("p", {
+        classe: "texto-pequeno",
+        texto: diario
+          ? `Você acertou ${diario.acertos} de ${diario.total}. Volte amanhã para um novo desafio.`
+          : "Volte amanhã para um novo desafio.",
+      }),
+      el("a", { classe: "botao botao--amarelo", texto: "Rever respostas", atributos: { href: linkDoDesafio } }),
     ];
   } else {
     situacao = [
-      el("a", { classe: "botao botao--amarelo", texto: "Aceitar desafio", atributos: { href: `${ctx.base}pages/jogo.html?modo=diario` } }),
+      el("a", { classe: "botao botao--amarelo", texto: "Aceitar desafio", atributos: { href: linkDoDesafio } }),
     ];
   }
 
@@ -400,35 +427,42 @@ function criarBlocoNivel({ dados }) {
   ]);
 }
 
-/** Partidas por dia nos últimos 7 dias, a partir do histórico salvo. */
-function criarBlocoSemana({ dados }) {
-  const contagem = new Map();
-  for (const partida of dados.historico) {
-    const data = new Date(partida.data);
-    if (Number.isNaN(data.getTime())) continue;
-    const chave = dataLocalISO(data);
-    contagem.set(chave, (contagem.get(chave) ?? 0) + 1);
-  }
+/** Sequência de dias jogados e os últimos 7 dias (dia jogado = barra cheia). */
+function criarBlocoSequencia({ dados }) {
+  const sequencia = resumirSequencia(dados.diasJogados, dados.estatisticas.melhorSequencia);
+  const jogados = new Set(dados.diasJogados);
 
   const dias = Array.from({ length: 7 }, (_, indice) => {
     const data = new Date();
     data.setDate(data.getDate() - (6 - indice));
-    return { data, quantidade: contagem.get(dataLocalISO(data)) ?? 0 };
+    return { data, jogou: jogados.has(diaLocal(data)) };
   });
-  const maximo = Math.max(1, ...dias.map((dia) => dia.quantidade));
-  const total = dias.reduce((soma, dia) => soma + dia.quantidade, 0);
+
+  let titulo = "Nenhuma sequência ainda";
+  const apoios = ["Jogue hoje para começar uma sequência de dias."];
+  if (sequencia.atual > 0) {
+    titulo = plural(sequencia.atual, "dia seguido", "dias seguidos");
+    apoios[0] = sequencia.emRisco
+      ? "Jogue hoje para não perder a sequência."
+      : "Você já jogou hoje. Volte amanhã para continuar.";
+    if (sequencia.melhor > sequencia.atual) {
+      apoios.push(`Sua melhor sequência: ${plural(sequencia.melhor, "dia", "dias")}.`);
+    }
+  } else if (sequencia.melhor > 0) {
+    apoios.push(`Sua melhor sequência: ${plural(sequencia.melhor, "dia", "dias")}.`);
+  }
 
   const colunas = dias.map((dia, indice) => {
     const barra = el("span", { classe: "semana__barra" });
-    barra.style.setProperty("--altura", `${Math.max(8, (dia.quantidade / maximo) * 100)}%`);
-    if (dia.quantidade === 0) barra.dataset.vazio = "";
+    barra.style.setProperty("--altura", dia.jogou ? "100%" : "8%");
+    if (!dia.jogou) barra.dataset.vazio = "";
 
     return el(
       "li",
       {
         classe: `semana__dia${indice === 6 ? " semana__dia--hoje" : ""}`,
         atributos: {
-          "aria-label": `${dia.data.toLocaleDateString("pt-BR", { weekday: "long" })}: ${dia.quantidade} ${dia.quantidade === 1 ? "partida" : "partidas"}`,
+          "aria-label": `${dia.data.toLocaleDateString("pt-BR", { weekday: "long" })}: ${dia.jogou ? "jogou" : "não jogou"}`,
         },
       },
       [barra, el("span", { classe: "semana__letra", texto: dia.data.toLocaleDateString("pt-BR", { weekday: "narrow" }).toUpperCase() })]
@@ -436,8 +470,9 @@ function criarBlocoSemana({ dados }) {
   });
 
   return el("div", { classe: "painel__bloco", atributos: revelar(2) }, [
-    el("p", { classe: "rotulo", texto: "Sua semana" }),
-    el("p", { classe: "painel__titulo", texto: total === 0 ? "Nenhuma partida nos últimos 7 dias" : `${total} ${total === 1 ? "partida" : "partidas"} nos últimos 7 dias` }),
+    el("p", { classe: "rotulo", texto: "Sua sequência" }),
+    el("p", { classe: "painel__titulo", texto: titulo }),
+    ...apoios.map((texto) => el("p", { classe: "nivel-bloco__apoio", texto })),
     el("ol", { classe: "semana" }, colunas),
   ]);
 }
@@ -469,7 +504,7 @@ function criarBlocoPassos() {
 function renderizarPainel(ctx) {
   const blocos = ctx.novo
     ? [criarBlocoPassos(), criarBlocoDesafio(ctx)]
-    : [criarBlocoNivel(ctx), criarBlocoDesafio(ctx), criarBlocoSemana(ctx)];
+    : [criarBlocoNivel(ctx), criarBlocoDesafio(ctx), criarBlocoSequencia(ctx)];
 
   porId("painel").replaceChildren(
     el("div", { classe: `container painel__grade${ctx.novo ? " painel__grade--novo" : ""}` }, blocos)
@@ -489,7 +524,6 @@ function criarTema({ categoria, formato, total, estatistica, base }) {
     },
     [
       criarCapa(base, categoria),
-      el("span", { classe: "tema__glifo", atributos: { "aria-hidden": "true" } }, [criarIcone(categoria.icone, formato.icone)]),
       el("span", { classe: "tema__glifo", atributos: { "aria-hidden": "true" } }, [criarIcone(categoria.icone, formato.icone)]),
       el("div", { classe: "tema__topo" }, [el("span", { classe: "rotulo", texto: `${String(total).padStart(2, "0")} perguntas` })]),
       el("div", {}, [
@@ -569,21 +603,33 @@ function renderizarCategorias(ctx) {
 
 // ---------- Modos ----------
 function renderizarModos(ctx) {
+  const diarioConcluido = desafioDiarioConcluidoHoje();
+
   const itens = MODOS.map((modo, indice) => {
     const visual = VISUAL_DOS_MODOS[modo.id] ?? { icone: "star", regra: modo.descricao };
     const disponivel = MODOS_IMPLEMENTADOS.includes(modo.id);
+    const concluido = modo.id === "diario" && diarioConcluido;
+
+    // O desafio diário começa direto; os outros modos abrem o Explorar já com o modo escolhido
+    const href =
+      modo.id === "diario"
+        ? `${ctx.base}pages/jogo.html?modo=diario`
+        : `${ctx.base}pages/categorias.html?modo=${modo.id}`;
+
+    let fim;
+    if (!disponivel) fim = el("span", { classe: "badge", texto: "Em breve" });
+    else if (concluido) fim = el("span", { classe: "badge badge--sucesso" }, [criarIcone("check", 14), "Concluído hoje"]);
+    else fim = el("span", { classe: "modo__acao" }, [criarIcone("arrow-right", 20)]);
 
     const conteudo = [
       el("span", { classe: "modo__num", texto: String(indice + 1).padStart(2, "0") }),
       el("div", { classe: "modo__titulo" }, [criarIcone(visual.icone, 26), el("h3", { classe: "modo__nome", texto: modo.nome })]),
       el("p", { classe: "modo__regra", texto: visual.regra }),
-      disponivel
-        ? el("span", { classe: "modo__acao" }, [criarIcone("arrow-right", 20)])
-        : el("span", { classe: "badge", texto: "Em breve" }),
+      fim,
     ];
 
     const faixa = disponivel
-      ? el("a", { classe: "modo modo--ativo", atributos: { href: `${ctx.base}pages/categorias.html?modo=${modo.id}` } }, conteudo)
+      ? el("a", { classe: "modo modo--ativo", atributos: { href } }, conteudo)
       : el("div", { classe: "modo modo--bloqueado" }, conteudo);
 
     return el("li", { atributos: revelar(indice) }, [faixa]);
