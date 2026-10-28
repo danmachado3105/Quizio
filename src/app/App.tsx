@@ -7,6 +7,8 @@ import { Explorar } from '../paginas/Explorar'
 import { NaoEncontrada } from '../paginas/NaoEncontrada'
 import { Privacidade } from '../paginas/Privacidade'
 import { Sobre } from '../paginas/Sobre'
+import { Jogo } from '../paginas/Jogo'
+import { Resultado } from '../paginas/Resultado'
 
 function PaginaEmPreparacao({ titulo }: { titulo: string }) {
   return <main className="pagina container texto-longo"><p className="rotulo">QUIZIO</p><h1 tabIndex={-1}>{titulo}</h1><p>Esta área está sendo preparada.</p></main>
@@ -22,14 +24,16 @@ function FocoDaRota() {
 }
 
 function Conteudo() {
+  const localizacao = useLocation()
+  const emJogo = localizacao.pathname === '/jogo'
   return <>
     <FocoDaRota />
-    <Cabecalho />
+    {!emJogo && <Cabecalho />}
     <div id="conteudo" className="conteudo-principal"><Routes>
       <Route path="/" element={<Inicio />} />
       <Route path="/explorar" element={<Explorar />} />
-      <Route path="/jogo" element={<PaginaEmPreparacao titulo="Sua partida" />} />
-      <Route path="/resultado" element={<PaginaEmPreparacao titulo="Resultado" />} />
+      <Route path="/jogo" element={<Jogo />} />
+      <Route path="/resultado" element={<Resultado />} />
       <Route path="/perfil" element={<PaginaEmPreparacao titulo="Seu perfil" />} />
       <Route path="/conquistas" element={<PaginaEmPreparacao titulo="Conquistas" />} />
       <Route path="/recompensas" element={<PaginaEmPreparacao titulo="Recompensas" />} />
@@ -37,7 +41,7 @@ function Conteudo() {
       <Route path="/privacidade" element={<Privacidade />} />
       <Route path="*" element={<NaoEncontrada />} />
     </Routes></div>
-    <Rodape />
+    {!emJogo && <Rodape />}
   </>
 }
 
