@@ -19,6 +19,9 @@ import './estilos/pages/perfil.css'
 import './estilos/pages/conquistas.css'
 import './estilos/base.css'
 import './estilos/f3.css'
+import { registerSW } from 'virtual:pwa-register'
+
+if (import.meta.env.PROD) registerSW({ immediate: true })
 
 ReactDOM.createRoot(document.getElementById('raiz')!).render(
   <React.StrictMode>
