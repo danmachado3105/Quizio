@@ -12,6 +12,7 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "exportar-identidade": "node scripts/exportar-identidade.mjs",
+    "otimizar-capas": "node scripts/otimizar-capas.mjs",
     "auditar-perguntas": "tsx scripts/auditar-perguntas.ts"
   },
   "dependencies": {
