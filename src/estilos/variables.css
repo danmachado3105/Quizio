@@ -6,30 +6,30 @@
    ===================================================================== */
 :root {
   /* ---------- Paleta ---------- */
-  --cor-creme: #FFF8EF;
-  --cor-roxo: #7254D8;
-  --cor-coral: #FF786B;
-  --cor-amarelo: #FFD166;
-  --cor-roxo-escuro: #35254F;
-  --cor-branco: #FFFFFF;
-  --cor-acerto: #27865B;
-  --cor-erro: #D94F58;
+  --cor-creme: #fff8ef;
+  --cor-roxo: #7254d8;
+  --cor-coral: #ff786b;
+  --cor-amarelo: #ffd166;
+  --cor-roxo-escuro: #35254f;
+  --cor-branco: #ffffff;
+  --cor-acerto: #27865b;
+  --cor-erro: #d94f58;
 
   /* A "tinta": texto, contornos e sombras duras */
   --tinta: var(--cor-roxo-escuro);
 
   /* Variações */
-  --cor-creme-2: #FFEFD9;
-  --cor-roxo-profundo: #4B35A3;
-  --cor-roxo-claro: #ECE7FB;
-  --cor-coral-profundo: #D9574A;
-  --cor-coral-claro: #FFE7E3;
-  --cor-amarelo-profundo: #D9A93A;
-  --cor-amarelo-claro: #FFF2CF;
-  --cor-acerto-claro: #E0F2EA;
-  --cor-erro-claro: #FBE6E8;
-  --cor-acerto-texto: #1B6B45;
-  --cor-erro-texto: #A8323B;
+  --cor-creme-2: #ffefd9;
+  --cor-roxo-profundo: #4b35a3;
+  --cor-roxo-claro: #ece7fb;
+  --cor-coral-profundo: #d9574a;
+  --cor-coral-claro: #ffe7e3;
+  --cor-amarelo-profundo: #d9a93a;
+  --cor-amarelo-claro: #fff2cf;
+  --cor-acerto-claro: #e0f2ea;
+  --cor-erro-claro: #fbe6e8;
+  --cor-acerto-texto: #1b6b45;
+  --cor-erro-texto: #a8323b;
 
   /* Texto e superfícies */
   --cor-texto: var(--tinta);
@@ -38,7 +38,8 @@
   --cor-superficie: var(--cor-branco);
 
   /* ---------- Tipografia ---------- */
-  --fonte-titulo: "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --fonte-titulo:
+    "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
   --fonte-corpo: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --fonte-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
