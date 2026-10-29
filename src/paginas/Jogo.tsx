@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { PERGUNTAS } from '../dados/perguntas'
 import { obterRegrasDoModo, obterNomeDoModo } from '../dados/modos'
 import { Icone } from '../componentes/Icone'
 import { useDados } from '../servicos/useDados'
 import { tocarSom } from '../servicos/som'
-import { abandonarPartida, avancar, calcularPulosRestantes, calcularRestanteMs, concluirPartida, criarPartida, esgotarTempo, obterPartidaAtiva, obterQuestaoAtual, obterVezDeJogar, pausarPartida, pular, responder, retomarPartida, type Partida } from '../servicos/partida'
+import { abandonarPartida, avancar, calcularRestanteMs, concluirPartida, criarPartida, esgotarTempo, obterPartidaAtiva, obterQuestaoAtual, obterVezDeJogar, responder, retomarPartida, type Partida } from '../servicos/partida'
 import type { Dificuldade, ModoId } from '../tipos'
 
 function lerConfig(params: URLSearchParams) {
@@ -19,6 +19,7 @@ export function Jogo() {
   const navigate = useNavigate()
   const dados = useDados()
   const [partida, setPartida] = useState<Partida | null>(() => obterPartidaAtiva(PERGUNTAS))
+  const feedbackRef = useRef<HTMLDivElement>(null)
   const [tick, setTick] = useState(Date.now())
   const [confirmarSaida, setConfirmarSaida] = useState(false)
   const [convidadoPronto, setConvidadoPronto] = useState(false)
@@ -33,6 +34,23 @@ export function Jogo() {
   }, [config, partida])
 
   useEffect(() => {
+    if (!partida || partida.pausadaEm === null) return
+    retomarPartida(partida)
+    setPartida({ ...partida })
+  }, [partida])
+
+  useEffect(() => {
+    if (!partida || partida.config.modoId === 'duelo' || !partida.respostas[partida.indice]) return
+    const quadro = window.requestAnimationFrame(() => {
+      feedbackRef.current?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'nearest',
+      })
+    })
+    return () => window.cancelAnimationFrame(quadro)
+  }, [partida?.id, partida?.indice, partida?.respostas.length, partida?.config.modoId])
+
+  useEffect(() => {
     if (!partida || partida.pausadaEm !== null || !obterRegrasDoModo(partida.config.modoId).temTempo) return
     const id = window.setInterval(() => setTick(Date.now()), 100)
     return () => window.clearInterval(id)
@@ -41,7 +59,7 @@ export function Jogo() {
   const sincronizar = (estado = partida) => {
     if (!estado) return
     const resultado = concluirPartida(estado, PERGUNTAS)
-    if (resultado) { setPartida(null); navigate('/resultado', { replace: true }) }
+    if (resultado) { navigate('/resultado', { replace: true }) }
     else setPartida({ ...estado, respostas: [...estado.respostas], questoes: [...estado.questoes], convidado: estado.convidado ? { ...estado.convidado, respostas: [...estado.convidado.respostas] } : null })
   }
   useEffect(() => {
@@ -62,13 +80,21 @@ export function Jogo() {
   const sair = () => { abandonarPartida(); navigate('/explorar') }
 
   return <main className="jogo" aria-label="Partida de quiz">
-    <header className="jogo__topo"><Link to="/explorar" onClick={(evento) => { evento.preventDefault(); setConfirmarSaida(true) }} aria-label="Sair da partida"><Icone nome="arrow-left" /></Link><span>{obterNomeDoModo(partida.config.modoId)}{partida.config.treino ? ' · Treino' : ''}</span><strong>{partida.indice + 1}<small>/{partida.questoes.length}</small></strong>{regras.permitePausa && <button type="button" className="botao-icone" onClick={() => { pausarPartida(partida); setPartida({ ...partida }) }} aria-label="Pausar"><Icone nome="pause" /></button>}</header>
+    <header className="jogo__topo"><Link to="/explorar" onClick={(evento) => { evento.preventDefault(); setConfirmarSaida(true) }} aria-label="Sair da partida"><Icone nome="arrow-left" /></Link><span>{obterNomeDoModo(partida.config.modoId)}{partida.config.treino ? ' · Treino' : ''}</span><strong>{partida.indice + 1}<small>/{partida.questoes.length}</small></strong></header>
     <div className="jogo__segmentos" aria-label={`Pergunta ${partida.indice + 1} de ${partida.questoes.length}`}>{partida.questoes.map((questao, indice) => <span key={questao.id} className={indice < partida.indice ? partida.respostas[indice]?.acertou ? 'feito-certo' : 'feito-erro' : indice === partida.indice ? 'atual' : ''} />)}</div>
     {regras.temTempo && <div className="jogo__tempo" role="progressbar" aria-label="Tempo restante" aria-valuenow={Math.ceil((restante ?? 0) / 1000)} aria-valuemin={0} aria-valuemax={20} style={{ transform: `scaleX(${Math.max(0, (restante ?? 0) / 20000)})` }} />}
-    {partida.pausadaEm !== null ? <section className="jogo__pausa"><Icone nome="pause" tamanho={38} /><p className="rotulo">PAUSA</p><h1>Respira. A partida espera.</h1><button className="botao botao--primario" onClick={() => { retomarPartida(partida); setPartida({ ...partida }) }}>Continuar</button><button className="link-acao" onClick={() => setConfirmarSaida(true)}>Abandonar partida</button></section> : <div className="jogo__grade">
+    <div className="jogo__grade">
       <section className="jogo__pergunta"><p className="rotulo">{atual.pergunta.categoria.replaceAll('-', ' ')} · {atual.pergunta.dificuldade}</p><h1 tabIndex={-1}>{atual.pergunta.enunciado}</h1><div className="jogo__pontos"><span>{partida.pontuacao.toLocaleString('pt-BR')} pontos</span><span>Combo {partida.combo}</span></div>{regras.temTempo && <span className="sr-only" aria-live="polite">{Math.ceil((restante ?? 0) / 1000) === 5 ? 'Restam 5 segundos' : ''}</span>}</section>
-      <section className="jogo__respostas" aria-label="Alternativas">{partida.config.modoId === 'duelo' && vez === 1 && !convidadoPronto && <div className="jogo__passe"><Icone nome="users" tamanho={30} /><h2>Passe o aparelho para o convidado</h2><p>A resposta do jogador está escondida.</p><button className="botao botao--primario" onClick={() => setConvidadoPronto(true)}>Convidado, responder</button></div>}{partida.config.modoId === 'duelo' && vez === null && <div className="jogo__revelacao"><p>Jogador: {partida.respostas[partida.indice]?.acertou ? 'acertou' : 'errou'} · Convidado: {partida.convidado?.respostas[partida.indice]?.acertou ? 'acertou' : 'errou'}</p><button className="botao botao--primario" onClick={avancarOuTerminar}>Próxima pergunta</button></div>}{(vez === 0 || (partida.config.modoId === 'duelo' && vez === 1 && convidadoPronto)) && atual.alternativas.map((alternativa, indice) => <button type="button" key={alternativa.indiceOriginal} className="jogo__opcao" onClick={() => { responderPosicao(indice); if (partida.config.modoId === 'duelo') setConvidadoPronto(false) }}><span>{String.fromCharCode(65 + indice)}</span>{alternativa.texto}</button>)}{resposta && partida.config.modoId !== 'duelo' && <div className="jogo__explicacao"><p>{resposta.acertou ? 'Boa! Resposta certa.' : resposta.motivo === 'pulou' ? 'Pergunta pulada.' : 'Quase. Veja a resposta certa.'}</p><strong>{atual.pergunta.alternativas[atual.pergunta.correta]}</strong><p>{atual.pergunta.explicacao}</p><button className="botao botao--primario" onClick={avancarOuTerminar}>{partida.indice + 1 === partida.questoes.length ? 'Ver resultado' : 'Próxima pergunta'}</button></div>}{regras.permitePular && vez === 0 && !resposta && <button className="link-acao" disabled={!calcularPulosRestantes(partida)} onClick={() => { pular(partida, PERGUNTAS); setPartida({ ...partida, respostas: [...partida.respostas] }) }}>Pular pergunta ({calcularPulosRestantes(partida)} restantes)</button>}</section>
-    </div>}
-    {confirmarSaida && <div className="drawer-fundo"><section className="confirmar-saida" role="dialog" aria-modal="true" aria-labelledby="sair-titulo"><h2 id="sair-titulo">Abandonar esta partida?</h2><p>Seu progresso desta rodada não entra no histórico nem rende XP.</p><button className="botao botao--primario" onClick={sair}>Abandonar</button><button className="botao botao--secundario" onClick={() => setConfirmarSaida(false)}>Continuar jogando</button></section></div>}
+      <section className="jogo__respostas" aria-label="Alternativas">{partida.config.modoId === 'duelo' && vez === 1 && !convidadoPronto && <div className="jogo__passe"><Icone nome="users" tamanho={30} /><h2>Passe o aparelho para o convidado</h2><p>A resposta do jogador está escondida.</p><button className="botao botao--primario" onClick={() => setConvidadoPronto(true)}>Convidado, responder</button></div>}{partida.config.modoId === 'duelo' && vez === null && <div className="jogo__revelacao"><p>Jogador: {partida.respostas[partida.indice]?.acertou ? 'acertou' : 'errou'} · Convidado: {partida.convidado?.respostas[partida.indice]?.acertou ? 'acertou' : 'errou'}</p><button className="botao botao--primario" onClick={avancarOuTerminar}>Próxima pergunta</button></div>}{(vez === 0 || (partida.config.modoId !== 'duelo' && Boolean(resposta)) || (partida.config.modoId === 'duelo' && vez === 1 && convidadoPronto)) && atual.alternativas.map((alternativa, indice) => { const alternativaCorreta = alternativa.indiceOriginal === atual.pergunta.correta; const alternativaEscolhida = alternativa.indiceOriginal === resposta?.escolhida; 
+      const estado = resposta
+      ? alternativaCorreta
+      ? ' jogo__opcao--certa'
+      : alternativaEscolhida
+      ? ' jogo__opcao--errada'
+      : ''
+     : '';
+ return <button type="button" key={alternativa.indiceOriginal} className={`jogo__opcao${estado}`} disabled={Boolean(resposta)} onClick={() => { responderPosicao(indice); if (partida.config.modoId === 'duelo') setConvidadoPronto(false) }}><span>{String.fromCharCode(65 + indice)}</span>{alternativa.texto}</button>})}{resposta && partida.config.modoId !== 'duelo' && <div ref={feedbackRef} className={`jogo__explicacao jogo__explicacao--${resposta.acertou ? 'certa' : 'errada'}`}><p className="jogo__feedback-estado"><Icone nome={resposta.acertou ? 'check' : 'x'} tamanho={19} />{resposta.acertou ? 'Boa! Resposta certa.' : resposta.motivo === 'tempo' ? 'O tempo acabou. Veja a resposta certa.' : 'Quase. Veja a resposta certa.'}</p><strong>{atual.pergunta.alternativas[atual.pergunta.correta]}</strong><p>{atual.pergunta.explicacao}</p><button className="botao botao--primario" onClick={avancarOuTerminar}>{partida.indice + 1 === partida.questoes.length ? 'Ver resultado' : 'Próxima pergunta'}</button></div>}</section>
+    </div>
+    {confirmarSaida && <div className="drawer-fundo"><section className="confirmar-saida" role="dialog" aria-modal="true" aria-labelledby="sair-titulo"><p className="rotulo">PARTIDA EM ANDAMENTO</p><h2 id="sair-titulo">Abandonar esta partida?</h2><p className="confirmar-saida__mensagem">Seu progresso desta rodada não entra no histórico nem rende XP.</p><div className="confirmar-saida__acoes"><button className="botao botao--secundario confirmar-saida__abandonar" onClick={sair}>Abandonar</button><button className="botao botao--primario" onClick={() => setConfirmarSaida(false)}>Continuar jogando</button></div></section></div>}
   </main>
 }
