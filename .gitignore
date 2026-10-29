@@ -1,5 +1,13 @@
+# Dependências locais e saídas de build
 node_modules/
 dist/
 coverage/
+.vite/
 *.tsbuildinfo
+
+# Arquivos temporários de sistema e ambiente
 .DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
